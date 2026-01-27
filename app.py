@@ -1906,6 +1906,48 @@ def health():
     """
 
 
+@app.route('/emergency-setup')
+def emergency_setup():
+    """Emergency table creation"""
+    try:
+        # Create tables individually
+        with db.engine.begin() as conn:
+            conn.execute(db.text("""
+                CREATE TABLE IF NOT EXISTS "user" (
+                    id SERIAL PRIMARY KEY,
+                    full_name VARCHAR(100) NOT NULL,
+                    id_number VARCHAR(13) UNIQUE NOT NULL,
+                    email VARCHAR(120) UNIQUE NOT NULL,
+                    password_hash VARCHAR(200) NOT NULL,
+                    phone_number VARCHAR(15) NOT NULL,
+                    date_of_birth DATE,
+                    is_active BOOLEAN DEFAULT TRUE,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+            """))
+            
+            conn.execute(db.text("""
+                CREATE TABLE IF NOT EXISTS account (
+                    id SERIAL PRIMARY KEY,
+                    account_number VARCHAR(10) UNIQUE NOT NULL,
+                    account_type VARCHAR(20) DEFAULT 'MAIN',
+                    balance FLOAT DEFAULT 0.0,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    user_id INTEGER REFERENCES "user"(id)
+                )
+            """))
+        
+        create_default_admin()
+        
+        return """
+        <h1>✅ Emergency Setup Complete!</h1>
+        <p>Tables created manually</p>
+        <p><a href="/startup-status">Check status</a></p>
+        <p><a href="/register">Try registration</a></p>
+        """
+    except Exception as e:
+        return f"<h1>❌ Emergency Setup Failed</h1><p>{str(e)}</p>"
+
 
 # ==================== APPLICATION STARTUP ====================
 
@@ -1931,30 +1973,30 @@ def create_default_admin():
     except Exception as e:
         print(f"⚠️  Could not create admin (database might not be ready): {e}")
 
+
 def init_app():
-    """Initialize the application and database with detailed error logging"""
-    print("🚀 Starting database initialization...")
-    
+    """Initialize the application and database"""
     with app.app_context():
         try:
-            print("📊 Attempting to create database tables...")
+            # Import all models to ensure they're registered with SQLAlchemy
+            from app import User, Account, Transaction, Goal, BillPayment, Admin, Notification, BankRevenue
+            
+            print("🔧 Models imported successfully")
+            print("📊 Creating database tables...")
             db.create_all()
-            print("✅ Database tables created successfully!")
+            print("✅ Database tables created!")
             
             print("👤 Creating default admin...")
             create_default_admin()
             
             print("🔍 Testing database connection...")
             user_count = User.query.count()
-            print(f"✅ Database connection working. Total users: {user_count}")
+            print(f"✅ Database working! Users: {user_count}")
             
         except Exception as e:
-            print(f"❌ Database initialization failed: {str(e)}")
-            print(f"❌ Error type: {type(e).__name__}")
+            print(f"❌ Database init failed: {str(e)}")
             import traceback
-            print(f"❌ Full traceback: {traceback.format_exc()}")
-            # Don't re-raise - let the app continue so we can see the error page
-            
+            print(f"❌ Traceback: {traceback.format_exc()}")           
             
 # Initialize the app when this file is imported
 init_app()
