@@ -1837,36 +1837,73 @@ def debug_database():
     
     
 
-@app.route('/setup-database')
-def setup_database():
-    """Force database setup"""
+
+
+@app.route('/startup-status')
+def startup_status():
+    """Check if the app started successfully"""
     try:
-        db.create_all()
-        create_default_admin()
+        # Try to access database
+        user_count = User.query.count()
+        admin_count = Admin.query.count()
         
-        # Test registration
-        test_user = User(
-            full_name="Test User",
-            id_number="1234567890123",
-            email="test@example.com",
-            password_hash="test123",
-            phone_number="0812345678",
-            is_active=True
-        )
-        db.session.add(test_user)
-        db.session.commit()
+        return f"""
+        <h1>✅ App Running Successfully!</h1>
+        <p>Users in database: {user_count}</p>
+        <p>Admins in database: {admin_count}</p>
+        <p><a href="/register">Try Registration</a></p>
+        <p><a href="/">Homepage</a></p>
+        """
+    except Exception as e:
+        return f"""
+        <h1>❌ App Startup Failed</h1>
+        <p>Error: {str(e)}</p>
+        <p>Error type: {type(e).__name__}</p>
+        <p><a href="/force-setup">Click here to force database setup</a></p>
+        """
+
+
+@app.route('/force-setup')
+def force_setup():
+    """Force database setup with detailed error reporting"""
+    try:
+        print("🔧 Force setup starting...")
+        db.create_all()
+        print("✅ Tables created")
+        
+        create_default_admin()
+        print("✅ Admin created")
         
         return """
-        <h1>✅ Database Setup Complete!</h1>
-        <p>Tables created successfully</p>
-        <p>Admin user created: admin@nkunabank.co.za / Admin@123</p>
-        <p>Test user created: test@example.com</p>
-        <p><a href="/">Go to homepage</a></p>
+        <h1>✅ Force Setup Complete!</h1>
+        <p>Database tables created</p>
+        <p>Admin user created</p>
+        <p><a href="/startup-status">Check status</a></p>
         <p><a href="/register">Try registration</a></p>
         """
     except Exception as e:
-        return f"<h1>❌ Setup Error</h1><p>Error: {str(e)}</p><p><a href='/debug-database'>Debug info</a></p>"    
-    
+        error_details = str(e).replace('<', '&lt;').replace('>', '&gt;')
+        return f"""
+        <h1>❌ Force Setup Failed</h1>
+        <p><strong>Error:</strong> {error_details}</p>
+        <p><strong>Error type:</strong> {type(e).__name__}</p>
+        <hr>
+        <h3>Quick Fix:</h3>
+        <p>1. Check if your DATABASE_URL is correct in Render settings</p>
+        <p>2. Make sure all model classes are defined before db.create_all()</p>
+        <p>3. Try removing and re-adding the database</p>
+        """
+
+
+@app.route('/health')
+def health():
+    """Basic health check - no database access"""
+    return """
+    <h1>✅ App is responding!</h1>
+    <p>The Flask app is running but database might have issues.</p>
+    <p><a href="/startup-status">Check database status</a></p>
+    <p><a href="/force-setup">Force database setup</a></p>
+    """
 
 
 
@@ -1895,24 +1932,30 @@ def create_default_admin():
         print(f"⚠️  Could not create admin (database might not be ready): {e}")
 
 def init_app():
-    """Initialize the application and database"""
+    """Initialize the application and database with detailed error logging"""
+    print("🚀 Starting database initialization...")
+    
     with app.app_context():
         try:
-            # Try to create all tables
+            print("📊 Attempting to create database tables...")
             db.create_all()
             print("✅ Database tables created successfully!")
             
-            # Create default admin
+            print("👤 Creating default admin...")
             create_default_admin()
             
-            # Check if we can query users (test connection)
+            print("🔍 Testing database connection...")
             user_count = User.query.count()
             print(f"✅ Database connection working. Total users: {user_count}")
             
         except Exception as e:
-            print(f"⚠️  Database initialization issue: {e}")
-            print("🔄 Will retry on next request...")
-
+            print(f"❌ Database initialization failed: {str(e)}")
+            print(f"❌ Error type: {type(e).__name__}")
+            import traceback
+            print(f"❌ Full traceback: {traceback.format_exc()}")
+            # Don't re-raise - let the app continue so we can see the error page
+            
+            
 # Initialize the app when this file is imported
 init_app()
 
