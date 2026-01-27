@@ -1949,6 +1949,158 @@ def emergency_setup():
         return f"<h1>❌ Emergency Setup Failed</h1><p>{str(e)}</p>"
 
 
+
+@app.route('/create-tables-now')
+def create_tables_now():
+    """Force create all tables with raw SQL"""
+    try:
+        # Raw SQL to create all tables
+        sql_commands = [
+            # User table
+            '''
+            CREATE TABLE IF NOT EXISTS "user" (
+                id SERIAL PRIMARY KEY,
+                full_name VARCHAR(100) NOT NULL,
+                id_number VARCHAR(13) UNIQUE NOT NULL,
+                email VARCHAR(120) UNIQUE NOT NULL,
+                password_hash VARCHAR(200) NOT NULL,
+                phone_number VARCHAR(15) NOT NULL,
+                date_of_birth DATE,
+                is_active BOOLEAN DEFAULT TRUE,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+            ''',
+            
+            # Account table
+            '''
+            CREATE TABLE IF NOT EXISTS account (
+                id SERIAL PRIMARY KEY,
+                account_number VARCHAR(10) UNIQUE NOT NULL,
+                account_type VARCHAR(20) DEFAULT 'MAIN',
+                balance FLOAT DEFAULT 0.0,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                user_id INTEGER REFERENCES "user"(id)
+            )
+            ''',
+            
+            # Transaction table
+            '''
+            CREATE TABLE IF NOT EXISTS transaction (
+                id SERIAL PRIMARY KEY,
+                transaction_id VARCHAR(20) UNIQUE NOT NULL,
+                from_account VARCHAR(10) NOT NULL,
+                to_account VARCHAR(10) NOT NULL,
+                amount FLOAT NOT NULL,
+                transaction_type VARCHAR(20),
+                description VARCHAR(200),
+                status VARCHAR(20) DEFAULT 'PENDING',
+                fee FLOAT DEFAULT 0.0,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                undo_deadline TIMESTAMP,
+                user_id INTEGER REFERENCES "user"(id)
+            )
+            ''',
+            
+            # Goal table
+            '''
+            CREATE TABLE IF NOT EXISTS goal (
+                id SERIAL PRIMARY KEY,
+                name VARCHAR(100) NOT NULL,
+                target_amount FLOAT NOT NULL,
+                current_amount FLOAT DEFAULT 0.0,
+                target_date DATE NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                is_active BOOLEAN DEFAULT TRUE,
+                auto_deposit BOOLEAN DEFAULT FALSE,
+                auto_deposit_amount FLOAT,
+                auto_deposit_day INTEGER,
+                user_id INTEGER REFERENCES "user"(id),
+                account_id INTEGER REFERENCES account(id)
+            )
+            ''',
+            
+            # BillPayment table
+            '''
+            CREATE TABLE IF NOT EXISTS bill_payment (
+                id SERIAL PRIMARY KEY,
+                user_id INTEGER REFERENCES "user"(id),
+                bill_type VARCHAR(50),
+                amount FLOAT NOT NULL,
+                reference_number VARCHAR(50),
+                meter_number VARCHAR(50),
+                status VARCHAR(20) DEFAULT 'PENDING',
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+            ''',
+            
+            # Admin table
+            '''
+            CREATE TABLE IF NOT EXISTS admin (
+                id SERIAL PRIMARY KEY,
+                email VARCHAR(120) UNIQUE NOT NULL,
+                password_hash VARCHAR(200) NOT NULL,
+                full_name VARCHAR(100),
+                is_super_admin BOOLEAN DEFAULT FALSE,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+            ''',
+            
+            # Notification table
+            '''
+            CREATE TABLE IF NOT EXISTS notification (
+                id SERIAL PRIMARY KEY,
+                user_id INTEGER REFERENCES "user"(id),
+                title VARCHAR(100) NOT NULL,
+                message VARCHAR(500) NOT NULL,
+                notification_type VARCHAR(20),
+                is_read BOOLEAN DEFAULT FALSE,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                expires_at TIMESTAMP
+            )
+            ''',
+            
+            # BankRevenue table
+            '''
+            CREATE TABLE IF NOT EXISTS bank_revenue (
+                id SERIAL PRIMARY KEY,
+                revenue_type VARCHAR(50),
+                amount FLOAT NOT NULL,
+                description VARCHAR(200),
+                reference_id VARCHAR(50),
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+            '''
+        ]
+        
+        # Execute each SQL command
+        with db.engine.begin() as conn:
+            for sql in sql_commands:
+                conn.execute(db.text(sql))
+        
+        # Create admin user
+        create_default_admin()
+        
+        return """
+        <h1>✅ Tables Created Successfully!</h1>
+        <p>All database tables have been created with raw SQL</p>
+        <p>Admin user created</p>
+        <hr>
+        <p><a href="/register">Try Registration Now</a></p>
+        <p><a href="/login">Try Login</a></p>
+        """
+        
+    except Exception as e:
+        return f"""
+        <h1>❌ Table Creation Failed</h1>
+        <p><strong>Error:</strong> {str(e)}</p>
+        <p><strong>Error type:</strong> {type(e).__name__}</p>
+        <hr>
+        <p>This usually means the tables already exist or there's a connection issue</p>
+        <p><a href="/">Go to Homepage</a></p>
+        """
+
+
+
 # ==================== APPLICATION STARTUP ====================
 
 
