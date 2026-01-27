@@ -1794,6 +1794,82 @@ def notification_count():
         'unread_count': unread_count
     })
 
+
+
+
+
+@app.route('/debug-database')
+def debug_database():
+    """Debug route to check database status"""
+    try:
+        # Check if tables exist
+        from sqlalchemy import inspect
+        inspector = inspect(db.engine)
+        tables = inspector.get_table_names()
+        
+        # Try to query each table
+        results = {}
+        for table_name in ['user', 'account', 'admin']:
+            try:
+                if table_name == 'user':
+                    count = User.query.count()
+                    results[table_name] = f"✅ Table exists, {count} records"
+                elif table_name == 'account':
+                    count = Account.query.count()
+                    results[table_name] = f"✅ Table exists, {count} records"
+                elif table_name == 'admin':
+                    count = Admin.query.count()
+                    results[table_name] = f"✅ Table exists, {count} records"
+            except Exception as e:
+                results[table_name] = f"❌ Error: {str(e)}"
+        
+        return f"""
+        <h1>Database Debug Info</h1>
+        <p><strong>Tables found:</strong> {tables}</p>
+        <hr>
+        <h2>Table Status:</h2>
+        {"<br>".join([f"<p><strong>{k}:</strong> {v}</p>" for k, v in results.items()])}
+        <hr>
+        <p><a href="/setup-database">Click here to force setup database</a></p>
+        """
+    except Exception as e:
+        return f"<h1>❌ Database Error</h1><p>{str(e)}</p><p><a href='/setup-database'>Try setup</a></p>"
+    
+    
+
+@app.route('/setup-database')
+def setup_database():
+    """Force database setup"""
+    try:
+        db.create_all()
+        create_default_admin()
+        
+        # Test registration
+        test_user = User(
+            full_name="Test User",
+            id_number="1234567890123",
+            email="test@example.com",
+            password_hash="test123",
+            phone_number="0812345678",
+            is_active=True
+        )
+        db.session.add(test_user)
+        db.session.commit()
+        
+        return """
+        <h1>✅ Database Setup Complete!</h1>
+        <p>Tables created successfully</p>
+        <p>Admin user created: admin@nkunabank.co.za / Admin@123</p>
+        <p>Test user created: test@example.com</p>
+        <p><a href="/">Go to homepage</a></p>
+        <p><a href="/register">Try registration</a></p>
+        """
+    except Exception as e:
+        return f"<h1>❌ Setup Error</h1><p>Error: {str(e)}</p><p><a href='/debug-database'>Debug info</a></p>"    
+    
+
+
+
 # ==================== APPLICATION STARTUP ====================
 
 
