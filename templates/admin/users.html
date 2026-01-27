@@ -1,0 +1,696 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Users - Nkuna Bank Admin{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h2 mb-1">
+                <i class="fas fa-users me-2 text-primary"></i>User Management
+            </h1>
+            <p class="text-muted mb-0">Manage all registered users and their accounts</p>
+        </div>
+        <div>
+            <a href="{{ url_for('admin_dashboard') }}" class="btn btn-outline-primary">
+                <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+            </a>
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card border-0 bg-primary bg-opacity-10">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-primary bg-opacity-25 p-3 rounded-circle me-3">
+                            <i class="fas fa-users fa-lg text-primary"></i>
+                        </div>
+                        <div>
+                            <h3 class="h2 mb-0">{{ users.total }}</h3>
+                            <p class="text-muted mb-0">Total Users</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 bg-success bg-opacity-10">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-success bg-opacity-25 p-3 rounded-circle me-3">
+                            <i class="fas fa-user-check fa-lg text-success"></i>
+                        </div>
+                        <div>
+                            <h3 class="h2 mb-0">{{ active_users_count }}</h3>
+                            <p class="text-muted mb-0">Active Users</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 bg-danger bg-opacity-10">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-danger bg-opacity-25 p-3 rounded-circle me-3">
+                            <i class="fas fa-user-slash fa-lg text-danger"></i>
+                        </div>
+                        <div>
+                            <h3 class="h2 mb-0">{{ inactive_users_count }}</h3>
+                            <p class="text-muted mb-0">Inactive Users</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 bg-info bg-opacity-10">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-info bg-opacity-25 p-3 rounded-circle me-3">
+                            <i class="fas fa-calendar-alt fa-lg text-info"></i>
+                        </div>
+                        <div>
+                            <h3 class="h2 mb-0">{{ today_users_count }}</h3>
+                            <p class="text-muted mb-0">New Today</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search and Filters -->
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body">
+            <form method="GET" action="{{ url_for('admin_users') }}" class="row g-3">
+                <div class="col-md-4">
+                    <label for="search" class="form-label">Search Users</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="search" name="search" 
+                               placeholder="Name, Email, or ID Number" value="{{ request.args.get('search', '') }}">
+                        <button class="btn btn-primary" type="submit">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <label for="status" class="form-label">Status Filter</label>
+                    <select class="form-select" id="status" name="status" onchange="this.form.submit()">
+                        <option value="">All Statuses</option>
+                        <option value="active" {% if request.args.get('status') == 'active' %}selected{% endif %}>Active</option>
+                        <option value="inactive" {% if request.args.get('status') == 'inactive' %}selected{% endif %}>Inactive</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="sort" class="form-label">Sort By</label>
+                    <select class="form-select" id="sort" name="sort" onchange="this.form.submit()">
+                        <option value="newest" {% if request.args.get('sort') == 'newest' %}selected{% endif %}>Newest First</option>
+                        <option value="oldest" {% if request.args.get('sort') == 'oldest' %}selected{% endif %}>Oldest First</option>
+                        <option value="name" {% if request.args.get('sort') == 'name' %}selected{% endif %}>Name A-Z</option>
+                    </select>
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <a href="{{ url_for('admin_users') }}" class="btn btn-outline-secondary w-100">
+                        <i class="fas fa-redo me-2"></i>Reset
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Users Table -->
+    <div class="card border-0 shadow-sm">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="py-3 px-4">
+                                <i class="fas fa-id-badge me-2"></i>User ID
+                            </th>
+                            <th class="py-3 px-4">
+                                <i class="fas fa-user me-2"></i>User Info
+                            </th>
+                            <th class="py-3 px-4">
+                                <i class="fas fa-id-card me-2"></i>ID Number
+                            </th>
+                            <th class="py-3 px-4">
+                                <i class="fas fa-phone me-2"></i>Contact
+                            </th>
+                            <th class="py-3 px-4">
+                                <i class="fas fa-wallet me-2"></i>Accounts
+                            </th>
+                            <th class="py-3 px-4">
+                                <i class="fas fa-calendar me-2"></i>Registered
+                            </th>
+                            <th class="py-3 px-4">
+                                <i class="fas fa-toggle-on me-2"></i>Status
+                            </th>
+                            <th class="py-3 px-4 text-end">
+                                <i class="fas fa-cogs me-2"></i>Actions
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users.items %}
+                        <tr class="align-middle">
+                            <td class="px-4">
+                                <span class="badge bg-secondary">#{{ user.id }}</span>
+                            </td>
+                            <td class="px-4">
+                                <div class="d-flex align-items-center">
+                                    <div class="bg-primary bg-opacity-10 p-2 rounded-circle me-3">
+                                        <i class="fas fa-user text-primary"></i>
+                                    </div>
+                                    <div>
+                                        <h6 class="mb-1">{{ user.full_name }}</h6>
+                                        <small class="text-muted">{{ user.email }}</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-4">
+                                <code>{{ user.id_number[:6] }} {{ user.id_number[6:10] }} {{ user.id_number[10:] }}</code>
+                                <br>
+                                <small class="text-muted">
+                                    DOB: {{ user.date_of_birth.strftime('%d %b %Y') if user.date_of_birth else 'N/A' }}
+                                </small>
+                            </td>
+                            <td class="px-4">
+                                {{ user.phone_number }}
+                                <br>
+                                <small class="text-muted">{{ user.email }}</small>
+                            </td>
+                            <td class="px-4">
+                                {% if user.accounts %}
+                                    <span class="badge bg-info me-1">{{ user.accounts|length }} accounts</span>
+                                    {% for account in user.accounts[:2] %}
+                                        <small class="d-block text-muted">{{ account.account_number }} (R{{ account.balance|format_currency }})</small>
+                                    {% endfor %}
+                                    {% if user.accounts|length > 2 %}
+                                        <small class="text-primary">+{{ user.accounts|length - 2 }} more</small>
+                                    {% endif %}
+                                {% else %}
+                                    <span class="badge bg-warning">No accounts</span>
+                                {% endif %}
+                            </td>
+                            <td class="px-4">
+                                <div class="d-flex flex-column">
+                                    <span>{{ user.created_at.strftime('%d %b %Y') }}</span>
+                                    <small class="text-muted">{{ user.created_at.strftime('%I:%M %p') }}</small>
+                                </div>
+                            </td>
+                            <td class="px-4">
+                                {% if user.is_active %}
+                                    <span class="badge bg-success">
+                                        <i class="fas fa-check-circle me-1"></i>Active
+                                    </span>
+                                {% else %}
+                                    <span class="badge bg-danger">
+                                        <i class="fas fa-times-circle me-1"></i>Inactive
+                                    </span>
+                                {% endif %}
+                            </td>
+                            <td class="px-4 text-end">
+                                <div class="btn-group" role="group">
+                                    <button type="button" class="btn btn-sm btn-outline-primary" 
+                                            data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i class="fas fa-ellipsis-v"></i>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end">
+                                        <li>
+                                            <a class="dropdown-item" href="#" data-bs-toggle="modal" 
+                                               data-bs-target="#userDetailsModal{{ user.id }}">
+                                                <i class="fas fa-eye me-2"></i>View Details
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" href="#" onclick="toggleUserStatus({{ user.id }})">
+                                                <i class="fas fa-power-off me-2"></i>
+                                                {% if user.is_active %}
+                                                    Deactivate User
+                                                {% else %}
+                                                    Activate User
+                                                {% endif %}
+                                            </a>
+                                        </li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li>
+                                            <a class="dropdown-item text-danger" href="#" 
+                                               onclick="confirmDelete({{ user.id }}, '{{ user.full_name }}')">
+                                                <i class="fas fa-trash me-2"></i>Delete User
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <!-- User Details Modal -->
+                        <div class="modal fade" id="userDetailsModal{{ user.id }}" tabindex="-1">
+                            <div class="modal-dialog modal-lg">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">
+                                            <i class="fas fa-user me-2"></i>User Details: {{ user.full_name }}
+                                        </h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <h6 class="mb-3">Personal Information</h6>
+                                                <table class="table table-sm">
+                                                    <tr>
+                                                        <th width="40%">Full Name:</th>
+                                                        <td>{{ user.full_name }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>ID Number:</th>
+                                                        <td>{{ user.id_number }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Date of Birth:</th>
+                                                        <td>{{ user.date_of_birth.strftime('%d %B %Y') if user.date_of_birth else 'N/A' }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Age:</th>
+                                                        <td>
+                                                            {% if user.date_of_birth %}
+                                                                {{ ((current_date - user.date_of_birth).days // 365) }} years
+                                                            {% else %}
+                                                                N/A
+                                                            {% endif %}
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <h6 class="mb-3">Contact Information</h6>
+                                                <table class="table table-sm">
+                                                    <tr>
+                                                        <th width="40%">Email:</th>
+                                                        <td>{{ user.email }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Phone:</th>
+                                                        <td>{{ user.phone_number }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Status:</th>
+                                                        <td>
+                                                            {% if user.is_active %}
+                                                                <span class="badge bg-success">Active</span>
+                                                            {% else %}
+                                                                <span class="badge bg-danger">Inactive</span>
+                                                            {% endif %}
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Registered:</th>
+                                                        <td>{{ user.created_at.strftime('%d %B %Y at %I:%M %p') }}</td>
+                                                    </tr>
+                                                </table>
+                                            </div>
+                                        </div>
+
+                                        <div class="mt-4">
+                                            <h6 class="mb-3">User Accounts</h6>
+                                            {% if user.accounts %}
+                                                <div class="table-responsive">
+                                                    <table class="table table-sm">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Account Number</th>
+                                                                <th>Type</th>
+                                                                <th>Balance</th>
+                                                                <th>Created</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            {% for account in user.accounts %}
+                                                            <tr>
+                                                                <td>{{ account.account_number }}</td>
+                                                                <td>
+                                                                    <span class="badge {% if account.account_type == 'MAIN' %}bg-primary{% else %}bg-info{% endif %}">
+                                                                        {{ account.account_type }}
+                                                                    </span>
+                                                                </td>
+                                                                <td>R{{ account.balance|format_currency }}</td>
+                                                                <td>{{ account.created_at.strftime('%d %b %Y') }}</td>
+                                                            </tr>
+                                                            {% endfor %}
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            {% else %}
+                                                <div class="alert alert-warning">
+                                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                                    No accounts found for this user.
+                                                </div>
+                                            {% endif %}
+                                        </div>
+
+                                        <div class="mt-4">
+                                            <h6 class="mb-3">Statistics</h6>
+                                            <div class="row">
+                                                <div class="col-md-4">
+                                                    <div class="card bg-light">
+                                                        <div class="card-body text-center">
+                                                            <h3 class="h4 mb-1">{{ user.transactions|length }}</h3>
+                                                            <p class="text-muted mb-0">Transactions</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <div class="card bg-light">
+                                                        <div class="card-body text-center">
+                                                            <h3 class="h4 mb-1">{{ user.goals|length }}</h3>
+                                                            <p class="text-muted mb-0">Goals</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <div class="card bg-light">
+                                                        <div class="card-body text-center">
+                                                            <h3 class="h4 mb-1">{{ user.bill_payments|length }}</h3>
+                                                            <p class="text-muted mb-0">Bill Payments</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                        <button type="button" class="btn btn-primary" onclick="toggleUserStatus({{ user.id }})">
+                                            {% if user.is_active %}
+                                                <i class="fas fa-user-slash me-2"></i>Deactivate User
+                                            {% else %}
+                                                <i class="fas fa-user-check me-2"></i>Activate User
+                                            {% endif %}
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pagination -->
+    {% if users.pages > 1 %}
+    <div class="d-flex justify-content-between align-items-center mt-4">
+        <div>
+            <p class="text-muted mb-0">
+                Showing {{ users.items|length }} of {{ users.total }} users
+            </p>
+        </div>
+        <nav aria-label="User pagination">
+            <ul class="pagination mb-0">
+                {% if users.has_prev %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('admin_users', page=users.prev_num, search=request.args.get('search', ''), status=request.args.get('status', ''), sort=request.args.get('sort', '')) }}">
+                            <i class="fas fa-chevron-left"></i>
+                        </a>
+                    </li>
+                {% else %}
+                    <li class="page-item disabled">
+                        <span class="page-link"><i class="fas fa-chevron-left"></i></span>
+                    </li>
+                {% endif %}
+
+                {% for page_num in users.iter_pages(left_edge=2, left_current=2, right_current=3, right_edge=2) %}
+                    {% if page_num %}
+                        {% if page_num == users.page %}
+                            <li class="page-item active">
+                                <span class="page-link">{{ page_num }}</span>
+                            </li>
+                        {% else %}
+                            <li class="page-item">
+                                <a class="page-link" href="{{ url_for('admin_users', page=page_num, search=request.args.get('search', ''), status=request.args.get('status', ''), sort=request.args.get('sort', '')) }}">
+                                    {{ page_num }}
+                                </a>
+                            </li>
+                        {% endif %}
+                    {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link">...</span>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+
+                {% if users.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('admin_users', page=users.next_num, search=request.args.get('search', ''), status=request.args.get('status', ''), sort=request.args.get('sort', '')) }}">
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                    </li>
+                {% else %}
+                    <li class="page-item disabled">
+                        <span class="page-link"><i class="fas fa-chevron-right"></i></span>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteConfirmationModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-danger">
+                    <i class="fas fa-exclamation-triangle me-2"></i>Confirm Delete
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete user <strong id="deleteUserName"></strong>?</p>
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-circle me-2"></i>
+                    <strong>Warning:</strong> This action cannot be undone. All user data including accounts, transactions, and goals will be permanently deleted.
+                </div>
+                <p class="text-muted">Consider deactivating the user instead to preserve data.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteBtn">
+                    <i class="fas fa-trash me-2"></i>Delete Permanently
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Toggle user status
+    function toggleUserStatus(userId) {
+        if (confirm('Are you sure you want to change this user\'s status?')) {
+            fetch(`/admin/users/${userId}/toggle`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showToast('User status updated successfully', 'success');
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1500);
+                } else {
+                    showToast(data.message || 'Failed to update user status', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showToast('An error occurred', 'error');
+            });
+        }
+    }
+
+    // Confirm delete user
+    let userIdToDelete = null;
+    
+    function confirmDelete(userId, userName) {
+        userIdToDelete = userId;
+        document.getElementById('deleteUserName').textContent = userName;
+        const modal = new bootstrap.Modal(document.getElementById('deleteConfirmationModal'));
+        modal.show();
+    }
+
+    document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
+        if (userIdToDelete) {
+            // Note: You need to implement the delete route in your app.py
+            // For now, we'll just show a message that this feature isn't implemented
+            const modal = bootstrap.Modal.getInstance(document.getElementById('deleteConfirmationModal'));
+            modal.hide();
+            showToast('Delete user functionality requires backend implementation', 'info');
+        }
+    });
+
+    // Toast notification function
+    function showToast(message, type = 'info') {
+        const toastContainer = document.getElementById('toastContainer') || createToastContainer();
+        
+        const toastId = 'toast-' + Date.now();
+        const toastHtml = `
+            <div id="${toastId}" class="toast align-items-center border-0 ${type === 'success' ? 'bg-success' : type === 'error' ? 'bg-danger' : 'bg-info'} text-white" role="alert">
+                <div class="d-flex">
+                    <div class="toast-body">
+                        <i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle'} me-2"></i>
+                        ${message}
+                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                </div>
+            </div>
+        `;
+        
+        toastContainer.insertAdjacentHTML('beforeend', toastHtml);
+        const toast = new bootstrap.Toast(document.getElementById(toastId));
+        toast.show();
+        
+        // Remove toast after it's hidden
+        document.getElementById(toastId).addEventListener('hidden.bs.toast', function () {
+            this.remove();
+        });
+    }
+
+    function createToastContainer() {
+        const container = document.createElement('div');
+        container.id = 'toastContainer';
+        container.className = 'toast-container position-fixed top-0 end-0 p-3';
+        container.style.zIndex = '1055';
+        document.body.appendChild(container);
+        return container;
+    }
+
+    // Export users data (CSV)
+    function exportUsers() {
+        const searchParams = new URLSearchParams({
+            search: '{{ request.args.get("search", "") }}',
+            status: '{{ request.args.get("status", "") }}',
+            sort: '{{ request.args.get("sort", "") }}',
+            export: 'csv'
+        });
+        
+        window.location.href = `/admin/users/export?${searchParams.toString()}`;
+    }
+
+    // Initialize tooltips
+    document.addEventListener('DOMContentLoaded', function() {
+        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+    });
+</script>
+
+<style>
+    .table-hover tbody tr:hover {
+        background-color: rgba(0, 102, 204, 0.05);
+        transform: translateX(4px);
+        transition: all 0.2s ease;
+    }
+    
+    .table th {
+        font-weight: 600;
+        color: var(--primary-blue);
+        border-bottom: 2px solid var(--primary-blue);
+    }
+    
+    .badge {
+        padding: 0.5em 0.8em;
+        font-weight: 500;
+    }
+    
+    .dropdown-menu {
+        border-radius: 10px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+        border: 1px solid rgba(0, 0, 0, 0.05);
+    }
+    
+    .dropdown-item {
+        padding: 0.5rem 1rem;
+        border-radius: 5px;
+        margin: 0.1rem 0.5rem;
+        width: auto;
+    }
+    
+    .dropdown-item:hover {
+        background-color: var(--light-blue);
+    }
+    
+    .page-link {
+        border-radius: 8px;
+        margin: 0 3px;
+        border: 1px solid #dee2e6;
+        color: var(--primary-blue);
+    }
+    
+    .page-item.active .page-link {
+        background-color: var(--primary-blue);
+        border-color: var(--primary-blue);
+    }
+    
+    .modal-content {
+        border-radius: 15px;
+        border: none;
+    }
+    
+    .modal-header {
+        background: linear-gradient(135deg, var(--primary-blue) 0%, var(--dark-blue) 100%);
+        color: white;
+        border-radius: 15px 15px 0 0;
+    }
+    
+    .table-sm th, .table-sm td {
+        padding: 0.5rem;
+    }
+    
+    @media (max-width: 768px) {
+        .table-responsive {
+            border: 0;
+        }
+        
+        .table thead {
+            display: none;
+        }
+        
+        .table tr {
+            display: block;
+            margin-bottom: 1rem;
+            border: 1px solid #dee2e6;
+            border-radius: 10px;
+        }
+        
+        .table td {
+            display: block;
+            text-align: right;
+            padding: 0.5rem 1rem;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .table td::before {
+            content: attr(data-label);
+            float: left;
+            font-weight: bold;
+            color: var(--primary-blue);
+        }
+        
+        .table td:last-child {
+            border-bottom: 0;
+        }
+    }
+</style>
+{% endblock %}

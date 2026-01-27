@@ -1,0 +1,393 @@
+{% extends "base.html" %}
+
+{% block title %}Login - Nkuna Bank{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card border-0 shadow-lg overflow-hidden">
+                <div class="row g-0">
+                    <!-- Left Side - Benefits -->
+                    <div class="col-lg-5 d-none d-lg-block">
+                        <div class="bg-primary text-white h-100 p-4 p-md-5">
+                            <div class="h-100 d-flex flex-column justify-content-center">
+                                <div class="text-center mb-5">
+                                    <i class="fas fa-university fa-4x mb-4 text-white-50"></i>
+                                    <h2 class="h3 mb-3">Welcome Back</h2>
+                                    <p class="opacity-75">Secure access to your Nkuna Bank account</p>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <div class="bg-white bg-opacity-25 p-2 rounded-circle me-3">
+                                            <i class="fas fa-shield-alt text-white"></i>
+                                        </div>
+                                        <div>
+                                            <h5 class="h6 mb-1">Secure Login</h5>
+                                            <p class="small opacity-75 mb-0">256-bit encryption protects your data</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="d-flex align-items-center mb-3">
+                                        <div class="bg-white bg-opacity-25 p-2 rounded-circle me-3">
+                                            <i class="fas fa-bell text-white"></i>
+                                        </div>
+                                        <div>
+                                            <h5 class="h6 mb-1">Real-time Notifications</h5>
+                                            <p class="small opacity-75 mb-0">Stay updated on your account activity</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="d-flex align-items-center">
+                                        <div class="bg-white bg-opacity-25 p-2 rounded-circle me-3">
+                                            <i class="fas fa-chart-line text-white"></i>
+                                        </div>
+                                        <div>
+                                            <h5 class="h6 mb-1">Smart Dashboard</h5>
+                                            <p class="small opacity-75 mb-0">Track your finances in real-time</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="mt-auto">
+                                    <div class="card bg-white bg-opacity-10 border-0">
+                                        <div class="card-body p-3">
+                                            <h5 class="h6 mb-2">Need Help?</h5>
+                                            <p class="small mb-2 opacity-75">Contact our support team</p>
+                                            <a href="tel:0860111222" class="text-white text-decoration-none">
+                                                <i class="fas fa-phone me-2"></i>0860 111 222
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Right Side - Login Form -->
+                    <div class="col-lg-7">
+                        <div class="card-body p-4 p-md-5">
+                            <div class="text-center mb-4">
+                                <a href="{{ url_for('index') }}" class="d-inline-block mb-3">
+                                    <i class="fas fa-university fa-2x text-primary"></i>
+                                </a>
+                                <h2 class="h3 mb-3">Login to Your Account</h2>
+                                <p class="text-muted">Access your secure banking dashboard</p>
+                            </div>
+                            
+                            <form method="POST" action="{{ url_for('login') }}">
+                                {{ form.hidden_tag() }}
+                                
+                                <!-- Email -->
+                                <div class="mb-4">
+                                    <label for="{{ form.email.id }}" class="form-label">
+                                        <i class="fas fa-envelope me-2 text-primary"></i>Email Address
+                                    </label>
+                                    <div class="input-group">
+                                        {{ form.email(class="form-control form-control-lg", placeholder="your.email@example.com") }}
+                                        <span class="input-group-text bg-light">
+                                            <i class="fas fa-at text-primary"></i>
+                                        </span>
+                                    </div>
+                                    {% if form.email.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {% for error in form.email.errors %}
+                                                <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <!-- Password -->
+                                <div class="mb-4">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <label for="{{ form.password.id }}" class="form-label mb-0">
+                                            <i class="fas fa-lock me-2 text-primary"></i>Password
+                                        </label>
+                                        <a href="#forgot-password" class="text-decoration-none small text-primary">
+                                            <i class="fas fa-key me-1"></i>Forgot Password?
+                                        </a>
+                                    </div>
+                                    <div class="input-group">
+                                        {{ form.password(class="form-control form-control-lg", placeholder="Enter your password", id="password") }}
+                                        <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                    </div>
+                                    {% if form.password.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {% for error in form.password.errors %}
+                                                <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <!-- Remember Me -->
+                                <div class="mb-4">
+                                    <div class="form-check">
+                                        {{ form.remember(class="form-check-input") }}
+                                        <label class="form-check-label" for="{{ form.remember.id }}">
+                                            Remember me on this device
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <!-- Submit Button -->
+                                <div class="d-grid mb-4">
+                                    {{ form.submit(class="btn btn-primary btn-lg", value="Login to Dashboard") }}
+                                </div>
+                                
+                               
+                                <!-- Divider -->
+                                <div class="position-relative my-4">
+                                    <hr>
+                                    <div class="position-absolute top-50 start-50 translate-middle bg-white px-3">
+                                        <span class="text-muted">Or continue with</span>
+                                    </div>
+                                </div>
+                                
+                                <!-- Alternative Actions -->
+                                <!-- Alternative Actions -->
+                                <div class="d-grid gap-3">
+    <a href="{{ url_for('register') }}" class="btn btn-outline-primary btn-lg">
+        <i class="fas fa-user-plus me-2"></i>Create New Account
+    </a>
+    
+    <a href="{{ url_for('admin_login') }}" class="btn btn-outline-warning btn-lg">
+        <i class="fas fa-user-shield me-2"></i>Admin Login
+    </a>
+    
+    <a href="{{ url_for('index') }}" class="btn btn-outline-secondary btn-lg">
+        <i class="fas fa-home me-2"></i>Return to Home
+    </a>
+</div>
+                            </form>
+                            
+                            <!-- Security Tips -->
+                            <div class="mt-5">
+                                <h6 class="mb-3">
+                                    <i class="fas fa-shield-alt me-2 text-primary"></i>Security Tips
+                                </h6>
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <div class="d-flex">
+                                            <i class="fas fa-check-circle text-success me-2 mt-1"></i>
+                                            <div>
+                                                <small class="text-muted">Always check for the lock icon in your browser</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="d-flex">
+                                            <i class="fas fa-check-circle text-success me-2 mt-1"></i>
+                                            <div>
+                                                <small class="text-muted">Never share your password with anyone</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="d-flex">
+                                            <i class="fas fa-check-circle text-success me-2 mt-1"></i>
+                                            <div>
+                                                <small class="text-muted">Log out when using public computers</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="d-flex">
+                                            <i class="fas fa-check-circle text-success me-2 mt-1"></i>
+                                            <div>
+                                                <small class="text-muted">Use different passwords for different accounts</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Quick Stats -->
+            <div class="row g-3 mt-4">
+                <div class="col-md-3">
+                    <div class="card border-0 bg-primary bg-opacity-10">
+                        <div class="card-body text-center">
+                            <h3 class="h2 mb-1 text-primary">24/7</h3>
+                            <p class="small text-muted mb-0">Online Access</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card border-0 bg-success bg-opacity-10">
+                        <div class="card-body text-center">
+                            <h3 class="h2 mb-1 text-success">256-bit</h3>
+                            <p class="small text-muted mb-0">Encryption</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card border-0 bg-warning bg-opacity-10">
+                        <div class="card-body text-center">
+                            <h3 class="h2 mb-1 text-warning">99.9%</h3>
+                            <p class="small text-muted mb-0">Uptime</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card border-0 bg-info bg-opacity-10">
+                        <div class="card-body text-center">
+                            <h3 class="h2 mb-1 text-info">Instant</h3>
+                            <p class="small text-muted mb-0">Transfers</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Forgot Password Modal -->
+<div class="modal fade" id="forgotPasswordModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-key me-2"></i>Reset Your Password
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p class="text-muted mb-4">
+                    Please contact our support team to reset your password. We'll verify your identity and help you regain access to your account.
+                </p>
+                <div class="alert alert-info">
+                    <div class="d-flex">
+                        <i class="fas fa-headset me-3"></i>
+                        <div>
+                            <strong>Contact Support</strong>
+                            <p class="mb-1">Email: support@nkunabank.co.za</p>
+                            <p class="mb-0">Phone: 0860 111 222</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <a href="tel:0860111222" class="btn btn-primary">
+                    <i class="fas fa-phone me-2"></i>Call Support
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Toggle password visibility
+    document.getElementById('togglePassword').addEventListener('click', function() {
+        const passwordInput = document.getElementById('password');
+        const icon = this.querySelector('i');
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            icon.classList.replace('fa-eye', 'fa-eye-slash');
+        } else {
+            passwordInput.type = 'password';
+            icon.classList.replace('fa-eye-slash', 'fa-eye');
+        }
+    });
+    
+    // Forgot password modal
+    document.querySelector('a[href="#forgot-password"]').addEventListener('click', function(e) {
+        e.preventDefault();
+        const modal = new bootstrap.Modal(document.getElementById('forgotPasswordModal'));
+        modal.show();
+    });
+    
+    // Auto-focus email field
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('{{ form.email.id }}').focus();
+    });
+    
+    // Form auto-submit on Enter
+    document.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter' && e.target.tagName === 'INPUT') {
+            const form = document.querySelector('form');
+            if (!form.checkValidity()) {
+                form.reportValidity();
+            }
+        }
+    });
+    
+    // Add loading state to submit button
+    document.querySelector('form').addEventListener('submit', function() {
+        const submitBtn = this.querySelector('input[type="submit"]');
+        submitBtn.disabled = true;
+        submitBtn.value = 'Logging in...';
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Logging in...';
+    });
+</script>
+
+<style>
+    .card {
+        border-radius: 15px;
+        transition: transform 0.3s ease;
+    }
+    
+    .card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .form-control-lg {
+        padding: 0.75rem 1rem;
+        border-radius: 10px;
+        border: 2px solid #e9ecef;
+        transition: all 0.3s ease;
+    }
+    
+    .form-control-lg:focus {
+        border-color: var(--primary-blue);
+        box-shadow: 0 0 0 0.25rem rgba(0, 102, 204, 0.25);
+    }
+    
+    .input-group-text {
+        border-radius: 0 10px 10px 0;
+        border: 2px solid #e9ecef;
+        border-left: none;
+        background: #f8f9fa;
+    }
+    
+    .input-group .form-control {
+        border-right: none;
+    }
+    
+    .btn-lg {
+        padding: 0.75rem 2rem;
+        border-radius: 10px;
+        font-weight: 600;
+    }
+    
+    .alert {
+        border-radius: 10px;
+        border: none;
+    }
+    
+    .modal-content {
+        border-radius: 15px;
+        border: none;
+    }
+    
+    .modal-header {
+        background: linear-gradient(135deg, var(--primary-blue) 0%, var(--dark-blue) 100%);
+        color: white;
+        border-radius: 15px 15px 0 0;
+    }
+    
+    @media (max-width: 768px) {
+        .card-body {
+            padding: 2rem !important;
+        }
+    }
+</style>
+{% endblock %}

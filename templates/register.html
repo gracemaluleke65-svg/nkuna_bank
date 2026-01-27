@@ -1,0 +1,517 @@
+{% extends "base.html" %}
+
+{% block title %}Register - Nkuna Bank{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-lg overflow-hidden">
+                <div class="row g-0">
+                    <!-- Left Side - Form -->
+                    <div class="col-md-7">
+                        <div class="card-body p-4 p-md-5">
+                            <div class="text-center mb-4">
+                                <a href="{{ url_for('index') }}" class="d-inline-block mb-3">
+                                    <i class="fas fa-university fa-2x text-primary"></i>
+                                </a>
+                                <h2 class="h3 mb-3">Create Your Account</h2>
+                                <p class="text-muted">Join thousands of South Africans banking smarter</p>
+                            </div>
+
+                            <form method="POST" action="{{ url_for('register') }}">
+                                {{ form.hidden_tag() }}
+                                
+                                <!-- Full Name -->
+                                <div class="mb-3">
+                                    <label for="{{ form.full_name.id }}" class="form-label">
+                                        <i class="fas fa-user me-2 text-primary"></i>Full Name
+                                    </label>
+                                    {{ form.full_name(class="form-control form-control-lg", placeholder="Enter your full name") }}
+                                    {% if form.full_name.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {% for error in form.full_name.errors %}
+                                                <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                <!-- ID Number -->
+                                <div class="mb-3">
+                                    <label for="{{ form.id_number.id }}" class="form-label">
+                                        <i class="fas fa-id-card me-2 text-primary"></i>South African ID Number
+                                    </label>
+                                    <div class="input-group">
+                                        {{ form.id_number(class="form-control form-control-lg", placeholder="13-digit SA ID (numbers only)") }}
+                                        <span class="input-group-text bg-light">
+                                            <i class="fas fa-shield-alt text-primary"></i>
+                                        </span>
+                                    </div>
+                                    <small class="text-muted d-block mt-1">
+                                        <i class="fas fa-info-circle me-1"></i>Must be exactly 13 digits. We validate using Luhn algorithm.
+                                    </small>
+                                    {% if form.id_number.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {% for error in form.id_number.errors %}
+                                                <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                <!-- Email -->
+                                <div class="mb-3">
+                                    <label for="{{ form.email.id }}" class="form-label">
+                                        <i class="fas fa-envelope me-2 text-primary"></i>Email Address
+                                    </label>
+                                    <div class="input-group">
+                                        {{ form.email(class="form-control form-control-lg", placeholder="your.email@example.com") }}
+                                        <span class="input-group-text bg-light">
+                                            <i class="fas fa-at text-primary"></i>
+                                        </span>
+                                    </div>
+                                    {% if form.email.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {% for error in form.email.errors %}
+                                                <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                <!-- Phone Number -->
+                                <div class="mb-3">
+                                    <label for="{{ form.phone_number.id }}" class="form-label">
+                                        <i class="fas fa-phone me-2 text-primary"></i>Phone Number
+                                    </label>
+                                    <div class="input-group">
+                                        {{ form.phone_number(class="form-control form-control-lg", placeholder="0812345678 or +27812345678") }}
+                                        <span class="input-group-text bg-light">
+                                            <i class="fas fa-mobile-alt text-primary"></i>
+                                        </span>
+                                    </div>
+                                    <small class="text-muted d-block mt-1">
+                                        <i class="fas fa-info-circle me-1"></i>South African format: 10 or 11 digits
+                                    </small>
+                                    {% if form.phone_number.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {% for error in form.phone_number.errors %}
+                                                <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                <!-- Password -->
+                                <div class="mb-3">
+                                    <label for="{{ form.password.id }}" class="form-label">
+                                        <i class="fas fa-lock me-2 text-primary"></i>Password
+                                    </label>
+                                    <div class="input-group">
+                                        {{ form.password(class="form-control form-control-lg", placeholder="At least 6 characters", id="password") }}
+                                        <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                    </div>
+                                    {% if form.password.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {% for error in form.password.errors %}
+                                                <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                <!-- Confirm Password -->
+                                <div class="mb-4">
+                                    <label for="{{ form.confirm_password.id }}" class="form-label">
+                                        <i class="fas fa-lock me-2 text-primary"></i>Confirm Password
+                                    </label>
+                                    <div class="input-group">
+                                        {{ form.confirm_password(class="form-control form-control-lg", placeholder="Confirm your password", id="confirmPassword") }}
+                                        <button class="btn btn-outline-secondary" type="button" id="toggleConfirmPassword">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                    </div>
+                                    {% if form.confirm_password.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {% for error in form.confirm_password.errors %}
+                                                <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                <!-- Age Verification Alert -->
+                                <div class="alert alert-info mb-4">
+                                    <div class="d-flex">
+                                        <i class="fas fa-exclamation-circle fa-lg me-3"></i>
+                                        <div>
+                                            <strong>Age Verification</strong>
+                                            <p class="mb-0 small">You must be 18 years or older to register. Your age will be automatically verified from your ID number.</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Submit Button -->
+                                <div class="d-grid">
+                                    {{ form.submit(class="btn btn-primary btn-lg", value="Create Account") }}
+                                </div>
+
+                                <!-- Progress Bar for Password Strength -->
+                                <div class="mt-3">
+                                    <div class="progress" style="height: 5px;">
+                                        <div class="progress-bar" id="passwordStrength" role="progressbar" style="width: 0%"></div>
+                                    </div>
+                                    <small class="text-muted" id="passwordFeedback">Password strength</small>
+                                </div>
+                            </form>
+
+                            <div class="text-center mt-4">
+                                <p class="text-muted mb-2">Already have an account?</p>
+                                <a href="{{ url_for('login') }}" class="btn btn-outline-primary">
+                                    <i class="fas fa-sign-in-alt me-2"></i>Login to Your Account
+                                </a>
+                            </div>
+
+                            <hr class="my-4">
+
+                            <!-- Security Info -->
+                            <div class="text-center">
+                                <small class="text-muted">
+                                    <i class="fas fa-shield-alt me-1"></i> Your information is encrypted and secure
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Side - Benefits -->
+                    <div class="col-md-5 bg-primary text-white p-4 p-md-5">
+                        <div class="h-100 d-flex flex-column justify-content-center">
+                            <h3 class="h4 mb-4">Why Join Nkuna Bank?</h3>
+                            
+                            <div class="mb-4">
+                                <div class="d-flex align-items-start mb-3">
+                                    <div class="bg-white bg-opacity-25 p-2 rounded-circle me-3">
+                                        <i class="fas fa-undo text-white"></i>
+                                    </div>
+                                    <div>
+                                        <h5 class="h6 mb-1">15-Minute Undo</h5>
+                                        <p class="small mb-0">Reverse transactions if you make a mistake</p>
+                                    </div>
+                                </div>
+
+                                <div class="d-flex align-items-start mb-3">
+                                    <div class="bg-white bg-opacity-25 p-2 rounded-circle me-3">
+                                        <i class="fas fa-bullseye text-white"></i>
+                                    </div>
+                                    <div>
+                                        <h5 class="h6 mb-1">Goal Savings</h5>
+                                        <p class="small mb-0">Save for specific goals with progress tracking</p>
+                                    </div>
+                                </div>
+
+                                <div class="d-flex align-items-start mb-3">
+                                    <div class="bg-white bg-opacity-25 p-2 rounded-circle me-3">
+                                        <i class="fas fa-bolt text-white"></i>
+                                    </div>
+                                    <div>
+                                        <h5 class="h6 mb-1">Instant Bill Payments</h5>
+                                        <p class="small mb-0">Pay electricity, water, airtime, and data instantly</p>
+                                    </div>
+                                </div>
+
+                                <div class="d-flex align-items-start">
+                                    <div class="bg-white bg-opacity-25 p-2 rounded-circle me-3">
+                                        <i class="fas fa-shield-alt text-white"></i>
+                                    </div>
+                                    <div>
+                                        <h5 class="h6 mb-1">SA ID Verification</h5>
+                                        <p class="small mb-0">Advanced validation for secure registration</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mt-auto">
+                                <div class="card bg-white bg-opacity-10 border-0">
+                                    <div class="card-body p-3">
+                                        <div class="d-flex align-items-center">
+                                            <i class="fas fa-check-circle fa-2x me-3"></i>
+                                            <div>
+                                                <h5 class="h6 mb-1">Instant Account</h5>
+                                                <p class="small mb-0">Get your 10-digit account number immediately</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Additional Info -->
+            <div class="mt-4">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <div class="card border-0 h-100">
+                            <div class="card-body text-center">
+                                <i class="fas fa-lock fa-2x text-primary mb-3"></i>
+                                <h6 class="card-title">Bank-Level Security</h6>
+                                <p class="card-text small text-muted">256-bit encryption and secure authentication</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card border-0 h-100">
+                            <div class="card-body text-center">
+                                <i class="fas fa-mobile-alt fa-2x text-primary mb-3"></i>
+                                <h6 class="card-title">Always Available</h6>
+                                <p class="card-text small text-muted">Access your account 24/7 from any device</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card border-0 h-100">
+                            <div class="card-body text-center">
+                                <i class="fas fa-headset fa-2x text-primary mb-3"></i>
+                                <h6 class="card-title">24/7 Support</h6>
+                                <p class="card-text small text-muted">Get help whenever you need it</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Toggle password visibility
+    document.getElementById('togglePassword').addEventListener('click', function() {
+        const passwordInput = document.getElementById('password');
+        const icon = this.querySelector('i');
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            icon.classList.replace('fa-eye', 'fa-eye-slash');
+        } else {
+            passwordInput.type = 'password';
+            icon.classList.replace('fa-eye-slash', 'fa-eye');
+        }
+    });
+
+    // Toggle confirm password visibility
+    document.getElementById('toggleConfirmPassword').addEventListener('click', function() {
+        const confirmPasswordInput = document.getElementById('confirmPassword');
+        const icon = this.querySelector('i');
+        if (confirmPasswordInput.type === 'password') {
+            confirmPasswordInput.type = 'text';
+            icon.classList.replace('fa-eye', 'fa-eye-slash');
+        } else {
+            confirmPasswordInput.type = 'password';
+            icon.classList.replace('fa-eye-slash', 'fa-eye');
+        }
+    });
+
+    // Password strength checker
+    document.getElementById('password').addEventListener('input', function() {
+        const password = this.value;
+        const strengthBar = document.getElementById('passwordStrength');
+        const feedback = document.getElementById('passwordFeedback');
+        
+        let strength = 0;
+        let feedbackText = 'Password strength: ';
+        
+        // Length check
+        if (password.length >= 8) strength += 25;
+        
+        // Lowercase check
+        if (/[a-z]/.test(password)) strength += 25;
+        
+        // Uppercase check
+        if (/[A-Z]/.test(password)) strength += 25;
+        
+        // Number/special character check
+        if (/[0-9!@#$%^&*]/.test(password)) strength += 25;
+        
+        // Update progress bar
+        strengthBar.style.width = strength + '%';
+        
+        // Update color and feedback text
+        if (strength < 50) {
+            strengthBar.className = 'progress-bar bg-danger';
+            feedbackText += 'Weak';
+        } else if (strength < 75) {
+            strengthBar.className = 'progress-bar bg-warning';
+            feedbackText += 'Fair';
+        } else {
+            strengthBar.className = 'progress-bar bg-success';
+            feedbackText += 'Strong';
+        }
+        
+        feedback.textContent = feedbackText;
+    });
+
+    // Auto-format phone number (kept for user convenience but cleaned on submit)
+    document.getElementById('{{ form.phone_number.id }}').addEventListener('input', function(e) {
+        let value = e.target.value.replace(/\D/g, '');
+        
+        if (value.startsWith('27')) {
+            value = '0' + value.substring(2);
+        }
+        
+        // Format with spaces for readability (optional)
+        if (value.length > 3 && value.length <= 6) {
+            value = value.replace(/(\d{3})(\d+)/, '$1 $2');
+        } else if (value.length > 6) {
+            value = value.replace(/(\d{3})(\d{3})(\d+)/, '$1 $2 $3');
+        }
+        
+        e.target.value = value;
+    });
+
+    // ID Number - Only allow digits and auto-clean on input
+    document.getElementById('{{ form.id_number.id }}').addEventListener('input', function(e) {
+        // Remove all non-digit characters
+        let value = e.target.value.replace(/\D/g, '');
+        
+        // Limit to 13 digits
+        value = value.substring(0, 13);
+        
+        // Update the input value
+        e.target.value = value;
+    });
+
+    // ID Number - Validate on blur (when user leaves the field)
+    document.getElementById('{{ form.id_number.id }}').addEventListener('blur', function(e) {
+        const value = e.target.value;
+        
+        // Check if it's exactly 13 digits
+        if (value.length === 13) {
+            e.target.classList.remove('is-invalid');
+            e.target.classList.add('is-valid');
+        } else if (value.length > 0) {
+            e.target.classList.remove('is-valid');
+            e.target.classList.add('is-invalid');
+        } else {
+            e.target.classList.remove('is-valid', 'is-invalid');
+        }
+    });
+
+    // Form validation on submit
+    document.querySelector('form').addEventListener('submit', function(e) {
+        const phoneInput = document.getElementById('{{ form.phone_number.id }}');
+        const idInput = document.getElementById('{{ form.id_number.id }}');
+        
+        // Clean phone number before submission (remove spaces)
+        let phoneValue = phoneInput.value.replace(/\D/g, '');
+        if (phoneValue.startsWith('27') && phoneValue.length === 11) {
+            phoneValue = '0' + phoneValue.substring(2);
+        }
+        phoneInput.value = phoneValue;
+        
+        // ID number is already digits-only from our input handler
+        
+        return true;
+    });
+
+    // Real-time ID number validation
+    document.getElementById('{{ form.id_number.id }}').addEventListener('input', function() {
+        const idInput = this;
+        const idValue = idInput.value;
+        
+        // Show length indicator
+        const indicator = document.getElementById('id-length-indicator') || (function() {
+            const div = document.createElement('div');
+            div.id = 'id-length-indicator';
+            div.className = 'small mt-1';
+            idInput.parentNode.appendChild(div);
+            return div;
+        })();
+        
+        if (idValue.length === 13) {
+            indicator.innerHTML = '<i class="fas fa-check-circle text-success me-1"></i>13 digits ✓';
+            indicator.className = 'small mt-1 text-success';
+        } else if (idValue.length > 0) {
+            indicator.innerHTML = `<i class="fas fa-exclamation-circle text-warning me-1"></i>${idValue.length}/13 digits`;
+            indicator.className = 'small mt-1 text-warning';
+        } else {
+            indicator.innerHTML = '<i class="fas fa-info-circle text-muted me-1"></i>13 digits required';
+            indicator.className = 'small mt-1 text-muted';
+        }
+    });
+</script>
+
+<style>
+    .card {
+        border-radius: 15px;
+        transition: transform 0.3s ease;
+    }
+    
+    .card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .form-control-lg {
+        padding: 0.75rem 1rem;
+        border-radius: 10px;
+        border: 2px solid #e9ecef;
+        transition: all 0.3s ease;
+    }
+    
+    .form-control-lg:focus {
+        border-color: var(--primary-blue);
+        box-shadow: 0 0 0 0.25rem rgba(0, 102, 204, 0.25);
+    }
+    
+    .form-control-lg.is-valid {
+        border-color: var(--accent-green);
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%2300C853' d='M2.3 6.73L.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3e%3c/svg%3e");
+    }
+    
+    .form-control-lg.is-invalid {
+        border-color: #dc3545;
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e");
+    }
+    
+    .input-group-text {
+        border-radius: 0 10px 10px 0;
+        border: 2px solid #e9ecef;
+        border-left: none;
+        background: #f8f9fa;
+    }
+    
+    .input-group .form-control {
+        border-right: none;
+    }
+    
+    .btn-lg {
+        padding: 0.75rem 2rem;
+        border-radius: 10px;
+        font-weight: 600;
+    }
+    
+    .progress {
+        border-radius: 10px;
+        background-color: #e9ecef;
+    }
+    
+    .progress-bar {
+        border-radius: 10px;
+        transition: width 0.5s ease;
+    }
+    
+    .alert {
+        border-radius: 10px;
+        border: none;
+    }
+    
+    /* ID number input specific styling */
+    input[placeholder*="13-digit"] {
+        font-family: 'Courier New', monospace;
+        letter-spacing: 1px;
+        font-weight: 500;
+    }
+</style>
+{% endblock %}

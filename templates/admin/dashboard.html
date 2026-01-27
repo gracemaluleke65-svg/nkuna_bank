@@ -1,0 +1,641 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard - Nkuna Bank{% endblock %}
+
+{% block content %}
+<style>
+    .admin-header {
+        background: linear-gradient(135deg, var(--primary-blue) 0%, var(--dark-blue) 100%);
+        color: white;
+        padding: 2rem 0;
+        border-radius: 0 0 20px 20px;
+        margin-bottom: 2rem;
+    }
+    
+    .stats-card {
+        background: white;
+        border-radius: 15px;
+        padding: 1.5rem;
+        height: 100%;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+        border-left: 4px solid var(--primary-blue);
+    }
+    
+    .stats-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0, 102, 204, 0.15);
+    }
+    
+    .stats-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1rem;
+        font-size: 1.5rem;
+    }
+    
+    .stats-number {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+    
+    .stats-label {
+        color: var(--text-light);
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    
+    .recent-table {
+        background: white;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    }
+    
+    .table-header {
+        background: var(--light-blue);
+        padding: 1.5rem;
+        border-bottom: 1px solid #e9ecef;
+    }
+    
+    .transaction-row {
+        transition: all 0.2s ease;
+        border-bottom: 1px solid #f8f9fa;
+    }
+    
+    .transaction-row:hover {
+        background: #f8f9fa;
+    }
+    
+    .badge-pending {
+        background: #fff3cd;
+        color: #856404;
+    }
+    
+    .badge-completed {
+        background: #d1ecf1;
+        color: #0c5460;
+    }
+    
+    .badge-undone {
+        background: #d4edda;
+        color: #155724;
+    }
+    
+    .user-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--primary-blue), var(--sky-blue));
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+    }
+    
+    .revenue-badge {
+        background: var(--light-blue);
+        color: var(--primary-blue);
+        padding: 0.5rem 1rem;
+        border-radius: 50px;
+        font-size: 0.85rem;
+        font-weight: 500;
+    }
+    
+    .admin-sidebar {
+        position: sticky;
+        top: 100px;
+    }
+    
+    .admin-nav {
+        background: white;
+        border-radius: 15px;
+        padding: 1.5rem;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    }
+    
+    .admin-nav-link {
+        display: flex;
+        align-items: center;
+        padding: 0.75rem 1rem;
+        color: var(--text-dark);
+        text-decoration: none;
+        border-radius: 10px;
+        margin-bottom: 0.5rem;
+        transition: all 0.3s ease;
+    }
+    
+    .admin-nav-link:hover {
+        background: var(--light-blue);
+        color: var(--primary-blue);
+        transform: translateX(5px);
+    }
+    
+    .admin-nav-link.active {
+        background: var(--primary-blue);
+        color: white;
+    }
+    
+    .admin-nav-link i {
+        width: 24px;
+        margin-right: 10px;
+    }
+</style>
+
+<!-- Admin Header -->
+<div class="admin-header">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <h1 class="h2 mb-3">Admin Dashboard</h1>
+                <p class="mb-0 opacity-75">
+                    <i class="fas fa-user-shield me-2"></i>Welcome, {{ current_user.full_name or current_user.email }}
+                </p>
+            </div>
+            <div class="col-md-6 text-md-end">
+                <div class="btn-group">
+                    <a href="{{ url_for('admin_logout') }}" class="btn btn-light">
+                        <i class="fas fa-sign-out-alt me-2"></i>Logout
+                    </a>
+                    <a href="{{ url_for('index') }}" class="btn btn-outline-light">
+                        <i class="fas fa-home me-2"></i>Home
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container py-4">
+    <div class="row">
+        <!-- Admin Sidebar -->
+        <div class="col-lg-3 mb-4">
+            <div class="admin-sidebar">
+                <div class="admin-nav">
+                    <div class="text-center mb-4">
+                        <div class="user-avatar mx-auto mb-2">
+                            {{ current_user.email[0]|upper }}
+                        </div>
+                        <h6 class="mb-1">{{ current_user.full_name or current_user.email }}</h6>
+                        <small class="text-muted">
+                            {% if current_user.is_super_admin %}
+                                <span class="badge bg-danger">Super Admin</span>
+                            {% else %}
+                                <span class="badge bg-primary">Admin</span>
+                            {% endif %}
+                        </small>
+                    </div>
+                    
+                    <nav class="nav flex-column">
+                        <a href="{{ url_for('admin_dashboard') }}" class="admin-nav-link active">
+                            <i class="fas fa-tachometer-alt"></i>
+                            Dashboard
+                        </a>
+                        <a href="{{ url_for('admin_users') }}" class="admin-nav-link">
+                            <i class="fas fa-users"></i>
+                            User Management
+                        </a>
+                        <a href="{{ url_for('admin_transactions') }}" class="admin-nav-link">
+                            <i class="fas fa-list-alt"></i>
+                            All Transactions
+                        </a>
+                        <a href="{{ url_for('admin_login') }}" class="admin-nav-link">
+                            <i class="fas fa-cog"></i>
+                            Settings
+                        </a>
+                    </nav>
+                    
+                    <hr class="my-4">
+                    
+                    <div class="text-center">
+                        <small class="text-muted">
+                            <i class="fas fa-clock me-1"></i>
+                            {{ current_time.strftime('%Y-%m-%d %H:%M') }}
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="col-lg-9">
+            <!-- Stats Cards -->
+            <div class="row mb-4">
+                <div class="col-md-6 col-lg-3 mb-4">
+                    <div class="stats-card">
+                        <div class="stats-icon" style="background: rgba(0, 102, 204, 0.1); color: var(--primary-blue);">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stats-number">{{ total_users }}</div>
+                        <div class="stats-label">Total Users</div>
+                        <small class="text-muted">
+                            <i class="fas fa-arrow-up text-success me-1"></i>
+                            Active accounts
+                        </small>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 col-lg-3 mb-4">
+                    <div class="stats-card">
+                        <div class="stats-icon" style="background: rgba(40, 167, 69, 0.1); color: #28a745;">
+                            <i class="fas fa-exchange-alt"></i>
+                        </div>
+                        <div class="stats-number">{{ total_transactions }}</div>
+                        <div class="stats-label">Total Transactions</div>
+                        <small class="text-muted">
+                            <i class="fas fa-sync-alt text-primary me-1"></i>
+                            All types
+                        </small>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 col-lg-3 mb-4">
+                    <div class="stats-card">
+                        <div class="stats-icon" style="background: rgba(255, 193, 7, 0.1); color: #ffc107;">
+                            <i class="fas fa-money-bill-wave"></i>
+                        </div>
+                        <div class="stats-number">{{ total_deposits }}</div>
+                        <div class="stats-label">Total Deposits</div>
+                        <small class="text-muted">
+                            <i class="fas fa-arrow-down text-success me-1"></i>
+                            Money in
+                        </small>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 col-lg-3 mb-4">
+                    <div class="stats-card">
+                        <div class="stats-icon" style="background: rgba(220, 53, 69, 0.1); color: #dc3545;">
+                            <i class="fas fa-chart-bar"></i>
+                        </div>
+                        <div class="stats-number">{{ total_fees }}</div>
+                        <div class="stats-label">Total Fees</div>
+                        <small class="text-muted">
+                            <i class="fas fa-percentage text-warning me-1"></i>
+                            1% transaction fee
+                        </small>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Bank Overview -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="recent-table">
+                        <div class="table-header">
+                            <h5 class="mb-0">
+                                <i class="fas fa-university me-2"></i>
+                                Bank Overview
+                            </h5>
+                        </div>
+                        <div class="p-4">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <div class="me-3">
+                                            <i class="fas fa-wallet fa-2x text-primary"></i>
+                                        </div>
+                                        <div>
+                                            <h6 class="mb-0">Total Bank Balance</h6>
+                                            <div class="h4 mb-0">{{ total_balance }}</div>
+                                        </div>
+                                    </div>
+                                    <small class="text-muted">Sum of all user account balances</small>
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <div class="me-3">
+                                            <i class="fas fa-percentage fa-2x text-success"></i>
+                                        </div>
+                                        <div>
+                                            <h6 class="mb-0">Average Transaction Fee</h6>
+                                            <div class="h4 mb-0">1%</div>
+                                        </div>
+                                    </div>
+                                    <small class="text-muted">Min R2, Max R100 per transaction</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Recent Transactions -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="recent-table">
+                        <div class="table-header">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-history me-2"></i>
+                                    Recent Transactions
+                                </h5>
+                                <a href="{{ url_for('admin_transactions') }}" class="btn btn-sm btn-outline-primary">
+                                    View All
+                                </a>
+                            </div>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Type</th>
+                                        <th>From/To</th>
+                                        <th>Amount</th>
+                                        <th>Status</th>
+                                        <th>Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for transaction in recent_transactions %}
+                                    <tr class="transaction-row">
+                                        <td>
+                                            <small class="text-muted">{{ transaction.transaction_id[:8] }}...</small>
+                                        </td>
+                                        <td>
+                                            <span class="badge {% if transaction.transaction_type == 'DEPOSIT' %}bg-success{% elif transaction.transaction_type == 'TRANSFER' %}bg-primary{% else %}bg-info{% endif %}">
+                                                {{ transaction.transaction_type }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <small>
+                                                {{ transaction.from_account[:3] }}... → {{ transaction.to_account[:3] }}...
+                                            </small>
+                                        </td>
+                                        <td>
+                                            <strong>{{ format_currency(transaction.amount) }}</strong>
+                                            {% if transaction.fee > 0 %}
+                                                <br>
+                                                <small class="text-muted">Fee: {{ format_currency(transaction.fee) }}</small>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if transaction.status == 'COMPLETED' %}
+                                                <span class="badge badge-completed">Completed</span>
+                                            {% elif transaction.status == 'PENDING' %}
+                                                <span class="badge badge-pending">Pending</span>
+                                            {% elif transaction.status == 'UNDONE' %}
+                                                <span class="badge badge-undone">Undone</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <small>{{ transaction.created_at.strftime('%Y-%m-%d') }}</small><br>
+                                            <small class="text-muted">{{ transaction.created_at.strftime('%H:%M') }}</small>
+                                        </td>
+                                    </tr>
+                                    {% else %}
+                                    <tr>
+                                        <td colspan="6" class="text-center py-4">
+                                            <i class="fas fa-database fa-2x text-muted mb-3"></i>
+                                            <p class="text-muted">No transactions found</p>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Recent Users & Quick Actions -->
+            <div class="row">
+                <!-- Recent Users -->
+                <div class="col-lg-7 mb-4">
+                    <div class="recent-table">
+                        <div class="table-header">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-user-plus me-2"></i>
+                                    Recent Users
+                                </h5>
+                                <a href="{{ url_for('admin_users') }}" class="btn btn-sm btn-outline-primary">
+                                    Manage Users
+                                </a>
+                            </div>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>User</th>
+                                        <th>ID Number</th>
+                                        <th>Email</th>
+                                        <th>Joined</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for user in recent_users %}
+                                    <tr class="transaction-row">
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="user-avatar me-2">
+                                                    {{ user.full_name[0]|upper if user.full_name else user.email[0]|upper }}
+                                                </div>
+                                                <div>
+                                                    <div class="fw-medium">{{ user.full_name.split()[0] if user.full_name else 'User' }}</div>
+                                                    <small class="text-muted">{{ user.phone_number }}</small>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <small>{{ user.id_number[:6] }}*****</small>
+                                        </td>
+                                        <td>
+                                            <small>{{ user.email[:15] }}...</small>
+                                        </td>
+                                        <td>
+                                            <small>{{ user.created_at.strftime('%Y-%m-%d') }}</small>
+                                        </td>
+                                        <td>
+                                            {% if user.is_active %}
+                                                <span class="badge bg-success">
+                                                    <i class="fas fa-check-circle me-1"></i>Active
+                                                </span>
+                                            {% else %}
+                                                <span class="badge bg-danger">
+                                                    <i class="fas fa-times-circle me-1"></i>Inactive
+                                                </span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% else %}
+                                    <tr>
+                                        <td colspan="5" class="text-center py-4">
+                                            <i class="fas fa-users fa-2x text-muted mb-3"></i>
+                                            <p class="text-muted">No users found</p>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Quick Actions -->
+                <div class="col-lg-5 mb-4">
+                    <div class="recent-table">
+                        <div class="table-header">
+                            <h5 class="mb-0">
+                                <i class="fas fa-bolt me-2"></i>
+                                Quick Actions
+                            </h5>
+                        </div>
+                        <div class="p-4">
+                            <div class="d-grid gap-3">
+                                <a href="{{ url_for('admin_users') }}" class="btn btn-outline-primary btn-lg d-flex align-items-center justify-content-between">
+                                    <div>
+                                        <i class="fas fa-users me-3"></i>
+                                        <span>User Management</span>
+                                    </div>
+                                    <i class="fas fa-arrow-right"></i>
+                                </a>
+                                
+                                <a href="{{ url_for('admin_transactions') }}" class="btn btn-outline-primary btn-lg d-flex align-items-center justify-content-between">
+                                    <div>
+                                        <i class="fas fa-list-alt me-3"></i>
+                                        <span>Transaction Logs</span>
+                                    </div>
+                                    <i class="fas fa-arrow-right"></i>
+                                </a>
+                                
+                                <a href="{{ url_for('index') }}" class="btn btn-outline-secondary btn-lg d-flex align-items-center justify-content-between">
+                                    <div>
+                                        <i class="fas fa-home me-3"></i>
+                                        <span>View Public Site</span>
+                                    </div>
+                                    <i class="fas fa-external-link-alt"></i>
+                                </a>
+                            </div>
+                            
+                            <hr class="my-4">
+                            
+                            <!-- System Status -->
+                            <div>
+                                <h6 class="mb-3">
+                                    <i class="fas fa-server me-2"></i>
+                                    System Status
+                                </h6>
+                                <div class="row g-3">
+                                    <div class="col-6">
+                                        <div class="d-flex align-items-center">
+                                            <div class="me-3">
+                                                <i class="fas fa-database text-success"></i>
+                                            </div>
+                                            <div>
+                                                <small class="text-muted">Database</small>
+                                                <div class="fw-medium">Online</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="d-flex align-items-center">
+                                            <div class="me-3">
+                                                <i class="fas fa-shield-alt text-success"></i>
+                                            </div>
+                                            <div>
+                                                <small class="text-muted">Security</small>
+                                                <div class="fw-medium">Active</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="d-flex align-items-center">
+                                            <div class="me-3">
+                                                <i class="fas fa-bolt text-success"></i>
+                                            </div>
+                                            <div>
+                                                <small class="text-muted">Performance</small>
+                                                <div class="fw-medium">Optimal</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="d-flex align-items-center">
+                                            <div class="me-3">
+                                                <i class="fas fa-clock text-success"></i>
+                                            </div>
+                                            <div>
+                                                <small class="text-muted">Uptime</small>
+                                                <div class="fw-medium">100%</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Auto-refresh dashboard every 60 seconds
+    setTimeout(function() {
+        window.location.reload();
+    }, 60000);
+    
+    // Format currency on page
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add current time to the page
+        const updateTime = () => {
+            const now = new Date();
+            const timeElements = document.querySelectorAll('.current-time');
+            timeElements.forEach(el => {
+                el.textContent = now.toLocaleString('en-ZA', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+            });
+        };
+        
+        updateTime();
+        setInterval(updateTime, 60000); // Update every minute
+        
+        // Add click animation to stats cards
+        document.querySelectorAll('.stats-card').forEach(card => {
+            card.addEventListener('click', function() {
+                this.style.transform = 'translateY(-10px) scale(1.02)';
+                setTimeout(() => {
+                    this.style.transform = 'translateY(-5px) scale(1)';
+                }, 150);
+            });
+        });
+        
+        // Initialize tooltips
+        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        const tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+    });
+</script>
+
+{% if not current_time %}
+<script>
+    // Fallback if current_time not provided by backend
+    document.addEventListener('DOMContentLoaded', function() {
+        const timeElement = document.querySelector('.admin-nav small.text-muted');
+        if (timeElement && timeElement.textContent.includes('clock')) {
+            const now = new Date();
+            timeElement.innerHTML = `<i class="fas fa-clock me-1"></i>${now.toLocaleDateString()} ${now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
+        }
+    });
+</script>
+{% endif %}
+{% endblock %}

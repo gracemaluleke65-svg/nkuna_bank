@@ -1,0 +1,550 @@
+{% extends "base.html" %}
+
+{% block title %}Profile - Nkuna Bank{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Page Header -->
+    <div class="row mb-4">
+        <div class="col">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Profile</li>
+                </ol>
+            </nav>
+            <h1 class="h2 mb-2">Profile Information</h1>
+            <p class="text-muted">View and manage your personal and account information</p>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="row">
+        <!-- Left Column: Personal Information -->
+        <div class="col-lg-4 mb-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-user-circle me-2"></i>Personal Information
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <!-- Profile Picture Placeholder -->
+                    <div class="text-center mb-4">
+                        <div class="profile-pic-container mx-auto mb-3" style="
+                            width: 120px;
+                            height: 120px;
+                            background: linear-gradient(135deg, var(--primary-blue), var(--sky-blue));
+                            border-radius: 50%;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            color: white;
+                            font-size: 3rem;
+                        ">
+                            {{ user.full_name[0] | upper }}
+                        </div>
+                        <h4 class="mb-1">{{ user.full_name }}</h4>
+                        <p class="text-muted mb-0">Active Account Holder</p>
+                        <div class="mt-2">
+                            <span class="badge bg-success">
+                                <i class="fas fa-check-circle me-1"></i>Verified
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Personal Info Details -->
+                    <div class="mb-3">
+                        <h6 class="text-muted mb-2">
+                            <i class="fas fa-id-card me-2"></i>Identity Details
+                        </h6>
+                        <div class="list-group list-group-flush">
+                            <div class="list-group-item d-flex justify-content-between px-0 py-2">
+                                <span>ID Number:</span>
+                                <strong>{{ user.id_number }}</strong>
+                            </div>
+                            <div class="list-group-item d-flex justify-content-between px-0 py-2">
+                                <span>Date of Birth:</span>
+                                <strong>{{ user.date_of_birth.strftime('%d %B %Y') if user.date_of_birth else 'N/A' }}</strong>
+                            </div>
+                            <div class="list-group-item d-flex justify-content-between px-0 py-2">
+                                <span>Age:</span>
+                                <strong>
+                                    {% if user.date_of_birth %}
+                                        {% set today = datetime.now().date() %}
+                                        {% set dob = user.date_of_birth %}
+                                        {% set age = today.year - dob.year - ((today.month, today.day) < (dob.month, dob.day)) %}
+                                        {{ age }} years
+                                    {% else %}
+                                        N/A
+                                    {% endif %}
+                                </strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Contact Details -->
+                    <div class="mb-3">
+                        <h6 class="text-muted mb-2">
+                            <i class="fas fa-address-book me-2"></i>Contact Details
+                        </h6>
+                        <div class="list-group list-group-flush">
+                            <div class="list-group-item d-flex align-items-center px-0 py-2">
+                                <i class="fas fa-envelope text-primary me-3"></i>
+                                <div>
+                                    <small class="text-muted d-block">Email</small>
+                                    <strong>{{ user.email }}</strong>
+                                </div>
+                            </div>
+                            <div class="list-group-item d-flex align-items-center px-0 py-2">
+                                <i class="fas fa-phone text-primary me-3"></i>
+                                <div>
+                                    <small class="text-muted d-block">Phone</small>
+                                    <strong>{{ user.phone_number }}</strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Account Status -->
+                    <div class="mt-4">
+                        <h6 class="text-muted mb-2">
+                            <i class="fas fa-user-check me-2"></i>Account Status
+                        </h6>
+                        <div class="d-flex justify-content-between align-items-center p-3 bg-light rounded">
+                            <div>
+                                <small class="text-muted d-block">Member Since</small>
+                                <strong>{{ user.created_at.strftime('%d %B %Y') }}</strong>
+                            </div>
+                            <div class="text-end">
+                                <small class="text-muted d-block">Status</small>
+                                <span class="badge bg-{{ 'success' if user.is_active else 'danger' }}">
+                                    {{ 'Active' if user.is_active else 'Inactive' }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column: Account Information -->
+        <div class="col-lg-8">
+            <!-- Account Summary Card -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-wallet me-2"></i>Account Summary
+                    </h5>
+                    <span class="badge bg-primary">Total Balance: {{ format_currency(total_balance) }}</span>
+                </div>
+                <div class="card-body">
+                    <!-- Main Account Info -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="card border-primary border-2 h-100">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start mb-3">
+                                        <div>
+                                            <h6 class="text-muted mb-1">Primary Account</h6>
+                                            <h4 class="mb-0">{{ format_currency(main_account.balance) }}</h4>
+                                        </div>
+                                        <div class="bg-primary bg-opacity-10 p-2 rounded-circle">
+                                            <i class="fas fa-piggy-bank fa-lg text-primary"></i>
+                                        </div>
+                                    </div>
+                                    <div class="mb-2">
+                                        <small class="text-muted">Account Number:</small>
+                                        <div class="d-flex align-items-center">
+                                            <code class="h5 mb-0 me-2">{{ main_account.account_number }}</code>
+                                            <button class="btn btn-sm btn-outline-primary" onclick="copyToClipboard('{{ main_account.account_number }}')">
+                                                <i class="fas fa-copy"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <small class="text-muted">
+                                        <i class="fas fa-info-circle me-1"></i>Use this account for deposits and transfers
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Quick Actions -->
+                        <div class="col-md-6">
+                            <div class="card border-0 h-100" style="background: linear-gradient(135deg, var(--light-blue), #e6f2ff);">
+                                <div class="card-body">
+                                    <h6 class="text-muted mb-3">Quick Actions</h6>
+                                    <div class="d-grid gap-2">
+                                        <a href="{{ url_for('deposit') }}" class="btn btn-outline-primary">
+                                            <i class="fas fa-money-bill-wave me-2"></i>Make Deposit
+                                        </a>
+                                        <a href="{{ url_for('transfer') }}" class="btn btn-outline-primary">
+                                            <i class="fas fa-exchange-alt me-2"></i>Transfer Money
+                                        </a>
+                                        <a href="{{ url_for('goals') }}" class="btn btn-outline-primary">
+                                            <i class="fas fa-bullseye me-2"></i>View Goals
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- All Accounts Section -->
+                    <div class="mb-4">
+                        <h5 class="mb-3">
+                            <i class="fas fa-university me-2"></i>All Accounts
+                        </h5>
+                        
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Account Number</th>
+                                        <th>Type</th>
+                                        <th>Balance</th>
+                                        <th>Created</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for account in accounts %}
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <code>{{ account.account_number }}</code>
+                                                {% if account.account_type == 'MAIN' %}
+                                                    <span class="badge bg-primary ms-2">Primary</span>
+                                                {% endif %}
+                                            </div>
+                                        </td>
+                                        <td>
+                                            {% if account.account_type == 'MAIN' %}
+                                                <span class="badge bg-primary">Main Account</span>
+                                            {% elif account.account_type == 'GOAL' %}
+                                                <span class="badge bg-success">Goal Account</span>
+                                            {% else %}
+                                                <span class="badge bg-secondary">{{ account.account_type }}</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <strong>{{ format_currency(account.balance) }}</strong>
+                                        </td>
+                                        <td>
+                                            <small>{{ account.created_at.strftime('%Y-%m-%d') }}</small>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-success">
+                                                <i class="fas fa-check-circle me-1"></i>Active
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                                <tfoot class="table-light">
+                                    <tr>
+                                        <td colspan="2" class="text-end"><strong>Total Balance:</strong></td>
+                                        <td colspan="3">
+                                            <h5 class="mb-0 text-primary">{{ format_currency(total_balance) }}</h5>
+                                        </td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Account Statistics -->
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-3">
+                            <div class="card border-0 bg-light h-100">
+                                <div class="card-body text-center">
+                                    <div class="bg-primary bg-opacity-10 p-3 rounded-circle d-inline-block mb-3">
+                                        <i class="fas fa-wallet fa-lg text-primary"></i>
+                                    </div>
+                                    <h4 class="mb-1">{{ accounts|length }}</h4>
+                                    <small class="text-muted">Total Accounts</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card border-0 bg-light h-100">
+                                <div class="card-body text-center">
+                                    <div class="bg-success bg-opacity-10 p-3 rounded-circle d-inline-block mb-3">
+                                        <i class="fas fa-bullseye fa-lg text-success"></i>
+                                    </div>
+                                    <h4 class="mb-1">
+                                        {{ accounts|selectattr('account_type', 'equalto', 'GOAL')|list|length }}
+                                    </h4>
+                                    <small class="text-muted">Goal Accounts</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card border-0 bg-light h-100">
+                                <div class="card-body text-center">
+                                    <div class="bg-warning bg-opacity-10 p-3 rounded-circle d-inline-block mb-3">
+                                        <i class="fas fa-calendar-alt fa-lg text-warning"></i>
+                                    </div>
+                                    <h4 class="mb-1">
+                                        {% if user.date_of_birth %}
+                                            {% set today = datetime.now().date() %}
+                                            {% set dob = user.date_of_birth %}
+                                            {% set age = today.year - dob.year - ((today.month, today.day) < (dob.month, dob.day)) %}
+                                            {{ age }}
+                                        {% else %}
+                                            N/A
+                                        {% endif %}
+                                    </h4>
+                                    <small class="text-muted">Years Old</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card border-0 bg-light h-100">
+                                <div class="card-body text-center">
+                                    <div class="bg-info bg-opacity-10 p-3 rounded-circle d-inline-block mb-3">
+                                        <i class="fas fa-history fa-lg text-info"></i>
+                                    </div>
+                                    {% set days_ago = (datetime.now() - user.created_at).days %}
+                                    <h4 class="mb-1">{{ days_ago }}</h4>
+                                    <small class="text-muted">Days with us</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Security Information -->
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header bg-white">
+                            <h6 class="mb-0">
+                                <i class="fas fa-shield-alt me-2"></i>Security Information
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="alert alert-success border-0">
+                                        <div class="d-flex">
+                                            <i class="fas fa-check-circle fa-lg me-3"></i>
+                                            <div>
+                                                <strong>Account Security</strong>
+                                                <p class="mb-0 small">Your account is secured with 256-bit encryption</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="alert alert-info border-0">
+                                        <div class="d-flex">
+                                            <i class="fas fa-id-card fa-lg me-3"></i>
+                                            <div>
+                                                <strong>ID Verified</strong>
+                                                <p class="mb-0 small">Your SA ID has been validated and verified</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                <a href="{{ url_for('history') }}" class="btn btn-outline-primary">
+                                    <i class="fas fa-history me-2"></i>View Transaction History
+                                </a>
+                                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#updateContactModal">
+                                    <i class="fas fa-edit me-2"></i>Update Contact Info
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Update Contact Modal -->
+<div class="modal fade" id="updateContactModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-edit me-2"></i>Update Contact Information
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-info">
+                    <div class="d-flex">
+                        <i class="fas fa-info-circle me-3"></i>
+                        <div>
+                            <strong>Important Notice</strong>
+                            <p class="mb-0 small">For security reasons, changes to email and phone number require verification. Contact support for assistance.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mb-4">
+                    <h6 class="mb-3">Current Contact Information</h6>
+                    <div class="list-group">
+                        <div class="list-group-item">
+                            <small class="text-muted d-block">Email Address</small>
+                            <strong>{{ user.email }}</strong>
+                        </div>
+                        <div class="list-group-item">
+                            <small class="text-muted d-block">Phone Number</small>
+                            <strong>{{ user.phone_number }}</strong>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="d-grid gap-2">
+                    <a href="mailto:support@nkunabank.co.za?subject=Contact%20Update%20Request&body=Hello%2C%0A%0AI%20would%20like%20to%20update%20my%20contact%20information.%0A%0AAccount%20Number%3A%20{{ main_account.account_number }}%0AFull%20Name%3A%20{{ user.full_name }}%0A%0APlease%20contact%20me%20for%20verification.%0A%0AThank%20you." 
+                       class="btn btn-primary">
+                        <i class="fas fa-envelope me-2"></i>Email Support for Changes
+                    </a>
+                    <a href="tel:0860111222" class="btn btn-outline-primary">
+                        <i class="fas fa-phone me-2"></i>Call Support: 0860 111 222
+                    </a>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Copy account number to clipboard
+    function copyToClipboard(text) {
+        navigator.clipboard.writeText(text).then(function() {
+            // Show success message
+            const btn = event.target.closest('button');
+            const originalHTML = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+            btn.classList.remove('btn-outline-primary');
+            btn.classList.add('btn-success');
+            
+            setTimeout(function() {
+                btn.innerHTML = originalHTML;
+                btn.classList.remove('btn-success');
+                btn.classList.add('btn-outline-primary');
+            }, 2000);
+        }).catch(function(err) {
+            console.error('Failed to copy: ', err);
+            alert('Failed to copy account number. Please copy manually.');
+        });
+    }
+
+    // Format phone number display
+    document.addEventListener('DOMContentLoaded', function() {
+        const phoneElement = document.querySelector('.list-group-item:has(i.fa-phone) strong');
+        if (phoneElement) {
+            const phone = phoneElement.textContent.trim();
+            // Format as 081 234 5678
+            if (phone.length === 10) {
+                phoneElement.textContent = phone.replace(/(\d{3})(\d{3})(\d{4})/, '$1 $2 $3');
+            }
+        }
+    });
+
+    // Format ID number display
+    document.addEventListener('DOMContentLoaded', function() {
+        const idElement = document.querySelector('.list-group-item:has(span:contains("ID Number:")) strong');
+        if (idElement) {
+            const id = idElement.textContent.trim();
+            // Format as 123456 7890 123
+            if (id.length === 13) {
+                idElement.textContent = id.replace(/(\d{6})(\d{4})(\d{3})/, '$1 $2 $3');
+            }
+        }
+    });
+
+    // Smooth scroll for modal
+    const updateModal = document.getElementById('updateContactModal');
+    if (updateModal) {
+        updateModal.addEventListener('shown.bs.modal', function () {
+            this.querySelector('.btn-primary').focus();
+        });
+    }
+</script>
+
+<style>
+    .card {
+        border-radius: 15px;
+        transition: transform 0.3s ease;
+    }
+    
+    .card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .profile-pic-container {
+        box-shadow: 0 5px 15px rgba(0, 102, 204, 0.3);
+    }
+    
+    .list-group-item {
+        border: none;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        padding-left: 0;
+        padding-right: 0;
+    }
+    
+    .list-group-item:last-child {
+        border-bottom: none;
+    }
+    
+    .table th {
+        border-top: none;
+        font-weight: 600;
+        color: var(--text-light);
+    }
+    
+    .table td {
+        vertical-align: middle;
+    }
+    
+    .badge {
+        padding: 0.5em 0.8em;
+        font-weight: 500;
+    }
+    
+    .modal-content {
+        border-radius: 15px;
+        border: none;
+    }
+    
+    .modal-header {
+        background: linear-gradient(135deg, var(--primary-blue) 0%, var(--dark-blue) 100%);
+        color: white;
+        border-radius: 15px 15px 0 0;
+    }
+    
+    .btn {
+        border-radius: 10px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-outline-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0, 102, 204, 0.2);
+    }
+    
+    @media (max-width: 768px) {
+        .card-body {
+            padding: 1.5rem !important;
+        }
+        
+        .h2 {
+            font-size: 1.5rem;
+        }
+        
+        .table-responsive {
+            font-size: 0.9rem;
+        }
+    }
+</style>
+
+{% set datetime = namespace(now=datetime.now()) %}
+{% endblock %}

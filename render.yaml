@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: nkuna-bank
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        fromDatabase:
+          name: nkuna-bank-db
+          property: connectionString
+
+databases:
+  - name: nkuna-bank-db
+    databaseName: nkuna_bank
+    user: nkuna_bank_user

@@ -1,0 +1,690 @@
+{% extends "base.html" %}
+
+{% block title %}Transaction History - Nkuna Bank{% endblock %}
+
+{% block extra_css %}
+<style>
+    .transaction-card {
+        border-radius: 10px;
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+        margin-bottom: 15px;
+    }
+    
+    .transaction-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    }
+    
+    .transaction-deposit {
+        border-left: 4px solid #28a745;
+    }
+    
+    .transaction-transfer {
+        border-left: 4px solid #0066CC;
+    }
+    
+    .transaction-bill {
+        border-left: 4px solid #ff6b35;
+    }
+    
+    .transaction-goal {
+        border-left: 4px solid #17a2b8;
+    }
+    
+    .status-completed {
+        background-color: #d4edda;
+        color: #155724;
+        padding: 3px 10px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+    
+    .status-pending {
+        background-color: #fff3cd;
+        color: #856404;
+        padding: 3px 10px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+    
+    .status-undone {
+        background-color: #f8d7da;
+        color: #721c24;
+        padding: 3px 10px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+    
+    .time-remaining {
+        font-size: 0.75rem;
+        padding: 2px 8px;
+        border-radius: 10px;
+        background: linear-gradient(135deg, #ff6b35, #ff8e53);
+        color: white;
+        font-weight: 600;
+    }
+    
+    .amount-positive {
+        color: #28a745;
+        font-weight: 600;
+    }
+    
+    .amount-negative {
+        color: #dc3545;
+        font-weight: 600;
+    }
+    
+    .amount-neutral {
+        color: #6c757d;
+        font-weight: 600;
+    }
+    
+    .filter-btn {
+        border-radius: 20px;
+        padding: 5px 15px;
+        font-size: 0.85rem;
+        transition: all 0.3s ease;
+    }
+    
+    .filter-btn:hover {
+        transform: translateY(-2px);
+    }
+    
+    .filter-btn.active {
+        background: linear-gradient(135deg, #0066CC, #0084FF);
+        color: white;
+        border: none;
+    }
+    
+    .stats-card {
+        border-radius: 10px;
+        border: none;
+        transition: transform 0.3s ease;
+    }
+    
+    .stats-card:hover {
+        transform: translateY(-5px);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Page Header -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1 class="h2 mb-2">
+                <i class="fas fa-history text-primary me-2"></i>Transaction History
+            </h1>
+            <p class="text-muted mb-0">View and manage all your financial transactions in one place</p>
+        </div>
+        <div class="col-md-4 text-md-end">
+            <a href="{{ url_for('dashboard') }}" class="btn btn-outline-primary">
+                <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+            </a>
+        </div>
+    </div>
+    
+    <!-- Stats Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="card stats-card border-0 shadow-sm" style="background: linear-gradient(135deg, #d4edda, #c3e6cb);">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-white bg-opacity-50 p-3 rounded-circle me-3">
+                            <i class="fas fa-arrow-down text-success fa-lg"></i>
+                        </div>
+                        <div>
+                            <p class="text-muted mb-1 small">Total Deposits</p>
+                            <h3 class="h4 mb-0">{{ format_currency(total_deposits) }}</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-3">
+            <div class="card stats-card border-0 shadow-sm" style="background: linear-gradient(135deg, #cce5ff, #b8daff);">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-white bg-opacity-50 p-3 rounded-circle me-3">
+                            <i class="fas fa-exchange-alt text-primary fa-lg"></i>
+                        </div>
+                        <div>
+                            <p class="text-muted mb-1 small">Total Transfers</p>
+                            <h3 class="h4 mb-0">{{ format_currency(total_transfers) }}</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-3">
+            <div class="card stats-card border-0 shadow-sm" style="background: linear-gradient(135deg, #fff3cd, #ffeaa7);">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-white bg-opacity-50 p-3 rounded-circle me-3">
+                            <i class="fas fa-percentage text-warning fa-lg"></i>
+                        </div>
+                        <div>
+                            <p class="text-muted mb-1 small">Total Fees Paid</p>
+                            <h3 class="h4 mb-0">{{ format_currency(total_fees) }}</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-3">
+            <div class="card stats-card border-0 shadow-sm" style="background: linear-gradient(135deg, #e2e3e5, #d6d8db);">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-white bg-opacity-50 p-3 rounded-circle me-3">
+                            <i class="fas fa-list-alt text-secondary fa-lg"></i>
+                        </div>
+                        <div>
+                            <p class="text-muted mb-1 small">Total Transactions</p>
+                            <h3 class="h4 mb-0">{{ transactions.total }}</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Filters -->
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <h5 class="mb-3 mb-md-0">
+                        <i class="fas fa-filter text-primary me-2"></i>Filter Transactions
+                    </h5>
+                </div>
+                <div class="col-md-6">
+                    <div class="d-flex flex-wrap gap-2 justify-content-md-end">
+                        <button class="filter-btn btn btn-outline-primary active" data-filter="all">
+                            All Transactions
+                        </button>
+                        <button class="filter-btn btn btn-outline-success" data-filter="deposit">
+                            <i class="fas fa-arrow-down me-1"></i>Deposits
+                        </button>
+                        <button class="filter-btn btn btn-outline-primary" data-filter="transfer">
+                            <i class="fas fa-exchange-alt me-1"></i>Transfers
+                        </button>
+                        <button class="filter-btn btn btn-outline-warning" data-filter="bill">
+                            <i class="fas fa-bolt me-1"></i>Bill Payments
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Transaction List -->
+    <div class="card border-0 shadow-sm">
+        <div class="card-body">
+            {% if transactions.items %}
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>Date & Time</th>
+                                <th>Transaction ID</th>
+                                <th>Type</th>
+                                <th>From / To</th>
+                                <th>Description</th>
+                                <th class="text-end">Amount</th>
+                                <th class="text-end">Fee</th>
+                                <th>Status</th>
+                                <th class="text-center">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for transaction in transactions.items %}
+                                <tr class="transaction-row {% if transaction.transaction_type == 'DEPOSIT' %}transaction-deposit{% elif transaction.transaction_type in ['TRANSFER', 'GOAL_DEPOSIT', 'GOAL_WITHDRAWAL'] %}transaction-transfer{% elif transaction.transaction_type == 'BILL_PAYMENT' %}transaction-bill{% endif %}"
+                                    data-type="{{ transaction.transaction_type|lower }}">
+                                    <td>
+                                        <div class="d-flex flex-column">
+                                            <span class="fw-medium">{{ transaction.created_at.strftime('%d %b %Y') }}</span>
+                                            <small class="text-muted">{{ transaction.created_at.strftime('%I:%M %p') }}</small>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <code class="bg-light px-2 py-1 rounded">{{ transaction.transaction_id }}</code>
+                                    </td>
+                                    <td>
+                                        {% if transaction.transaction_type == 'DEPOSIT' %}
+                                            <span class="badge bg-success">
+                                                <i class="fas fa-arrow-down me-1"></i>Deposit
+                                            </span>
+                                        {% elif transaction.transaction_type == 'TRANSFER' %}
+                                            <span class="badge bg-primary">
+                                                <i class="fas fa-exchange-alt me-1"></i>Transfer
+                                            </span>
+                                        {% elif transaction.transaction_type == 'BILL_PAYMENT' %}
+                                            <span class="badge bg-warning text-dark">
+                                                <i class="fas fa-bolt me-1"></i>Bill Payment
+                                            </span>
+                                        {% elif transaction.transaction_type == 'GOAL_DEPOSIT' %}
+                                            <span class="badge bg-info">
+                                                <i class="fas fa-bullseye me-1"></i>Goal Deposit
+                                            </span>
+                                        {% elif transaction.transaction_type == 'GOAL_WITHDRAWAL' %}
+                                            <span class="badge bg-info">
+                                                <i class="fas fa-bullseye me-1"></i>Goal Withdrawal
+                                            </span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">
+                                                {{ transaction.transaction_type }}
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="d-flex flex-column">
+                                            {% if transaction.transaction_type == 'DEPOSIT' %}
+                                                <small class="text-muted">From:</small>
+                                                <span class="fw-medium">DEPOSIT</span>
+                                                <small class="text-muted mt-1">To:</small>
+                                                <span class="fw-medium">{{ transaction.to_account }}</span>
+                                            {% elif transaction.transaction_type == 'TRANSFER' %}
+                                                <small class="text-muted">From:</small>
+                                                <span class="fw-medium">{{ transaction.from_account }}</span>
+                                                <small class="text-muted mt-1">To:</small>
+                                                <span class="fw-medium">{{ transaction.to_account }}</span>
+                                            {% elif transaction.transaction_type == 'BILL_PAYMENT' %}
+                                                <small class="text-muted">From:</small>
+                                                <span class="fw-medium">{{ transaction.from_account }}</span>
+                                                <small class="text-muted mt-1">To:</small>
+                                                <span class="fw-medium">BILL PAYMENT</span>
+                                            {% elif transaction.transaction_type == 'GOAL_DEPOSIT' %}
+                                                <small class="text-muted">From:</small>
+                                                <span class="fw-medium">{{ transaction.from_account }}</span>
+                                                <small class="text-muted mt-1">To:</small>
+                                                <span class="fw-medium">GOAL ACCOUNT</span>
+                                            {% elif transaction.transaction_type == 'GOAL_WITHDRAWAL' %}
+                                                <small class="text-muted">From:</small>
+                                                <span class="fw-medium">GOAL ACCOUNT</span>
+                                                <small class="text-muted mt-1">To:</small>
+                                                <span class="fw-medium">{{ transaction.to_account }}</span>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        {% if transaction.description %}
+                                            <span class="text-truncate d-inline-block" style="max-width: 200px;" title="{{ transaction.description }}">
+                                                {{ transaction.description }}
+                                            </span>
+                                        {% else %}
+                                            <span class="text-muted">No description</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-end">
+                                        {% if transaction.transaction_type == 'DEPOSIT' or transaction.transaction_type == 'GOAL_WITHDRAWAL' %}
+                                            <span class="amount-positive">+{{ format_currency(transaction.amount) }}</span>
+                                        {% elif transaction.transaction_type == 'TRANSFER' and transaction.from_account == current_user.accounts[0].account_number %}
+                                            <span class="amount-negative">-{{ format_currency(transaction.amount) }}</span>
+                                        {% elif transaction.transaction_type == 'BILL_PAYMENT' %}
+                                            <span class="amount-negative">-{{ format_currency(transaction.amount) }}</span>
+                                        {% elif transaction.transaction_type == 'GOAL_DEPOSIT' %}
+                                            <span class="amount-negative">-{{ format_currency(transaction.amount) }}</span>
+                                        {% else %}
+                                            <span class="amount-neutral">{{ format_currency(transaction.amount) }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-end">
+                                        {% if transaction.fee and transaction.fee > 0 %}
+                                            <span class="text-danger">-{{ format_currency(transaction.fee) }}</span>
+                                        {% else %}
+                                            <span class="text-muted">-</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if transaction.status == 'COMPLETED' %}
+                                            <span class="status-completed">
+                                                <i class="fas fa-check-circle me-1"></i>Completed
+                                            </span>
+                                        {% elif transaction.status == 'PENDING' %}
+                                            <span class="status-pending">
+                                                <i class="fas fa-clock me-1"></i>Pending
+                                            </span>
+                                        {% elif transaction.status == 'UNDONE' %}
+                                            <span class="status-undone">
+                                                <i class="fas fa-undo me-1"></i>Undone
+                                            </span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">{{ transaction.status }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-center">
+                                        {% if transaction.transaction_type == 'TRANSFER' and transaction.status == 'COMPLETED' %}
+                                            {% if can_undo_transaction(transaction) %}
+                                                <button class="btn btn-sm btn-outline-danger btn-undo" 
+                                                        data-transaction-id="{{ transaction.transaction_id }}"
+                                                        title="Undo this transaction (15-minute window)">
+                                                    <i class="fas fa-undo me-1"></i>Undo
+                                                    <br>
+                                                    <small class="time-remaining">15 min</small>
+                                                </button>
+                                            {% else %}
+                                                <button class="btn btn-sm btn-outline-secondary" disabled title="Undo window expired">
+                                                    <i class="fas fa-undo me-1"></i>Undo
+                                                </button>
+                                            {% endif %}
+                                        {% elif transaction.status == 'UNDONE' %}
+                                            <span class="badge bg-danger">Reversed</span>
+                                        {% else %}
+                                            <span class="text-muted">-</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Pagination -->
+                {% if transactions.pages > 1 %}
+                    <nav class="mt-4">
+                        <ul class="pagination justify-content-center">
+                            {% if transactions.has_prev %}
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ url_for('history', page=transactions.prev_num) }}">
+                                        <i class="fas fa-chevron-left"></i> Previous
+                                    </a>
+                                </li>
+                            {% else %}
+                                <li class="page-item disabled">
+                                    <span class="page-link">
+                                        <i class="fas fa-chevron-left"></i> Previous
+                                    </span>
+                                </li>
+                            {% endif %}
+                            
+                            {% for page_num in transactions.iter_pages(left_edge=2, right_edge=2, left_current=2, right_current=2) %}
+                                {% if page_num %}
+                                    {% if page_num == transactions.page %}
+                                        <li class="page-item active">
+                                            <span class="page-link">{{ page_num }}</span>
+                                        </li>
+                                    {% else %}
+                                        <li class="page-item">
+                                            <a class="page-link" href="{{ url_for('history', page=page_num) }}">{{ page_num }}</a>
+                                        </li>
+                                    {% endif %}
+                                {% else %}
+                                    <li class="page-item disabled">
+                                        <span class="page-link">...</span>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+                            
+                            {% if transactions.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ url_for('history', page=transactions.next_num) }}">
+                                        Next <i class="fas fa-chevron-right"></i>
+                                    </a>
+                                </li>
+                            {% else %}
+                                <li class="page-item disabled">
+                                    <span class="page-link">
+                                        Next <i class="fas fa-chevron-right"></i>
+                                    </span>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                {% endif %}
+                
+                <!-- Export Options -->
+                <div class="mt-4 pt-3 border-top">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <small class="text-muted">
+                                <i class="fas fa-info-circle me-1"></i>
+                                Showing {{ transactions.items|length }} of {{ transactions.total }} transactions
+                            </small>
+                        </div>
+                        <div class="col-md-6 text-md-end">
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-outline-primary btn-sm dropdown-toggle" data-bs-toggle="dropdown">
+                                    <i class="fas fa-download me-2"></i>Export
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" href="#"><i class="fas fa-file-pdf me-2"></i>PDF Report</a></li>
+                                    <li><a class="dropdown-item" href="#"><i class="fas fa-file-excel me-2"></i>Excel Sheet</a></li>
+                                    <li><a class="dropdown-item" href="#"><i class="fas fa-file-csv me-2"></i>CSV File</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+            {% else %}
+                <!-- Empty State -->
+                <div class="text-center py-5">
+                    <i class="fas fa-history fa-4x text-muted mb-4"></i>
+                    <h4 class="mb-3">No Transactions Yet</h4>
+                    <p class="text-muted mb-4">You haven't made any transactions yet. Start by making a deposit or transfer.</p>
+                    <div class="d-flex flex-wrap justify-content-center gap-3">
+                        <a href="{{ url_for('deposit') }}" class="btn btn-primary">
+                            <i class="fas fa-arrow-down me-2"></i>Make First Deposit
+                        </a>
+                        <a href="{{ url_for('transfer') }}" class="btn btn-outline-primary">
+                            <i class="fas fa-exchange-alt me-2"></i>Make Transfer
+                        </a>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Undo Info Card -->
+    <div class="card border-0 shadow-sm mt-4" style="border-left: 4px solid #ff6b35;">
+        <div class="card-body">
+            <div class="row align-items-center">
+                <div class="col-md-10">
+                    <h5 class="mb-1">
+                        <i class="fas fa-info-circle text-warning me-2"></i>About Transaction Undo
+                    </h5>
+                    <p class="text-muted mb-0">
+                        You can undo transfers within 15 minutes of completion. This feature gives you peace of mind against accidental transfers.
+                        Once undone, funds are immediately returned to your account and the recipient is notified.
+                    </p>
+                </div>
+                <div class="col-md-2 text-md-end">
+                    <span class="badge bg-warning text-dark px-3 py-2">
+                        <i class="fas fa-clock me-1"></i>15-Minute Window
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Undo Confirmation Modal -->
+<div class="modal fade" id="undoModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-warning">
+                    <i class="fas fa-exclamation-triangle me-2"></i>Confirm Transaction Undo
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to undo this transaction?</p>
+                <div class="alert alert-warning">
+                    <div class="d-flex">
+                        <i class="fas fa-info-circle me-3"></i>
+                        <div>
+                            <strong>Important:</strong>
+                            <ul class="mb-0 mt-2">
+                                <li>Funds will be immediately returned to your account</li>
+                                <li>The recipient will be notified of the reversal</li>
+                                <li>This action cannot be undone</li>
+                                <li>Transaction fees will be refunded</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="transaction-details p-3 bg-light rounded">
+                    <h6 class="mb-2">Transaction Details:</h6>
+                    <div class="row">
+                        <div class="col-6">
+                            <small class="text-muted">Transaction ID:</small>
+                            <p id="modalTransactionId" class="fw-bold mb-1"></p>
+                        </div>
+                        <div class="col-6">
+                            <small class="text-muted">Amount:</small>
+                            <p id="modalTransactionAmount" class="fw-bold mb-1"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form id="undoForm" method="POST">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-undo me-2"></i>Yes, Undo Transaction
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Filter transactions
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            // Remove active class from all buttons
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            
+            // Add active class to clicked button
+            this.classList.add('active');
+            
+            const filter = this.dataset.filter;
+            const rows = document.querySelectorAll('.transaction-row');
+            
+            rows.forEach(row => {
+                if (filter === 'all') {
+                    row.style.display = '';
+                } else if (row.dataset.type.includes(filter)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+    });
+    
+    // Undo transaction modal
+    document.querySelectorAll('.btn-undo').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const transactionId = this.dataset.transactionId;
+            const row = this.closest('tr');
+            const amountCell = row.querySelector('.amount-negative, .amount-positive, .amount-neutral');
+            
+            // Set modal content
+            document.getElementById('modalTransactionId').textContent = transactionId;
+            document.getElementById('modalTransactionAmount').textContent = amountCell.textContent;
+            
+            // Set form action
+            document.getElementById('undoForm').action = `/undo_transaction/${transactionId}`;
+            
+            // Show modal
+            const modal = new bootstrap.Modal(document.getElementById('undoModal'));
+            modal.show();
+        });
+    });
+    
+    // Auto-refresh page every 30 seconds to update undo timers
+    let refreshTimer = null;
+    
+    function startAutoRefresh() {
+        refreshTimer = setTimeout(() => {
+            location.reload();
+        }, 30000); // 30 seconds
+    }
+    
+    // Start auto-refresh if there are undo buttons visible
+    if (document.querySelector('.btn-undo:not([disabled])')) {
+        startAutoRefresh();
+    }
+    
+    // Stop auto-refresh when page is not visible
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            if (refreshTimer) {
+                clearTimeout(refreshTimer);
+                refreshTimer = null;
+            }
+        } else {
+            if (!refreshTimer && document.querySelector('.btn-undo:not([disabled])')) {
+                startAutoRefresh();
+            }
+        }
+    });
+    
+    // Search functionality (optional enhancement)
+    const searchInput = document.createElement('input');
+    searchInput.type = 'search';
+    searchInput.className = 'form-control form-control-sm';
+    searchInput.placeholder = 'Search transactions...';
+    searchInput.style.maxWidth = '250px';
+    
+    searchInput.addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase();
+        const rows = document.querySelectorAll('.transaction-row');
+        
+        rows.forEach(row => {
+            const text = row.textContent.toLowerCase();
+            if (text.includes(searchTerm)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    });
+    
+    // Add search input to header
+    document.addEventListener('DOMContentLoaded', function() {
+        const headerRow = document.querySelector('.card-body .row:first-child');
+        if (headerRow) {
+            const searchCol = document.createElement('div');
+            searchCol.className = 'col-md-4';
+            searchCol.appendChild(searchInput);
+            headerRow.appendChild(searchCol);
+        }
+    });
+    
+    // Sort functionality (optional enhancement)
+    document.querySelectorAll('th[data-sort]').forEach(th => {
+        th.style.cursor = 'pointer';
+        th.addEventListener('click', function() {
+            const sortBy = this.dataset.sort;
+            const isAsc = this.classList.contains('sort-asc');
+            
+            // Toggle sort direction
+            this.classList.toggle('sort-asc', !isAsc);
+            this.classList.toggle('sort-desc', isAsc);
+            
+            // Update icon
+            const icon = this.querySelector('.sort-icon') || document.createElement('i');
+            icon.className = `fas fa-sort-${isAsc ? 'down' : 'up'} sort-icon ms-1`;
+            this.appendChild(icon);
+            
+            // You would typically implement actual sorting logic here
+            // This would require additional backend support or complex frontend sorting
+            console.log(`Sort by ${sortBy} ${isAsc ? 'desc' : 'asc'}`);
+        });
+    });
+</script>
+{% endblock %}

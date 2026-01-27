@@ -1,0 +1,718 @@
+{% extends "base.html" %}
+
+{% block title %}Transfer Money - Nkuna Bank{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <!-- Left Column: Transfer Form -->
+        <div class="col-lg-8 mb-4 mb-lg-0">
+            <div class="card border-0 shadow-lg mb-4">
+                <div class="card-header bg-primary text-white py-3">
+                    <h3 class="h5 mb-0">
+                        <i class="fas fa-exchange-alt me-2"></i>Make a Transfer
+                    </h3>
+                </div>
+                <div class="card-body p-4">
+                    <div class="alert alert-info mb-4">
+                        <div class="d-flex">
+                            <i class="fas fa-info-circle fa-lg me-3"></i>
+                            <div>
+                                <strong>Important Information</strong>
+                                <ul class="mb-0 mt-1 small">
+                                    <li>You have 15 minutes to undo a transfer after completion</li>
+                                    <li>Transaction fee: 1% of amount (min R2, max R100)</li>
+                                    <li>Transfers are instant and cannot be cancelled after 15 minutes</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <form method="POST" action="{{ url_for('transfer') }}" id="transferForm">
+                        {{ form.hidden_tag() }}
+                        
+                        <!-- From Account (Read-only) -->
+                        <div class="mb-4">
+                            <label class="form-label">
+                                <i class="fas fa-user-circle me-2 text-primary"></i>From Account
+                            </label>
+                            <div class="input-group">
+                                <input type="text" class="form-control form-control-lg" 
+                                       value="{{ main_account.account_number }}" 
+                                       readonly
+                                       style="background-color: #f8f9fa; cursor: not-allowed;">
+                                <span class="input-group-text bg-light">
+                                    <i class="fas fa-university text-primary"></i>
+                                </span>
+                            </div>
+                            <div class="mt-1">
+                                <small class="text-muted">Your 10-digit account number</small>
+                            </div>
+                        </div>
+
+                        <!-- To Account -->
+                        <div class="mb-4">
+                            <label for="{{ form.to_account.id }}" class="form-label">
+                                <i class="fas fa-user-friends me-2 text-primary"></i>Recipient Account Number
+                            </label>
+                            <div class="input-group">
+                                {{ form.to_account(class="form-control form-control-lg", 
+                                                  placeholder="Enter 10-digit account number",
+                                                  id="toAccount",
+                                                  maxlength="10") }}
+                                <button class="btn btn-outline-primary" type="button" id="verifyAccountBtn">
+                                    <i class="fas fa-search me-1"></i>Verify
+                                </button>
+                            </div>
+                            <div class="mt-1">
+                                <div id="accountVerificationResult"></div>
+                                <small class="text-muted">Enter the recipient's 10-digit Nkuna Bank account number</small>
+                            </div>
+                            {% if form.to_account.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in form.to_account.errors %}
+                                        <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Amount -->
+                        <div class="mb-4">
+                            <label for="{{ form.amount.id }}" class="form-label">
+                                <i class="fas fa-money-bill-wave me-2 text-primary"></i>Amount to Transfer
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light">R</span>
+                                {{ form.amount(class="form-control form-control-lg", 
+                                             placeholder="0.00",
+                                             id="amount",
+                                             step="0.01",
+                                             min="0.01",
+                                             max="1000000") }}
+                            </div>
+                            {% if form.amount.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in form.amount.errors %}
+                                        <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Description -->
+                        <div class="mb-4">
+                            <label for="{{ form.description.id }}" class="form-label">
+                                <i class="fas fa-sticky-note me-2 text-primary"></i>Description (Optional)
+                            </label>
+                            {{ form.description(class="form-control form-control-lg", 
+                                              placeholder="e.g., Rent payment, Birthday gift, etc.",
+                                              id="description") }}
+                            <div class="mt-1">
+                                <small class="text-muted">Maximum 100 characters</small>
+                            </div>
+                        </div>
+
+                        <!-- Fee and Total Calculation -->
+                        <div class="card border-0 bg-light mb-4">
+                            <div class="card-body">
+                                <h6 class="card-title mb-3">
+                                    <i class="fas fa-calculator me-2 text-primary"></i>Transfer Summary
+                                </h6>
+                                
+                                <div class="row mb-2">
+                                    <div class="col-6 text-muted">Transfer Amount:</div>
+                                    <div class="col-6 text-end" id="transferAmountDisplay">R0.00</div>
+                                </div>
+                                
+                                <div class="row mb-2">
+                                    <div class="col-6 text-muted">Transaction Fee (1%):</div>
+                                    <div class="col-6 text-end" id="feeDisplay">R0.00</div>
+                                </div>
+                                
+                                <hr class="my-2">
+                                
+                                <div class="row">
+                                    <div class="col-6">
+                                        <strong>Total Deduction:</strong>
+                                    </div>
+                                    <div class="col-6 text-end">
+                                        <strong id="totalDisplay">R0.00</strong>
+                                    </div>
+                                </div>
+                                
+                                <div class="row mt-2">
+                                    <div class="col-6 text-muted">Your Balance:</div>
+                                    <div class="col-6 text-end">
+                                        <span id="balanceDisplay" class="fw-bold">
+                                            {{ format_currency(main_account.balance) }}
+                                        </span>
+                                    </div>
+                                </div>
+                                
+                                <div class="row mt-2">
+                                    <div class="col-6 text-muted">Remaining Balance:</div>
+                                    <div class="col-6 text-end">
+                                        <span id="remainingBalanceDisplay" class="fw-bold text-success">
+                                            {{ format_currency(main_account.balance) }}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg" id="submitBtn" disabled>
+                                <i class="fas fa-paper-plane me-2"></i>Transfer Money
+                            </button>
+                        </div>
+
+                        <!-- Undo Information -->
+                        <div class="mt-3 text-center">
+                            <small class="text-muted">
+                                <i class="fas fa-undo me-1 text-primary"></i>
+                                You can undo this transfer within 15 minutes after completion
+                            </small>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Recent Transfers -->
+            {% if recent_transfers %}
+            <div class="card border-0 shadow-lg">
+                <div class="card-header bg-light py-3">
+                    <h5 class="mb-0">
+                        <i class="fas fa-history me-2 text-primary"></i>Recent Transfers
+                    </h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="ps-4">Date</th>
+                                    <th>To Account</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                    <th class="text-end pe-4">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for transfer in recent_transfers[:5] %}
+                                <tr>
+                                    <td class="ps-4">
+                                        <small>{{ transfer.created_at.strftime('%Y-%m-%d') }}</small>
+                                    </td>
+                                    <td>
+                                        <code>{{ transfer.to_account }}</code>
+                                    </td>
+                                    <td>
+                                        <span class="fw-bold text-danger">
+                                            -{{ format_currency(transfer.amount) }}
+                                        </span>
+                                        {% if transfer.fee > 0 %}
+                                        <br>
+                                        <small class="text-muted">Fee: {{ format_currency(transfer.fee) }}</small>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if transfer.status == 'COMPLETED' %}
+                                            <span class="badge bg-success">
+                                                <i class="fas fa-check-circle me-1"></i>Completed
+                                            </span>
+                                        {% elif transfer.status == 'UNDONE' %}
+                                            <span class="badge bg-secondary">
+                                                <i class="fas fa-undo me-1"></i>Undone
+                                            </span>
+                                        {% else %}
+                                            <span class="badge bg-warning">
+                                                <i class="fas fa-clock me-1"></i>{{ transfer.status }}
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-end pe-4">
+                                        {% if transfer.status == 'COMPLETED' %}
+                                            <button class="btn btn-sm btn-outline-primary" 
+                                                    onclick="copyToClipboard('{{ transfer.transaction_id }}')"
+                                                    title="Copy Transaction ID">
+                                                <i class="fas fa-copy"></i>
+                                            </button>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="card-footer bg-light py-3">
+                    <a href="{{ url_for('history') }}" class="btn btn-outline-primary btn-sm">
+                        <i class="fas fa-list me-1"></i>View All Transactions
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Right Column: Info & Help -->
+        <div class="col-lg-4">
+            <!-- Account Summary -->
+            <div class="card border-0 shadow-lg mb-4">
+                <div class="card-header bg-success text-white py-3">
+                    <h5 class="mb-0">
+                        <i class="fas fa-wallet me-2"></i>Account Summary
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="text-center mb-4">
+                        <div class="display-6 fw-bold text-success">
+                            {{ format_currency(main_account.balance) }}
+                        </div>
+                        <p class="text-muted mb-0">Available Balance</p>
+                    </div>
+                    
+                    <div class="list-group list-group-flush">
+                        <div class="list-group-item d-flex justify-content-between align-items-center px-0 border-0">
+                            <span class="text-muted">
+                                <i class="fas fa-hashtag me-2"></i>Account Number
+                            </span>
+                            <code class="fw-bold">{{ main_account.account_number }}</code>
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between align-items-center px-0">
+                            <span class="text-muted">
+                                <i class="fas fa-user me-2"></i>Account Holder
+                            </span>
+                            <span class="fw-bold">{{ current_user.full_name }}</span>
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between align-items-center px-0">
+                            <span class="text-muted">
+                                <i class="fas fa-calendar me-2"></i>Account Created
+                            </span>
+                            <span>{{ main_account.created_at.strftime('%d %b %Y') }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Transfer Guidelines -->
+            <div class="card border-0 shadow-lg mb-4">
+                <div class="card-header bg-warning text-white py-3">
+                    <h5 class="mb-0">
+                        <i class="fas fa-lightbulb me-2"></i>Transfer Guidelines
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex mb-3">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-check-circle text-success fa-lg"></i>
+                        </div>
+                        <div class="ms-3">
+                            <h6 class="h6 mb-1">Double-check Account Number</h6>
+                            <p class="small text-muted mb-0">
+                                Verify the recipient's 10-digit account number before sending.
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex mb-3">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-check-circle text-success fa-lg"></i>
+                        </div>
+                        <div class="ms-3">
+                            <h6 class="h6 mb-1">Use Clear Descriptions</h6>
+                            <p class="small text-muted mb-0">
+                                Add a description to help identify the transaction.
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex mb-3">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-check-circle text-success fa-lg"></i>
+                        </div>
+                        <div class="ms-3">
+                            <h6 class="h6 mb-1">Check Your Balance</h6>
+                            <p class="small text-muted mb-0">
+                                Ensure you have enough funds including the transaction fee.
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-check-circle text-success fa-lg"></i>
+                        </div>
+                        <div class="ms-3">
+                            <h6 class="h6 mb-1">15-Minute Undo Window</h6>
+                            <p class="small text-muted mb-0">
+                                You can undo transfers within 15 minutes of completion.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="card border-0 shadow-lg">
+                <div class="card-header bg-info text-white py-3">
+                    <h5 class="mb-0">
+                        <i class="fas fa-bolt me-2"></i>Quick Actions
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="{{ url_for('dashboard') }}" class="btn btn-outline-primary">
+                            <i class="fas fa-tachometer-alt me-2"></i>Go to Dashboard
+                        </a>
+                        <a href="{{ url_for('deposit') }}" class="btn btn-outline-success">
+                            <i class="fas fa-money-bill-wave me-2"></i>Make a Deposit
+                        </a>
+                        <a href="{{ url_for('bills') }}" class="btn btn-outline-warning">
+                            <i class="fas fa-file-invoice-dollar me-2"></i>Pay Bills
+                        </a>
+                        <a href="{{ url_for('history') }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-history me-2"></i>Transaction History
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Get elements
+    const amountInput = document.getElementById('amount');
+    const toAccountInput = document.getElementById('toAccount');
+    const verifyBtn = document.getElementById('verifyAccountBtn');
+    const verificationResult = document.getElementById('accountVerificationResult');
+    const submitBtn = document.getElementById('submitBtn');
+    const transferForm = document.getElementById('transferForm');
+    
+    // Display elements
+    const transferAmountDisplay = document.getElementById('transferAmountDisplay');
+    const feeDisplay = document.getElementById('feeDisplay');
+    const totalDisplay = document.getElementById('totalDisplay');
+    const remainingBalanceDisplay = document.getElementById('remainingBalanceDisplay');
+    
+    // Get initial balance
+    const initialBalance = {{ main_account.balance }};
+    
+    // Format currency function
+    function formatCurrency(amount) {
+        return 'R' + parseFloat(amount).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+    }
+    
+    // Calculate transaction fee (1% min R2 max R100)
+    function calculateFee(amount) {
+        let fee = amount * 0.01;
+        if (fee < 2) fee = 2.00;
+        if (fee > 100) fee = 100.00;
+        return Math.round(fee * 100) / 100;
+    }
+    
+    // Update summary display
+    function updateSummary() {
+        const amount = parseFloat(amountInput.value) || 0;
+        const fee = calculateFee(amount);
+        const total = amount + fee;
+        const remaining = initialBalance - total;
+        
+        // Update displays
+        transferAmountDisplay.textContent = formatCurrency(amount);
+        feeDisplay.textContent = formatCurrency(fee);
+        totalDisplay.textContent = formatCurrency(total);
+        remainingBalanceDisplay.textContent = formatCurrency(remaining);
+        
+        // Color code remaining balance
+        if (remaining < 0) {
+            remainingBalanceDisplay.classList.remove('text-success');
+            remainingBalanceDisplay.classList.add('text-danger');
+        } else if (remaining < 100) {
+            remainingBalanceDisplay.classList.remove('text-success');
+            remainingBalanceDisplay.classList.add('text-warning');
+        } else {
+            remainingBalanceDisplay.classList.remove('text-danger', 'text-warning');
+            remainingBalanceDisplay.classList.add('text-success');
+        }
+        
+        // Enable/disable submit button - UPDATED VALIDATION
+        const toAccount = toAccountInput.value.trim();
+        const cleanAccount = toAccount.replace(/\D/g, "");
+        const isValidAmount = amount > 0 && amount <= 1000000;
+        const isAccountValid = cleanAccount.length === 10;
+        const hasSufficientFunds = total <= initialBalance;
+        
+        submitBtn.disabled = !(isValidAmount && isAccountValid && hasSufficientFunds);
+        
+        if (!hasSufficientFunds && amount > 0) {
+            remainingBalanceDisplay.innerHTML = formatCurrency(remaining) + 
+                ' <i class="fas fa-exclamation-triangle text-danger ms-1" title="Insufficient funds"></i>';
+        }
+    }
+    
+    // Verify account number
+    async function verifyAccount() {
+        const accountNumber = toAccountInput.value.trim();
+        const cleanAccountNumber = accountNumber.replace(/\D/g, "");
+        
+        if (cleanAccountNumber.length !== 10) {
+            verificationResult.innerHTML = `
+                <div class="alert alert-danger alert-dismissible fade show py-2" role="alert">
+                    <i class="fas fa-exclamation-circle me-2"></i>
+                    Account number must be 10 digits
+                    <button type="button" class="btn-close btn-close-sm" data-bs-dismiss="alert"></button>
+                </div>
+            `;
+            return;
+        }
+        
+        // Don't verify if it's the user's own account
+        if (cleanAccountNumber === '{{ main_account.account_number }}') {
+            verificationResult.innerHTML = `
+                <div class="alert alert-warning alert-dismissible fade show py-2" role="alert">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Cannot transfer to your own account
+                    <button type="button" class="btn-close btn-close-sm" data-bs-dismiss="alert"></button>
+                </div>
+            `;
+            return;
+        }
+        
+        // Show loading
+        verificationResult.innerHTML = `
+            <div class="alert alert-info alert-dismissible fade show py-2" role="alert">
+                <i class="fas fa-spinner fa-spin me-2"></i>
+                Verifying account...
+                <button type="button" class="btn-close btn-close-sm" data-bs-dismiss="alert"></button>
+            </div>
+        `;
+        
+        try {
+            const response = await fetch(`/api/check_account/${cleanAccountNumber}`);
+            const data = await response.json();
+            
+            if (data.exists) {
+                verificationResult.innerHTML = `
+                    <div class="alert alert-success alert-dismissible fade show py-2" role="alert">
+                        <i class="fas fa-check-circle me-2"></i>
+                        Account verified: <strong>${data.user_name}</strong>
+                        ${data.account_type === 'MAIN' ? '(Main Account)' : '(Goal Account)'}
+                        <button type="button" class="btn-close btn-close-sm" data-bs-dismiss="alert"></button>
+                    </div>
+                `;
+            } else {
+                verificationResult.innerHTML = `
+                    <div class="alert alert-danger alert-dismissible fade show py-2" role="alert">
+                        <i class="fas fa-times-circle me-2"></i>
+                        Account not found. Please check the account number.
+                        <button type="button" class="btn-close btn-close-sm" data-bs-dismiss="alert"></button>
+                    </div>
+                `;
+            }
+        } catch (error) {
+            verificationResult.innerHTML = `
+                <div class="alert alert-danger alert-dismissible fade show py-2" role="alert">
+                    <i class="fas fa-times-circle me-2"></i>
+                    Unable to verify account. Please try again.
+                    <button type="button" class="btn-close btn-close-sm" data-bs-dismiss="alert"></button>
+                </div>
+            `;
+        }
+    }
+    
+    // Copy to clipboard
+    function copyToClipboard(text) {
+        navigator.clipboard.writeText(text).then(() => {
+            // Show success message
+            const alert = document.createElement('div');
+            alert.className = 'alert alert-success alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3 z-3';
+            alert.innerHTML = `
+                <i class="fas fa-check-circle me-2"></i>
+                Transaction ID copied to clipboard!
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            document.body.appendChild(alert);
+            
+            // Remove after 3 seconds
+            setTimeout(() => {
+                alert.remove();
+            }, 3000);
+        });
+    }
+    
+    // Form validation on submit
+    transferForm.addEventListener('submit', function(e) {
+        // Clean the account number before submission
+        const rawAccountNumber = toAccountInput.value.trim();
+        const cleanAccountNumber = rawAccountNumber.replace(/\D/g, '');
+        
+        // Validate the cleaned account number
+        if (cleanAccountNumber.length !== 10) {
+            e.preventDefault();
+            alert('Please enter a valid 10-digit account number');
+            return false;
+        }
+        
+        // Update the form field with clean number
+        toAccountInput.value = cleanAccountNumber;
+        
+        const amount = parseFloat(amountInput.value);
+        const fee = calculateFee(amount);
+        const total = amount + fee;
+        
+        // Final validation
+        if (cleanAccountNumber === '{{ main_account.account_number }}') {
+            e.preventDefault();
+            alert('Cannot transfer to your own account');
+            return false;
+        }
+        
+        if (total > initialBalance) {
+            e.preventDefault();
+            alert('Insufficient funds to complete this transfer');
+            return false;
+        }
+        
+        if (!confirm(`Are you sure you want to transfer ${formatCurrency(amount)} to account ${cleanAccountNumber}?`)) {
+            e.preventDefault();
+            return false;
+        }
+        
+        // Disable button and show loading
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Processing Transfer...';
+        
+        return true;
+    });
+    
+    // Event listeners
+    amountInput.addEventListener('input', updateSummary);
+    toAccountInput.addEventListener('input', function() {
+        updateSummary();
+        // Clear verification result when account number changes
+        verificationResult.innerHTML = '';
+    });
+    
+    verifyBtn.addEventListener('click', verifyAccount);
+    
+    // Auto-format amount with thousands separators
+    amountInput.addEventListener('input', function(e) {
+        let value = e.target.value;
+        
+        // Remove non-numeric characters except decimal point
+        value = value.replace(/[^\d.]/g, '');
+        
+        // Ensure only one decimal point
+        const parts = value.split('.');
+        if (parts.length > 2) {
+            value = parts[0] + '.' + parts.slice(1).join('');
+        }
+        
+        // Limit to 2 decimal places
+        if (parts.length === 2) {
+            value = parts[0] + '.' + parts[1].substring(0, 2);
+        }
+        
+        e.target.value = value;
+    });
+    
+    // Initialize summary display
+    document.addEventListener('DOMContentLoaded', function() {
+        updateSummary();
+        amountInput.focus();
+    });
+</script>
+
+<style>
+    .card {
+        border-radius: 12px;
+        overflow: hidden;
+    }
+    
+    .card-header {
+        border-radius: 12px 12px 0 0 !important;
+    }
+    
+    .form-control-lg {
+        padding: 0.75rem 1rem;
+        border-radius: 8px;
+        border: 2px solid #e9ecef;
+        transition: all 0.3s ease;
+    }
+    
+    .form-control-lg:focus {
+        border-color: var(--primary-blue);
+        box-shadow: 0 0 0 0.25rem rgba(0, 102, 204, 0.25);
+    }
+    
+    .input-group-text {
+        border-radius: 8px 0 0 8px;
+        border: 2px solid #e9ecef;
+        border-right: none;
+        background: #f8f9fa;
+    }
+    
+    .input-group .form-control {
+        border-left: none;
+    }
+    
+    .btn-lg {
+        padding: 0.75rem 2rem;
+        border-radius: 8px;
+        font-weight: 600;
+    }
+    
+    .table th {
+        font-weight: 600;
+        color: var(--text-dark);
+        border-bottom: 2px solid #dee2e6;
+    }
+    
+    .table td {
+        vertical-align: middle;
+    }
+    
+    .badge {
+        padding: 0.35em 0.65em;
+        font-weight: 500;
+    }
+    
+    .list-group-item {
+        border-color: rgba(0, 0, 0, 0.05);
+    }
+    
+    .alert {
+        border-radius: 8px;
+        border: none;
+    }
+    
+    .btn-close-sm {
+        padding: 0.5rem;
+        font-size: 0.75rem;
+    }
+    
+    @media (max-width: 768px) {
+        .card-body {
+            padding: 1.5rem !important;
+        }
+        
+        .table-responsive {
+            font-size: 0.9rem;
+        }
+    }
+    
+    /* Animation for summary updates */
+    .update-animation {
+        animation: pulse 0.5s ease-in-out;
+    }
+    
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.02); }
+        100% { transform: scale(1); }
+    }
+</style>
+{% endblock %}

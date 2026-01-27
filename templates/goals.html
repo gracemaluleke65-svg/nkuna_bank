@@ -1,0 +1,785 @@
+{% extends "base.html" %}
+
+{% block title %}Goals - Nkuna Bank{% endblock %}
+
+{% block extra_css %}
+<style>
+    .goal-card {
+        border-radius: 15px;
+        border: 1px solid #e9ecef;
+        transition: all 0.3s ease;
+        overflow: hidden;
+    }
+    
+    .goal-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(0, 102, 204, 0.1);
+        border-color: var(--primary-blue);
+    }
+    
+    .progress-goal {
+        height: 8px;
+        border-radius: 4px;
+        background-color: #e9ecef;
+        overflow: hidden;
+    }
+    
+    .progress-goal-bar {
+        height: 100%;
+        border-radius: 4px;
+        transition: width 1s ease-in-out;
+    }
+    
+    .goal-status {
+        font-size: 0.85rem;
+        padding: 0.25rem 0.75rem;
+        border-radius: 50px;
+    }
+    
+    .status-active {
+        background-color: rgba(0, 200, 83, 0.1);
+        color: #00C853;
+        border: 1px solid rgba(0, 200, 83, 0.2);
+    }
+    
+    .status-completed {
+        background-color: rgba(33, 150, 243, 0.1);
+        color: #2196F3;
+        border: 1px solid rgba(33, 150, 243, 0.2);
+    }
+    
+    .goal-amount {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: var(--primary-blue);
+    }
+    
+    .goal-target {
+        color: var(--text-light);
+        font-size: 0.9rem;
+    }
+    
+    .days-remaining {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.25rem 0.75rem;
+        border-radius: 50px;
+        font-size: 0.85rem;
+        font-weight: 500;
+    }
+    
+    .days-warning {
+        background-color: rgba(255, 152, 0, 0.1);
+        color: #FF9800;
+        border: 1px solid rgba(255, 152, 0, 0.2);
+    }
+    
+    .days-success {
+        background-color: rgba(76, 175, 80, 0.1);
+        color: #4CAF50;
+        border: 1px solid rgba(76, 175, 80, 0.2);
+    }
+    
+    .days-danger {
+        background-color: rgba(244, 67, 54, 0.1);
+        color: #F44336;
+        border: 1px solid rgba(244, 67, 54, 0.2);
+    }
+    
+    .deposit-withdraw-card {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-radius: 15px;
+        border: 1px solid #dee2e6;
+    }
+    
+    .amount-input {
+        font-size: 1.25rem;
+        font-weight: 600;
+        border: 2px solid #dee2e6;
+        border-radius: 10px;
+        padding: 0.75rem 1rem;
+        transition: all 0.3s ease;
+    }
+    
+    .amount-input:focus {
+        border-color: var(--primary-blue);
+        box-shadow: 0 0 0 0.25rem rgba(0, 102, 204, 0.1);
+    }
+    
+    .action-btn {
+        padding: 0.75rem 1.5rem;
+        border-radius: 10px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    
+    .form-check-input:checked {
+        background-color: var(--primary-blue);
+        border-color: var(--primary-blue);
+    }
+    
+    .form-control-lg {
+        border-radius: 10px;
+        border: 2px solid #e9ecef;
+        transition: all 0.3s ease;
+    }
+    
+    .form-control-lg:focus {
+        border-color: var(--primary-blue);
+        box-shadow: 0 0 0 0.25rem rgba(0, 102, 204, 0.1);
+    }
+    
+    .empty-state {
+        padding: 4rem 2rem;
+        text-align: center;
+        background: white;
+        border-radius: 15px;
+        border: 2px dashed #dee2e6;
+    }
+    
+    .empty-state-icon {
+        font-size: 4rem;
+        color: #dee2e6;
+        margin-bottom: 1.5rem;
+    }
+    
+    .goal-icon {
+        width: 50px;
+        height: 50px;
+        background: linear-gradient(135deg, var(--light-blue) 0%, #d9ecff 100%);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 1rem;
+    }
+    
+    .goal-icon i {
+        font-size: 1.5rem;
+        color: var(--primary-blue);
+    }
+    
+    .auto-deposit-badge {
+        background-color: rgba(255, 193, 7, 0.1);
+        color: #FFC107;
+        border: 1px solid rgba(255, 193, 7, 0.2);
+        padding: 0.25rem 0.75rem;
+        border-radius: 50px;
+        font-size: 0.85rem;
+        display: inline-flex;
+        align-items: center;
+    }
+    
+    .modal-header {
+        background: linear-gradient(135deg, var(--primary-blue) 0%, var(--dark-blue) 100%);
+        color: white;
+        border-radius: 15px 15px 0 0;
+    }
+    
+    .modal-content {
+        border-radius: 15px;
+        border: none;
+    }
+    
+    /* Fix for number input validation */
+    input[type="number"] {
+        -moz-appearance: textfield;
+    }
+    
+    input[type="number"]::-webkit-outer-spin-button,
+    input[type="number"]::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Page Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}" class="text-decoration-none">
+                        <i class="fas fa-home"></i> Dashboard
+                    </a></li>
+                    <li class="breadcrumb-item active" aria-current="page">
+                        <i class="fas fa-bullseye"></i> Goals
+                    </li>
+                </ol>
+            </nav>
+            
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="h2 mb-2">Goal Savings</h1>
+                    <p class="text-muted mb-0">Set, track, and achieve your financial goals</p>
+                </div>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createGoalModal">
+                        <i class="fas fa-plus me-2"></i> New Goal
+                    </button>
+                    <a href="{{ url_for('dashboard') }}" class="btn btn-outline-primary">
+                        <i class="fas fa-tachometer-alt me-2"></i> Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Stats Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h6 class="text-muted mb-2">Active Goals</h6>
+                            <h3 class="h2 mb-0">{{ goals|length }}</h3>
+                        </div>
+                        <div class="bg-primary bg-opacity-10 p-3 rounded-circle">
+                            <i class="fas fa-bullseye text-primary fa-lg"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h6 class="text-muted mb-2">Total Saved</h6>
+                            <h3 class="h2 mb-0">{{ format_currency(total_saved) }}</h3>
+                        </div>
+                        <div class="bg-success bg-opacity-10 p-3 rounded-circle">
+                            <i class="fas fa-piggy-bank text-success fa-lg"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h6 class="text-muted mb-2">Goals Achieved</h6>
+                            <h3 class="h2 mb-0">{{ completed_goals }}</h3>
+                        </div>
+                        <div class="bg-warning bg-opacity-10 p-3 rounded-circle">
+                            <i class="fas fa-trophy text-warning fa-lg"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h6 class="text-muted mb-2">Main Account Balance</h6>
+                            <h3 class="h2 mb-0">{{ format_currency(main_account.balance) }}</h3>
+                        </div>
+                        <div class="bg-info bg-opacity-10 p-3 rounded-circle">
+                            <i class="fas fa-wallet text-info fa-lg"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Goals Grid -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <h3 class="h4 mb-4">Your Financial Goals</h3>
+            
+            {% if goals %}
+                <div class="row g-4">
+                    {% for goal in goals %}
+                    <div class="col-lg-6">
+                        <div class="goal-card card h-100">
+                            <div class="card-body p-4">
+                                <!-- Goal Header -->
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <div class="d-flex align-items-center">
+                                        <div class="goal-icon">
+                                            <i class="fas fa-{{ 'trophy' if goal.current_amount >= goal.target_amount else 'bullseye' }}"></i>
+                                        </div>
+                                        <div>
+                                            <h5 class="h5 mb-1">{{ goal.name }}</h5>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <span class="goal-status {{ 'status-completed' if goal.current_amount >= goal.target_amount else 'status-active' }}">
+                                                    {{ 'Achieved!' if goal.current_amount >= goal.target_amount else 'In Progress' }}
+                                                </span>
+                                                {% if goal.auto_deposit %}
+                                                <span class="auto-deposit-badge">
+                                                    <i class="fas fa-robot me-1"></i> Auto-save
+                                                </span>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="dropdown">
+                                        <i class="fas fa-ellipsis-v"></i>
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li>
+                                            <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#depositModal{{ goal.id }}">
+                                                <i class="fas fa-plus-circle text-success me-2"></i> Deposit
+                                            </button>
+                                        </li>
+                                        <li>
+                                            <button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#withdrawModal{{ goal.id }}">
+                                                <i class="fas fa-minus-circle text-warning me-2"></i> Withdraw
+                                            </button>
+                                        </li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li>
+                                            <button class="dropdown-item text-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ goal.id }}">
+                                                <i class="fas fa-trash me-2"></i> Delete
+                                            </button>
+                                        </li>
+                                    </ul>
+                                </div>
+                                
+                                <!-- Goal Progress -->
+                                <div class="mb-4">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <span class="goal-amount">{{ format_currency(goal.current_amount) }}</span>
+                                        <span class="goal-target">Target: {{ format_currency(goal.target_amount) }}</span>
+                                    </div>
+                                    <div class="progress-goal">
+                                        <div class="progress-goal-bar bg-primary" 
+                                             style="width: {{ (goal.current_amount / goal.target_amount * 100) if goal.target_amount > 0 else 0 }}%">
+                                        </div>
+                                    </div>
+                                    <div class="d-flex justify-content-between mt-2">
+                                        <small class="text-muted">{{ ((goal.current_amount / goal.target_amount) * 100)|round(1) if goal.target_amount > 0 else 0 }}% Complete</small>
+                                        <small class="text-muted">{{ goal.days_remaining }} days remaining</small>
+                                    </div>
+                                </div>
+                                
+                                <!-- Goal Details -->
+                                <div class="row g-3">
+                                    <div class="col-6">
+                                        <div class="card bg-light border-0">
+                                            <div class="card-body p-3 text-center">
+                                                <small class="text-muted d-block">Target Date</small>
+                                                <strong>{{ goal.target_date.strftime('%d %b %Y') }}</strong>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="card bg-light border-0">
+                                            <div class="card-body p-3 text-center">
+                                                <small class="text-muted d-block">Days Remaining</small>
+                                                <strong class="{% if goal.days_remaining <= 7 %}text-danger{% elif goal.days_remaining <= 30 %}text-warning{% else %}text-success{% endif %}">
+                                                    {{ goal.days_remaining }}
+                                                </strong>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Action Buttons -->
+                                <div class="row g-2 mt-3">
+                                    <div class="col-6">
+                                        <button class="btn btn-success w-100 action-btn" 
+                                                data-bs-toggle="modal" 
+                                                data-bs-target="#depositModal{{ goal.id }}"
+                                                {% if main_account.balance <= 0 %}disabled{% endif %}>
+                                            <i class="fas fa-plus me-2"></i> Deposit
+                                        </button>
+                                    </div>
+                                    <div class="col-6">
+                                        <button class="btn btn-warning w-100 action-btn" 
+                                                data-bs-toggle="modal" 
+                                                data-bs-target="#withdrawModal{{ goal.id }}"
+                                                {% if goal.current_amount <= 0 %}disabled{% endif %}>
+                                            <i class="fas fa-minus me-2"></i> Withdraw
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Deposit Modal for this goal - FIXED -->
+                        <div class="modal fade" id="depositModal{{ goal.id }}" tabindex="-1">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">
+                                            <i class="fas fa-plus-circle me-2"></i>Deposit to Goal
+                                        </h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <form method="POST" action="{{ url_for('deposit_to_goal', goal_id=goal.id) }}">
+                                            <div class="mb-3">
+                                                <label class="form-label">Goal Name</label>
+                                                <input type="text" class="form-control" value="{{ goal.name }}" readonly>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Current Amount</label>
+                                                <div class="input-group">
+                                                    <span class="input-group-text">R</span>
+                                                    <input type="text" class="form-control" value="{{ goal.current_amount }}" readonly>
+                                                </div>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Target Amount</label>
+                                                <div class="input-group">
+                                                    <span class="input-group-text">R</span>
+                                                    <input type="text" class="form-control" value="{{ goal.target_amount }}" readonly>
+                                                </div>
+                                            </div>
+                                            <div class="mb-4">
+                                                <label for="depositAmount{{ goal.id }}" class="form-label">Deposit Amount</label>
+                                                <div class="input-group">
+                                                    <span class="input-group-text">R</span>
+                                                    <input type="number" 
+                                                           class="form-control amount-input" 
+                                                           id="depositAmount{{ goal.id }}"
+                                                           name="amount" 
+                                                           min="1" 
+                                                           max="{{ main_account.balance }}"
+                                                           step="0.01" 
+                                                           required
+                                                           placeholder="0.00"
+                                                           oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');">
+                                                </div>
+                                                <div class="form-text">
+                                                    Available in main account: {{ format_currency(main_account.balance) }}
+                                                </div>
+                                            </div>
+                                            <div class="alert alert-info">
+                                                <div class="d-flex">
+                                                    <i class="fas fa-info-circle me-3"></i>
+                                                    <div>
+                                                        <small class="mb-0">This deposit will be transferred from your main account to your goal account.</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="d-flex gap-2">
+                                                <button type="button" class="btn btn-secondary w-50" data-bs-dismiss="modal">Cancel</button>
+                                                <button type="submit" class="btn btn-primary w-50">
+                                                    <i class="fas fa-check me-2"></i> Confirm Deposit
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Withdraw Modal for this goal - FIXED -->
+                        <div class="modal fade" id="withdrawModal{{ goal.id }}" tabindex="-1">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">
+                                            <i class="fas fa-minus-circle me-2"></i>Withdraw from Goal
+                                        </h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <form method="POST" action="{{ url_for('withdraw_from_goal', goal_id=goal.id) }}">
+                                            <div class="mb-3">
+                                                <label class="form-label">Goal Name</label>
+                                                <input type="text" class="form-control" value="{{ goal.name }}" readonly>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Current Amount</label>
+                                                <div class="input-group">
+                                                    <span class="input-group-text">R</span>
+                                                    <input type="text" class="form-control" value="{{ goal.current_amount }}" readonly>
+                                                </div>
+                                            </div>
+                                            <div class="mb-4">
+                                                <label for="withdrawAmount{{ goal.id }}" class="form-label">Withdraw Amount</label>
+                                                <div class="input-group">
+                                                    <span class="input-group-text">R</span>
+                                                    <input type="number" 
+                                                           class="form-control amount-input" 
+                                                           id="withdrawAmount{{ goal.id }}"
+                                                           name="amount" 
+                                                           min="1" 
+                                                           max="{{ goal.current_amount }}"
+                                                           step="0.01" 
+                                                           required
+                                                           placeholder="0.00"
+                                                           oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');">
+                                                </div>
+                                                <div class="form-text">
+                                                    Available in goal: {{ format_currency(goal.current_amount) }}
+                                                </div>
+                                            </div>
+                                            <div class="alert alert-warning">
+                                                <div class="d-flex">
+                                                    <i class="fas fa-exclamation-triangle me-3"></i>
+                                                    <div>
+                                                        <small class="mb-0">This withdrawal will be transferred from your goal account back to your main account.</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="d-flex gap-2">
+                                                <button type="button" class="btn btn-secondary w-50" data-bs-dismiss="modal">Cancel</button>
+                                                <button type="submit" class="btn btn-warning w-50">
+                                                    <i class="fas fa-check me-2"></i> Confirm Withdrawal
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Delete Modal for this goal -->
+                        <div class="modal fade" id="deleteModal{{ goal.id }}" tabindex="-1">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title text-danger">
+                                            <i class="fas fa-exclamation-triangle me-2"></i>Delete Goal
+                                        </h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="text-center mb-4">
+                                            <i class="fas fa-trash fa-3x text-danger mb-3"></i>
+                                            <h5>Are you sure?</h5>
+                                            <p class="text-muted">
+                                                This will delete your goal "{{ goal.name }}" and any remaining balance will be transferred back to your main account.
+                                            </p>
+                                        </div>
+                                        <div class="d-flex gap-2">
+                                            <button type="button" class="btn btn-secondary w-50" data-bs-dismiss="modal">Cancel</button>
+                                            <form method="POST" action="{{ url_for('delete_goal', goal_id=goal.id) }}" class="w-50">
+                                                <button type="submit" class="btn btn-danger w-100">
+                                                    <i class="fas fa-trash me-2"></i> Delete Goal
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <!-- Empty State -->
+                <div class="empty-state">
+                    <div class="empty-state-icon">
+                        <i class="fas fa-bullseye"></i>
+                    </div>
+                    <h4 class="mb-3">No Goals Yet</h4>
+                    <p class="text-muted mb-4">Start your financial journey by setting your first savings goal.</p>
+                    <button class="btn btn-primary btn-lg" data-bs-toggle="modal" data-bs-target="#createGoalModal">
+                        <i class="fas fa-plus me-2"></i> Create Your First Goal
+                    </button>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Create Goal Modal -->
+<div class="modal fade" id="createGoalModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-bullseye me-2"></i>Create New Goal
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form method="POST" action="{{ url_for('goals') }}" id="createGoalForm">
+                    {{ form.hidden_tag() }}
+                    
+                    <div class="row g-3">
+                        <!-- Goal Name -->
+                        <div class="col-12">
+                            <label for="{{ form.name.id }}" class="form-label">Goal Name</label>
+                            {{ form.name(class="form-control form-control-lg", placeholder="e.g., Vacation Fund, New Car, House Deposit") }}
+                            {% if form.name.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in form.name.errors %}
+                                        <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Target Amount -->
+                        <div class="col-md-6">
+                            <label for="{{ form.target_amount.id }}" class="form-label">Target Amount (R)</label>
+                            <div class="input-group">
+                                <span class="input-group-text">R</span>
+                                {{ form.target_amount(class="form-control form-control-lg", placeholder="1000.00", step="0.01") }}
+                            </div>
+                            {% if form.target_amount.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in form.target_amount.errors %}
+                                        <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Target Date -->
+                        <div class="col-md-6">
+                            <label for="{{ form.target_date.id }}" class="form-label">Target Date</label>
+                            {{ form.target_date(class="form-control form-control-lg", type="date") }}
+                            {% if form.target_date.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in form.target_date.errors %}
+                                        <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Auto-deposit Toggle -->
+                        <div class="col-12">
+                            <div class="form-check form-switch mb-3">
+                                {{ form.auto_deposit(class="form-check-input", id="autoDepositToggle") }}
+                                <label class="form-check-label" for="autoDepositToggle">
+                                    <i class="fas fa-robot me-2"></i> Enable Auto-deposit
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <!-- Auto-deposit Details (Hidden by default) -->
+                        <div id="autoDepositDetails" style="display: none;">
+                            <div class="col-md-6">
+                                <label for="{{ form.auto_deposit_amount.id }}" class="form-label">Auto-deposit Amount (R)</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">R</span>
+                                    {{ form.auto_deposit_amount(class="form-control form-control-lg", placeholder="100.00", step="0.01") }}
+                                </div>
+                                {% if form.auto_deposit_amount.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {% for error in form.auto_deposit_amount.errors %}
+                                            <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label for="{{ form.auto_deposit_day.id }}" class="form-label">Day of Month (1-28)</label>
+                                {{ form.auto_deposit_day(class="form-control form-control-lg", placeholder="15") }}
+                                {% if form.auto_deposit_day.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {% for error in form.auto_deposit_day.errors %}
+                                            <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <!-- Info Alert -->
+                        <div class="col-12">
+                            <div class="alert alert-info">
+                                <div class="d-flex">
+                                    <i class="fas fa-info-circle me-3"></i>
+                                    <div>
+                                        <small class="mb-0">
+                                            A new goal account will be created for this goal. You can deposit and withdraw funds as needed.
+                                            Auto-deposit will transfer funds from your main account to this goal automatically.
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex gap-2 mt-4">
+                        <button type="button" class="btn btn-secondary w-50" data-bs-dismiss="modal">Cancel</button>
+                        {{ form.submit(class="btn btn-primary w-50", value="Create Goal") }}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Auto-deposit toggle
+    const autoDepositToggle = document.getElementById('autoDepositToggle');
+    const autoDepositDetails = document.getElementById('autoDepositDetails');
+    
+    autoDepositToggle.addEventListener('change', function() {
+        if (this.checked) {
+            autoDepositDetails.style.display = 'block';
+            // Set required attribute for auto-deposit fields
+            document.getElementById('{{ form.auto_deposit_amount.id }}').required = true;
+            document.getElementById('{{ form.auto_deposit_day.id }}').required = true;
+        } else {
+            autoDepositDetails.style.display = 'none';
+            // Remove required attribute
+            document.getElementById('{{ form.auto_deposit_amount.id }}').required = false;
+            document.getElementById('{{ form.auto_deposit_day.id }}').required = false;
+        }
+    });
+    
+    // Date picker - set min date to tomorrow
+    const today = new Date();
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    
+    const targetDateInput = document.getElementById('{{ form.target_date.id }}');
+    targetDateInput.min = tomorrow.toISOString().split('T')[0];
+    
+    // Set default to 1 month from now
+    const oneMonthLater = new Date(today);
+    oneMonthLater.setMonth(oneMonthLater.getMonth() + 1);
+    targetDateInput.value = oneMonthLater.toISOString().split('T')[0];
+    
+    // Deposit amount validation
+    document.querySelectorAll('input[name="amount"]').forEach(input => {
+        input.addEventListener('input', function() {
+            const max = parseFloat(this.max);
+            const value = parseFloat(this.value);
+            
+            if (value > max) {
+                this.value = max;
+            }
+            
+            if (value < parseFloat(this.min)) {
+                this.value = this.min;
+            }
+        });
+    });
+    
+    // Calculate days remaining for each goal on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        // Animate progress bars
+        document.querySelectorAll('.progress-goal-bar').forEach(bar => {
+            const width = bar.style.width;
+            bar.style.width = '0%';
+            setTimeout(() => {
+                bar.style.width = width;
+            }, 100);
+        });
+        
+        // Format currency input
+        document.querySelectorAll('input[type="number"][step="0.01"]').forEach(input => {
+            input.addEventListener('blur', function() {
+                if (this.value) {
+                    this.value = parseFloat(this.value).toFixed(2);
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

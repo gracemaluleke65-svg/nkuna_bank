@@ -1,0 +1,264 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Login - Nkuna Bank{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card border-0 shadow-lg overflow-hidden">
+                <div class="row g-0">
+                    <!-- Left Side - Benefits -->
+                    <div class="col-lg-5 d-none d-lg-block">
+                        <div class="bg-primary text-white h-100 p-4 p-md-5">
+                            <div class="h-100 d-flex flex-column justify-content-center">
+                                <div class="text-center mb-5">
+                                    <i class="fas fa-university fa-4x mb-4 text-white-50"></i>
+                                    <h2 class="h3 mb-3">Admin Portal</h2>
+                                    <p class="opacity-75">Secure admin access to Nkuna Bank</p>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <div class="bg-white bg-opacity-25 p-2 rounded-circle me-3">
+                                            <i class="fas fa-shield-alt text-white"></i>
+                                        </div>
+                                        <div>
+                                            <h5 class="h6 mb-1">Admin Controls</h5>
+                                            <p class="small opacity-75 mb-0">Manage users and system settings</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="d-flex align-items-center mb-3">
+                                        <div class="bg-white bg-opacity-25 p-2 rounded-circle me-3">
+                                            <i class="fas fa-chart-line text-white"></i>
+                                        </div>
+                                        <div>
+                                            <h5 class="h6 mb-1">System Analytics</h5>
+                                            <p class="small opacity-75 mb-0">Monitor bank performance and revenue</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="d-flex align-items-center">
+                                        <div class="bg-white bg-opacity-25 p-2 rounded-circle me-3">
+                                            <i class="fas fa-users text-white"></i>
+                                        </div>
+                                        <div>
+                                            <h5 class="h6 mb-1">User Management</h5>
+                                            <p class="small opacity-75 mb-0">Oversee customer accounts</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="mt-auto">
+                                    <div class="card bg-white bg-opacity-10 border-0">
+                                        <div class="card-body p-3">
+                                            <h5 class="h6 mb-2">Admin Support</h5>
+                                            <p class="small mb-2 opacity-75">System administrator access</p>
+                                            <a href="mailto:admin@nkunabank.co.za" class="text-white text-decoration-none">
+                                                <i class="fas fa-envelope me-2"></i>admin@nkunabank.co.za
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Right Side - Login Form -->
+                    <div class="col-lg-7">
+                        <div class="card-body p-4 p-md-5">
+                            <div class="text-center mb-4">
+                                <a href="{{ url_for('index') }}" class="d-inline-block mb-3">
+                                    <i class="fas fa-university fa-2x text-primary"></i>
+                                </a>
+                                <h2 class="h3 mb-3">Admin Login</h2>
+                                <p class="text-muted">Access your admin dashboard</p>
+                            </div>
+                            
+                            <form method="POST" action="{{ url_for('admin_login') }}">
+                                {{ form.hidden_tag() }}
+                                
+                                <!-- Email -->
+                                <div class="mb-4">
+                                    <label for="{{ form.email.id }}" class="form-label">
+                                        <i class="fas fa-envelope me-2 text-primary"></i>Admin Email Address
+                                    </label>
+                                    <div class="input-group">
+                                        {{ form.email(class="form-control form-control-lg", placeholder="admin@example.com") }}
+                                        <span class="input-group-text bg-light">
+                                            <i class="fas fa-at text-primary"></i>
+                                        </span>
+                                    </div>
+                                    {% if form.email.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {% for error in form.email.errors %}
+                                                <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <!-- Password -->
+                                <div class="mb-4">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <label for="{{ form.password.id }}" class="form-label mb-0">
+                                            <i class="fas fa-lock me-2 text-primary"></i>Admin Password
+                                        </label>
+                                    </div>
+                                    <div class="input-group">
+                                        {{ form.password(class="form-control form-control-lg", placeholder="Enter your admin password", id="password") }}
+                                        <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                    </div>
+                                    {% if form.password.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {% for error in form.password.errors %}
+                                                <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <!-- Remember Me -->
+                                <div class="mb-4">
+                                    <div class="form-check">
+                                        {{ form.remember(class="form-check-input") }}
+                                        <label class="form-check-label" for="{{ form.remember.id }}">
+                                            Remember me on this device
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <!-- Submit Button -->
+                                <div class="d-grid mb-4">
+                                    {{ form.submit(class="btn btn-primary btn-lg", value="Login to Admin Dashboard") }}
+                                </div>
+                                
+                                <!-- Demo Admin Alert -->
+                                <div class="alert alert-info mb-4">
+                                    <div class="d-flex">
+                                        <i class="fas fa-info-circle fa-lg me-3"></i>
+                                        <div>
+                                            <strong>Demo Admin Access</strong>
+                                            <p class="mb-0 small">Email: admin@nkunabank.co.za / Password: Admin@123</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Divider -->
+                                <div class="position-relative my-4">
+                                    <hr>
+                                    <div class="position-absolute top-50 start-50 translate-middle bg-white px-3">
+                                        <span class="text-muted">Or return to</span>
+                                    </div>
+                                </div>
+                                
+                                <!-- Alternative Actions -->
+                                <div class="d-grid gap-3">
+                                    <a href="{{ url_for('login') }}" class="btn btn-outline-secondary btn-lg">
+                                        <i class="fas fa-user me-2"></i>User Login
+                                    </a>
+                                    
+                                    <a href="{{ url_for('index') }}" class="btn btn-outline-secondary btn-lg">
+                                        <i class="fas fa-home me-2"></i>Return to Home
+                                    </a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Toggle password visibility
+    document.getElementById('togglePassword').addEventListener('click', function() {
+        const passwordInput = document.getElementById('password');
+        const icon = this.querySelector('i');
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            icon.classList.replace('fa-eye', 'fa-eye-slash');
+        } else {
+            passwordInput.type = 'password';
+            icon.classList.replace('fa-eye-slash', 'fa-eye');
+        }
+    });
+    
+    // Auto-focus email field
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('{{ form.email.id }}').focus();
+    });
+    
+    // Form auto-submit on Enter
+    document.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter' && e.target.tagName === 'INPUT') {
+            const form = document.querySelector('form');
+            if (!form.checkValidity()) {
+                form.reportValidity();
+            }
+        }
+    });
+    
+    // Add loading state to submit button
+    document.querySelector('form').addEventListener('submit', function() {
+        const submitBtn = this.querySelector('input[type="submit"]');
+        submitBtn.disabled = true;
+        submitBtn.value = 'Logging in...';
+    });
+</script>
+
+<style>
+    .card {
+        border-radius: 15px;
+        transition: transform 0.3s ease;
+    }
+    
+    .card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .form-control-lg {
+        padding: 0.75rem 1rem;
+        border-radius: 10px;
+        border: 2px solid #e9ecef;
+        transition: all 0.3s ease;
+    }
+    
+    .form-control-lg:focus {
+        border-color: var(--primary-blue);
+        box-shadow: 0 0 0 0.25rem rgba(0, 102, 204, 0.25);
+    }
+    
+    .input-group-text {
+        border-radius: 0 10px 10px 0;
+        border: 2px solid #e9ecef;
+        border-left: none;
+        background: #f8f9fa;
+    }
+    
+    .input-group .form-control {
+        border-right: none;
+    }
+    
+    .btn-lg {
+        padding: 0.75rem 2rem;
+        border-radius: 10px;
+        font-weight: 600;
+    }
+    
+    .alert {
+        border-radius: 10px;
+        border: none;
+    }
+    
+    @media (max-width: 768px) {
+        .card-body {
+            padding: 2rem !important;
+        }
+    }
+</style>
+{% endblock %}

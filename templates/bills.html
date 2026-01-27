@@ -1,0 +1,842 @@
+{% extends "base.html" %}
+
+{% block title %}Bill Payments - Nkuna Bank{% endblock %}
+
+{% block extra_css %}
+<style>
+    .bill-type-card {
+        background: white;
+        border-radius: 15px;
+        padding: 1.5rem;
+        height: 100%;
+        border: 2px solid transparent;
+        transition: all 0.3s ease;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    }
+    
+    .bill-type-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0, 102, 204, 0.15);
+    }
+    
+    .bill-type-card.electricity {
+        border-color: #FFD700;
+    }
+    
+    .bill-type-card.water {
+        border-color: #00B4FF;
+    }
+    
+    .bill-type-card.airtime {
+        border-color: #00C853;
+    }
+    
+    .bill-type-card.data {
+        border-color: #FF6B35;
+    }
+    
+    .bill-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1rem;
+    }
+    
+    .bill-icon.electricity {
+        background: linear-gradient(135deg, #FFF8E1 0%, #FFECB3 100%);
+    }
+    
+    .bill-icon.water {
+        background: linear-gradient(135deg, #E3F2FD 0%, #BBDEFB 100%);
+    }
+    
+    .bill-icon.airtime {
+        background: linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%);
+    }
+    
+    .bill-icon.data {
+        background: linear-gradient(135deg, #FFEBEE 0%, #FFCDD2 100%);
+    }
+    
+    .bill-history-card {
+        background: white;
+        border-radius: 12px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        border-left: 4px solid var(--primary-blue);
+        transition: all 0.3s ease;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+    }
+    
+    .bill-history-card:hover {
+        transform: translateX(5px);
+        box-shadow: 0 5px 15px rgba(0, 102, 204, 0.1);
+    }
+    
+    .bill-history-card.completed {
+        border-left-color: #00C853;
+    }
+    
+    .bill-history-card.pending {
+        border-left-color: #FFA000;
+    }
+    
+    .form-control-lg {
+        border-radius: 10px;
+        border: 2px solid #e9ecef;
+        padding: 0.75rem 1rem;
+        transition: all 0.3s ease;
+    }
+    
+    .form-control-lg:focus {
+        border-color: var(--primary-blue);
+        box-shadow: 0 0 0 0.25rem rgba(0, 102, 204, 0.25);
+    }
+    
+    .select-wrapper {
+        position: relative;
+    }
+    
+    .select-wrapper select {
+        appearance: none;
+        padding-right: 2.5rem;
+    }
+    
+    .select-wrapper::after {
+        content: '\f078';
+        font-family: 'Font Awesome 6 Free';
+        font-weight: 900;
+        position: absolute;
+        right: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--primary-blue);
+        pointer-events: none;
+    }
+    
+    .info-alert {
+        background: linear-gradient(135deg, #E3F2FD 0%, #BBDEFB 100%);
+        border: 1px solid var(--primary-blue);
+        border-radius: 10px;
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .balance-card {
+        background: linear-gradient(135deg, var(--primary-blue) 0%, var(--dark-blue) 100%);
+        color: white;
+        border-radius: 15px;
+        padding: 1.5rem;
+    }
+    
+    .step-indicator {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 2rem;
+    }
+    
+    .step {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        position: relative;
+        z-index: 1;
+    }
+    
+    .step-number {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: #e9ecef;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        color: var(--text-light);
+        margin-bottom: 0.5rem;
+        transition: all 0.3s ease;
+    }
+    
+    .step.active .step-number {
+        background: var(--primary-blue);
+        color: white;
+        transform: scale(1.1);
+    }
+    
+    .step-line {
+        flex: 1;
+        height: 2px;
+        background: #e9ecef;
+        margin: 0 1rem;
+        position: relative;
+        top: -20px;
+    }
+    
+    .step-title {
+        font-size: 0.85rem;
+        color: var(--text-light);
+        text-align: center;
+    }
+    
+    .step.active .step-title {
+        color: var(--primary-blue);
+        font-weight: 600;
+    }
+    
+    @media (max-width: 768px) {
+        .step-indicator {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        
+        .step {
+            flex-direction: row;
+            margin-bottom: 1rem;
+            width: 100%;
+        }
+        
+        .step-line {
+            display: none;
+        }
+        
+        .step-number {
+            margin-right: 1rem;
+            margin-bottom: 0;
+        }
+        
+        .step-title {
+            text-align: left;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Page Header -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}"><i class="fas fa-home"></i> Dashboard</a></li>
+                    <li class="breadcrumb-item active" aria-current="page"><i class="fas fa-file-invoice-dollar"></i> Bill Payments</li>
+                </ol>
+            </nav>
+            
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="h2 mb-2"><i class="fas fa-file-invoice-dollar text-primary me-2"></i>Bill Payments</h1>
+                    <p class="text-muted mb-0">Pay your bills instantly and securely</p>
+                </div>
+                <div class="d-flex gap-2">
+                    <a href="{{ url_for('dashboard') }}" class="btn btn-outline-primary">
+                        <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Left Column - Bill Payment Form -->
+        <div class="col-lg-8 mb-4">
+            <!-- Balance Card -->
+            <div class="balance-card mb-4">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="mb-1">Available Balance</h6>
+                        <h3 class="mb-0">{{ format_currency(main_account.balance) }}</h3>
+                        <small>Main Account: {{ main_account.account_number }}</small>
+                    </div>
+                    <div>
+                        <i class="fas fa-wallet fa-3x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Payment Form -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body p-4">
+                    <h4 class="card-title mb-4"><i class="fas fa-money-bill-wave me-2"></i>Pay Bill</h4>
+                    
+                    <div class="step-indicator">
+                        <div class="step active">
+                            <div class="step-number">1</div>
+                            <div class="step-line"></div>
+                            <div class="step-title">Select Bill</div>
+                        </div>
+                        <div class="step">
+                            <div class="step-number">2</div>
+                            <div class="step-line"></div>
+                            <div class="step-title">Enter Details</div>
+                        </div>
+                        <div class="step">
+                            <div class="step-number">3</div>
+                            <div class="step-title">Confirm & Pay</div>
+                        </div>
+                    </div>
+
+                    <form method="POST" action="{{ url_for('bills') }}">
+                        {{ form.hidden_tag() }}
+                        
+                        <!-- Bill Type Selection -->
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Select Bill Type</label>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <div class="bill-type-card electricity {% if form.bill_type.data == 'ELECTRICITY' %}active-bill{% endif %}" 
+                                         onclick="selectBillType('ELECTRICITY')">
+                                        <div class="d-flex align-items-start">
+                                            <div class="bill-icon electricity me-3">
+                                                <i class="fas fa-bolt fa-xl text-warning"></i>
+                                            </div>
+                                            <div>
+                                                <h6 class="fw-bold mb-1">Electricity</h6>
+                                                <p class="small text-muted mb-0">Eskom, Municipalities</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="bill-type-card water {% if form.bill_type.data == 'WATER' %}active-bill{% endif %}" 
+                                         onclick="selectBillType('WATER')">
+                                        <div class="d-flex align-items-start">
+                                            <div class="bill-icon water me-3">
+                                                <i class="fas fa-tint fa-xl text-info"></i>
+                                            </div>
+                                            <div>
+                                                <h6 class="fw-bold mb-1">Water</h6>
+                                                <p class="small text-muted mb-0">Municipal water accounts</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="bill-type-card airtime {% if form.bill_type.data == 'AIR_TIME' %}active-bill{% endif %}" 
+                                         onclick="selectBillType('AIR_TIME')">
+                                        <div class="d-flex align-items-start">
+                                            <div class="bill-icon airtime me-3">
+                                                <i class="fas fa-mobile-alt fa-xl text-success"></i>
+                                            </div>
+                                            <div>
+                                                <h6 class="fw-bold mb-1">Airtime</h6>
+                                                <p class="small text-muted mb-0">All South African networks</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="bill-type-card data {% if form.bill_type.data == 'DATA' %}active-bill{% endif %}" 
+                                         onclick="selectBillType('DATA')">
+                                        <div class="d-flex align-items-start">
+                                            <div class="bill-icon data me-3">
+                                                <i class="fas fa-wifi fa-xl text-danger"></i>
+                                            </div>
+                                            <div>
+                                                <h6 class="fw-bold mb-1">Data Bundle</h6>
+                                                <p class="small text-muted mb-0">Mobile data packages</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {{ form.bill_type(class="d-none", id="bill_type") }}
+                            {% if form.bill_type.errors %}
+                                <div class="text-danger small mt-2">
+                                    {% for error in form.bill_type.errors %}
+                                        <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Amount -->
+                        <div class="mb-4">
+                            <label for="{{ form.amount.id }}" class="form-label fw-bold">
+                                <i class="fas fa-money-bill-wave me-2"></i>Amount (R)
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text">R</span>
+                                {{ form.amount(class="form-control form-control-lg", placeholder="0.00", step="0.01", min="1", max="5000") }}
+                            </div>
+                            <small class="text-muted">Amount must be between R1 and R5,000</small>
+                            {% if form.amount.errors %}
+                                <div class="text-danger small mt-2">
+                                    {% for error in form.amount.errors %}
+                                        <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Reference/Meter Number -->
+                        <div class="mb-4">
+                            <label for="{{ form.reference_number.id }}" class="form-label fw-bold" id="referenceLabel">
+                                <i class="fas fa-hashtag me-2"></i>Reference Number
+                            </label>
+                            {{ form.reference_number(class="form-control form-control-lg", placeholder="Enter reference or meter number") }}
+                            <small class="text-muted" id="referenceHelp">
+                                Enter your account reference or meter number
+                            </small>
+                            {% if form.reference_number.errors %}
+                                <div class="text-danger small mt-2">
+                                    {% for error in form.reference_number.errors %}
+                                        <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Phone Number (Conditional) -->
+                        <div class="mb-4" id="phoneNumberField" style="display: none;">
+                            <label for="{{ form.phone_number.id }}" class="form-label fw-bold">
+                                <i class="fas fa-phone me-2"></i>Phone Number
+                            </label>
+                            {{ form.phone_number(class="form-control form-control-lg", placeholder="0812345678") }}
+                            <small class="text-muted">Enter the phone number to receive airtime/data</small>
+                            {% if form.phone_number.errors %}
+                                <div class="text-danger small mt-2">
+                                    {% for error in form.phone_number.errors %}
+                                        <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Info Alert -->
+                        <div class="info-alert mb-4">
+                            <div class="d-flex">
+                                <i class="fas fa-info-circle text-primary fa-lg me-3"></i>
+                                <div>
+                                    <strong>Important Information</strong>
+                                    <ul class="mb-0 ps-3">
+                                        <li>Transactions are processed instantly</li>
+                                        <li>1% commission applies to all bill payments</li>
+                                        <li>Ensure you have sufficient balance before paying</li>
+                                        <li>Keep your reference number for tracking</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg" id="submitBtn">
+                                <i class="fas fa-paper-plane me-2"></i>Pay Bill Now
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Recent Bill Payments -->
+            {% if recent_bills %}
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <h5 class="card-title mb-3">
+                        <i class="fas fa-history me-2"></i>Recent Bill Payments
+                    </h5>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Type</th>
+                                    <th>Reference</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for bill in recent_bills %}
+                                <tr>
+                                    <td>{{ bill.created_at.strftime('%d %b %Y') }}</td>
+                                    <td>
+                                        {% if bill.bill_type == 'ELECTRICITY' %}
+                                            <span class="badge bg-warning bg-opacity-10 text-warning">
+                                                <i class="fas fa-bolt me-1"></i>Electricity
+                                            </span>
+                                        {% elif bill.bill_type == 'WATER' %}
+                                            <span class="badge bg-info bg-opacity-10 text-info">
+                                                <i class="fas fa-tint me-1"></i>Water
+                                            </span>
+                                        {% elif bill.bill_type == 'AIR_TIME' %}
+                                            <span class="badge bg-success bg-opacity-10 text-success">
+                                                <i class="fas fa-mobile-alt me-1"></i>Airtime
+                                            </span>
+                                        {% elif bill.bill_type == 'DATA' %}
+                                            <span class="badge bg-danger bg-opacity-10 text-danger">
+                                                <i class="fas fa-wifi me-1"></i>Data
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                    <td><code>{{ bill.reference_number }}</code></td>
+                                    <td class="fw-bold">{{ format_currency(bill.amount) }}</td>
+                                    <td>
+                                        {% if bill.status == 'COMPLETED' %}
+                                            <span class="badge bg-success">
+                                                <i class="fas fa-check-circle me-1"></i>Completed
+                                            </span>
+                                        {% elif bill.status == 'PENDING' %}
+                                            <span class="badge bg-warning">
+                                                <i class="fas fa-clock me-1"></i>Pending
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="text-center mt-3">
+                        <a href="{{ url_for('history') }}" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-list me-2"></i>View All Transactions
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Right Column - Help & Information -->
+        <div class="col-lg-4">
+            <!-- Quick Guide -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body p-4">
+                    <h5 class="card-title mb-3">
+                        <i class="fas fa-question-circle me-2"></i>How to Pay Bills
+                    </h5>
+                    <div class="mb-3">
+                        <div class="d-flex mb-3">
+                            <div class="flex-shrink-0">
+                                <div class="bg-primary bg-opacity-10 text-primary rounded-circle p-2">
+                                    <i class="fas fa-1"></i>
+                                </div>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h6 class="fw-bold mb-1">Select Bill Type</h6>
+                                <p class="small text-muted mb-0">Choose from electricity, water, airtime, or data</p>
+                            </div>
+                        </div>
+                        <div class="d-flex mb-3">
+                            <div class="flex-shrink-0">
+                                <div class="bg-primary bg-opacity-10 text-primary rounded-circle p-2">
+                                    <i class="fas fa-2"></i>
+                                </div>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h6 class="fw-bold mb-1">Enter Details</h6>
+                                <p class="small text-muted mb-0">Add amount, reference number, and phone (if needed)</p>
+                            </div>
+                        </div>
+                        <div class="d-flex">
+                            <div class="flex-shrink-0">
+                                <div class="bg-primary bg-opacity-10 text-primary rounded-circle p-2">
+                                    <i class="fas fa-3"></i>
+                                </div>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h6 class="fw-bold mb-1">Confirm Payment</h6>
+                                <p class="small text-muted mb-0">Review and submit. Payment is instant!</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bill Payment Tips -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body p-4">
+                    <h5 class="card-title mb-3">
+                        <i class="fas fa-lightbulb me-2"></i>Payment Tips
+                    </h5>
+                    <ul class="list-unstyled mb-0">
+                        <li class="mb-2">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            <small>Double-check reference numbers</small>
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            <small>Save payment confirmations</small>
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            <small>Pay before due dates to avoid penalties</small>
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            <small>Use correct meter numbers for utilities</small>
+                        </li>
+                        <li>
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            <small>Contact support if payment fails</small>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Supported Networks -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <h5 class="card-title mb-3">
+                        <i class="fas fa-sim-card me-2"></i>Supported Networks
+                    </h5>
+                    <div class="row g-2">
+                        <div class="col-6">
+                            <div class="border rounded p-2 text-center">
+                                <div class="text-primary mb-1">
+                                    <i class="fas fa-signal fa-lg"></i>
+                                </div>
+                                <small class="fw-bold">Vodacom</small>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="border rounded p-2 text-center">
+                                <div class="text-success mb-1">
+                                    <i class="fas fa-signal fa-lg"></i>
+                                </div>
+                                <small class="fw-bold">MTN</small>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="border rounded p-2 text-center">
+                                <div class="text-warning mb-1">
+                                    <i class="fas fa-signal fa-lg"></i>
+                                </div>
+                                <small class="fw-bold">Cell C</small>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="border rounded p-2 text-center">
+                                <div class="text-info mb-1">
+                                    <i class="fas fa-signal fa-lg"></i>
+                                </div>
+                                <small class="fw-bold">Telkom</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <small class="text-muted">
+                            <i class="fas fa-info-circle me-1"></i>
+                            All major South African networks supported for airtime and data purchases
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Select bill type function
+    function selectBillType(billType) {
+        document.getElementById('bill_type').value = billType;
+        
+        // Update visual selection
+        document.querySelectorAll('.bill-type-card').forEach(card => {
+            card.classList.remove('active-bill');
+            card.style.borderWidth = '2px';
+        });
+        
+        const selectedCard = document.querySelector(`.bill-type-card[onclick*="${billType}"]`);
+        selectedCard.classList.add('active-bill');
+        selectedCard.style.borderWidth = '3px';
+        
+        // Update form labels based on bill type
+        const referenceLabel = document.getElementById('referenceLabel');
+        const referenceHelp = document.getElementById('referenceHelp');
+        const phoneField = document.getElementById('phoneNumberField');
+        
+        switch(billType) {
+            case 'ELECTRICITY':
+                referenceLabel.innerHTML = '<i class="fas fa-hashtag me-2"></i>Meter Number';
+                referenceHelp.textContent = 'Enter your electricity meter number';
+                phoneField.style.display = 'none';
+                break;
+            case 'WATER':
+                referenceLabel.innerHTML = '<i class="fas fa-hashtag me-2"></i>Account Number';
+                referenceHelp.textContent = 'Enter your water account number';
+                phoneField.style.display = 'none';
+                break;
+            case 'AIR_TIME':
+                referenceLabel.innerHTML = '<i class="fas fa-hashtag me-2"></i>Voucher PIN (Optional)';
+                referenceHelp.textContent = 'Enter voucher PIN if available';
+                phoneField.style.display = 'block';
+                document.getElementById('{{ form.phone_number.id }}').placeholder = '0812345678';
+                break;
+            case 'DATA':
+                referenceLabel.innerHTML = '<i class="fas fa-hashtag me-2"></i>Bundle Code';
+                referenceHelp.textContent = 'Enter data bundle code (e.g., 1GB)';
+                phoneField.style.display = 'block';
+                document.getElementById('{{ form.phone_number.id }}').placeholder = '0812345678';
+                break;
+        }
+        
+        // Update step indicator
+        updateStepIndicator(1);
+    }
+    
+    // Initialize with selected bill type if exists
+    document.addEventListener('DOMContentLoaded', function() {
+        const selectedBillType = document.getElementById('bill_type').value;
+        if (selectedBillType) {
+            selectBillType(selectedBillType);
+        } else {
+            // Default to electricity
+            selectBillType('ELECTRICITY');
+        }
+        
+        // Format amount input
+        const amountInput = document.getElementById('{{ form.amount.id }}');
+        amountInput.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/[^\d.]/g, '');
+            let parts = value.split('.');
+            if (parts.length > 2) {
+                value = parts[0] + '.' + parts.slice(1).join('');
+            }
+            if (parts[1] && parts[1].length > 2) {
+                value = parts[0] + '.' + parts[1].substring(0, 2);
+            }
+            e.target.value = value;
+            
+            // Check if amount is valid
+            const amount = parseFloat(value) || 0;
+            const submitBtn = document.getElementById('submitBtn');
+            
+            if (amount > 0 && amount <= 5000) {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-paper-plane me-2"></i>Pay Bill Now';
+            } else {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-exclamation-circle me-2"></i>Invalid Amount';
+            }
+            
+            updateStepIndicator(2);
+        });
+        
+        // Format phone number
+        const phoneInput = document.getElementById('{{ form.phone_number.id }}');
+        if (phoneInput) {
+            phoneInput.addEventListener('input', function(e) {
+                let value = e.target.value.replace(/\D/g, '');
+                if (value.startsWith('27')) {
+                    value = '0' + value.substring(2);
+                }
+                if (value.length > 3 && value.length <= 6) {
+                    value = value.replace(/(\d{3})(\d+)/, '$1 $2');
+                } else if (value.length > 6) {
+                    value = value.replace(/(\d{3})(\d{3})(\d+)/, '$1 $2 $3');
+                }
+                e.target.value = value.substring(0, 12);
+            });
+        }
+        
+        // Form submission
+        const form = document.querySelector('form');
+        form.addEventListener('submit', function(e) {
+            const amount = parseFloat(amountInput.value) || 0;
+            const balance = {{ main_account.balance|tojson }};
+            
+            if (amount > balance) {
+                e.preventDefault();
+                alert('Insufficient balance. Please reduce the amount or make a deposit.');
+                return false;
+            }
+            
+            // Update button to show processing
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Processing...';
+            
+            updateStepIndicator(3);
+            return true;
+        });
+    });
+    
+    // Update step indicator
+    function updateStepIndicator(step) {
+        document.querySelectorAll('.step').forEach((s, index) => {
+            if (index + 1 <= step) {
+                s.classList.add('active');
+            } else {
+                s.classList.remove('active');
+            }
+        });
+    }
+    
+    // Auto-focus amount field when bill type is selected
+    document.querySelectorAll('.bill-type-card').forEach(card => {
+        card.addEventListener('click', function() {
+            setTimeout(() => {
+                document.getElementById('{{ form.amount.id }}').focus();
+            }, 100);
+        });
+    });
+</script>
+
+<style>
+    .active-bill {
+        border-width: 3px !important;
+        background: rgba(0, 102, 204, 0.05);
+    }
+    
+    .bill-type-card {
+        cursor: pointer;
+    }
+    
+    .bill-type-card:hover .bill-icon {
+        transform: scale(1.1);
+        transition: transform 0.3s ease;
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .balance-card {
+            padding: 1rem;
+        }
+        
+        .balance-card h3 {
+            font-size: 1.5rem;
+        }
+        
+        .bill-type-card {
+            margin-bottom: 1rem;
+        }
+    }
+    
+    /* Animation for form fields */
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .bill-type-card, .form-control-lg {
+        animation: slideIn 0.3s ease forwards;
+    }
+    
+    /* Custom scrollbar for table */
+    .table-responsive::-webkit-scrollbar {
+        height: 6px;
+    }
+    
+    .table-responsive::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 10px;
+    }
+    
+    .table-responsive::-webkit-scrollbar-thumb {
+        background: var(--primary-blue);
+        border-radius: 10px;
+    }
+</style>
+{% endblock %}

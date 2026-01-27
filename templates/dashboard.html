@@ -1,0 +1,721 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Nkuna Bank{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Dashboard Specific Styles */
+    .dashboard-card {
+        background: white;
+        border-radius: 15px;
+        border: 1px solid rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+        height: 100%;
+    }
+    
+    .dashboard-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(0, 102, 204, 0.1);
+        border-color: var(--sky-blue);
+    }
+    
+    .balance-card {
+        background: linear-gradient(135deg, var(--primary-blue) 0%, var(--dark-blue) 100%);
+        color: white;
+        border-radius: 15px;
+        padding: 2rem;
+    }
+    
+    .balance-amount {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin: 0;
+    }
+    
+    .quick-action-btn {
+        background: var(--light-blue);
+        border: none;
+        border-radius: 10px;
+        padding: 1rem;
+        width: 100%;
+        text-align: center;
+        transition: all 0.3s ease;
+    }
+    
+    .quick-action-btn:hover {
+        background: var(--primary-blue);
+        color: white;
+        transform: translateY(-3px);
+    }
+    
+    .quick-action-btn:hover i {
+        color: white;
+    }
+    
+    .transaction-item {
+        border-left: 4px solid transparent;
+        padding: 0.75rem 1rem;
+        margin: 0.5rem 0;
+        border-radius: 8px;
+        transition: all 0.2s ease;
+    }
+    
+    .transaction-item:hover {
+        background: var(--light-blue);
+        border-left-color: var(--primary-blue);
+    }
+    
+    .transaction-deposit {
+        border-left-color: var(--accent-green);
+    }
+    
+    .transaction-transfer {
+        border-left-color: var(--primary-blue);
+    }
+    
+    .transaction-goal {
+        border-left-color: var(--accent-orange);
+    }
+    
+    .transaction-bill {
+        border-left-color: var(--secondary-blue);
+    }
+    
+    .goal-progress {
+        height: 10px;
+        border-radius: 5px;
+        background: #e9ecef;
+        overflow: hidden;
+    }
+    
+    .goal-progress-bar {
+        height: 100%;
+        background: linear-gradient(to right, var(--primary-blue), var(--sky-blue));
+        border-radius: 5px;
+        transition: width 1s ease;
+    }
+    
+    .notification-item {
+        padding: 0.75rem;
+        border-radius: 10px;
+        margin-bottom: 0.5rem;
+        background: #f8f9fa;
+        border-left: 4px solid var(--primary-blue);
+    }
+    
+    .notification-success {
+        border-left-color: var(--accent-green);
+    }
+    
+    .notification-warning {
+        border-left-color: var(--accent-orange);
+    }
+    
+    .notification-info {
+        border-left-color: var(--primary-blue);
+    }
+    
+    .notification-unread {
+        background: white;
+        border: 1px solid var(--light-blue);
+    }
+    
+    .bill-item {
+        padding: 0.75rem;
+        border-radius: 10px;
+        margin-bottom: 0.5rem;
+        background: #f8f9fa;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .bill-electricity { border-left: 4px solid #FF6B35; }
+    .bill-water { border-left: 4px solid #36C; }
+    .bill-airtime { border-left: 4px solid #00C853; }
+    .bill-data { border-left: 4px solid #9C27B0; }
+    
+    .stats-card {
+        text-align: center;
+        padding: 1.5rem;
+        border-radius: 12px;
+        background: white;
+    }
+    
+    .stats-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+    }
+    
+    .stats-icon.deposit { background: rgba(0, 200, 83, 0.1); color: var(--accent-green); }
+    .stats-icon.transfer { background: rgba(0, 102, 204, 0.1); color: var(--primary-blue); }
+    .stats-icon.goal { background: rgba(255, 107, 53, 0.1); color: var(--accent-orange); }
+    .stats-icon.bill { background: rgba(156, 39, 176, 0.1); color: #9C27B0; }
+    
+    .recent-transactions {
+        max-height: 400px;
+        overflow-y: auto;
+    }
+    
+    .recent-transactions::-webkit-scrollbar {
+        width: 6px;
+    }
+    
+    .recent-transactions::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 3px;
+    }
+    
+    .recent-transactions::-webkit-scrollbar-thumb {
+        background: var(--primary-blue);
+        border-radius: 3px;
+    }
+    
+    @media (max-width: 768px) {
+        .balance-amount {
+            font-size: 2rem;
+        }
+        
+        .quick-action-btn {
+            padding: 0.75rem;
+        }
+        
+        .dashboard-card {
+            margin-bottom: 1.5rem;
+        }
+    }
+    
+    /* Alert styles */
+    .alert-custom {
+        border-radius: 10px;
+        border: none;
+        padding: 1rem 1.25rem;
+    }
+    
+    /* Badge styles */
+    .status-badge {
+        padding: 0.25rem 0.75rem;
+        border-radius: 50px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+    
+    .status-completed { background: rgba(0, 200, 83, 0.1); color: var(--accent-green); }
+    .status-pending { background: rgba(255, 193, 7, 0.1); color: #ffc107; }
+    .status-undo { background: rgba(0, 102, 204, 0.1); color: var(--primary-blue); }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Welcome & Balance Section -->
+    <div class="row mb-4">
+        <div class="col-lg-8 mb-4 mb-lg-0">
+            <div class="balance-card">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h1 class="h4 mb-2">Welcome back, {{ user.full_name.split()[0] }}!</h1>
+                        <p class="opacity-75 mb-3">Here's your financial overview</p>
+                        <h2 class="balance-amount">{{ format_currency(main_account.balance if main_account else 0) }}</h2>
+                        <p class="mb-0 opacity-75">
+                            <i class="fas fa-wallet me-2"></i>Main Account Balance
+                            {% if main_account %}
+                                <small class="d-block mt-1">Account: {{ main_account.account_number }}</small>
+                            {% endif %}
+                        </p>
+                    </div>
+                    <div class="text-end">
+                        <div class="d-flex gap-2 mb-3">
+                            <span class="badge bg-success bg-opacity-25 text-success">Active</span>
+                            <span class="badge bg-info bg-opacity-25 text-info">Verified</span>
+                        </div>
+                        <p class="mb-0 opacity-75">
+                            <i class="fas fa-calendar me-2"></i><span class="current-time"></span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="dashboard-card p-4">
+                <h3 class="h5 mb-3">Total Assets</h3>
+                <div class="d-flex align-items-end mb-3">
+                    <h2 class="balance-amount text-primary mb-0">{{ format_currency(total_balance) }}</h2>
+                    <small class="text-muted ms-2">All accounts</small>
+                </div>
+                
+                <div class="row g-2">
+                    <div class="col-6">
+                        <div class="stats-card">
+                            <div class="stats-icon deposit">
+                                <i class="fas fa-arrow-down"></i>
+                            </div>
+                            <h4 class="h6 mb-1">Deposits</h4>
+                            <p class="text-muted mb-0 small">This month</p>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="stats-card">
+                            <div class="stats-icon transfer">
+                                <i class="fas fa-exchange-alt"></i>
+                            </div>
+                            <h4 class="h6 mb-1">Transfers</h4>
+                            <p class="text-muted mb-0 small">This month</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="dashboard-card p-4">
+                <h3 class="h5 mb-3">Quick Actions</h3>
+                <div class="row g-3">
+                    <div class="col-6 col-md-3">
+                        <a href="{{ url_for('transfer') }}" class="quick-action-btn text-decoration-none">
+                            <i class="fas fa-exchange-alt fa-2x mb-2 text-primary"></i>
+                            <h6 class="mb-1">Transfer Money</h6>
+                            <p class="small text-muted mb-0">Send money to anyone</p>
+                        </a>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <a href="{{ url_for('deposit') }}" class="quick-action-btn text-decoration-none">
+                            <i class="fas fa-arrow-down fa-2x mb-2 text-success"></i>
+                            <h6 class="mb-1">Make Deposit</h6>
+                            <p class="small text-muted mb-0">Add funds to account</p>
+                        </a>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <a href="{{ url_for('goals') }}" class="quick-action-btn text-decoration-none">
+                            <i class="fas fa-bullseye fa-2x mb-2 text-warning"></i>
+                            <h6 class="mb-1">Goals</h6>
+                            <p class="small text-muted mb-0">Track & save for goals</p>
+                        </a>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <a href="{{ url_for('bills') }}" class="quick-action-btn text-decoration-none">
+                            <i class="fas fa-bolt fa-2x mb-2 text-info"></i>
+                            <h6 class="mb-1">Pay Bills</h6>
+                            <p class="small text-muted mb-0">Electricity, water, airtime</p>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="row g-4">
+        <!-- Recent Transactions -->
+        <div class="col-lg-8">
+            <div class="dashboard-card p-4 h-100">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h3 class="h5 mb-0">Recent Transactions</h3>
+                    <a href="{{ url_for('history') }}" class="btn btn-sm btn-outline-primary">
+                        <i class="fas fa-history me-1"></i>View All
+                    </a>
+                </div>
+                
+                <div class="recent-transactions">
+                    {% if transactions %}
+                        {% for transaction in transactions %}
+                            <div class="transaction-item transaction-{{ transaction.transaction_type.lower() }}">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div class="d-flex align-items-center">
+                                        <div class="me-3">
+                                            {% if transaction.transaction_type == 'DEPOSIT' %}
+                                                <i class="fas fa-arrow-down text-success fa-lg"></i>
+                                            {% elif transaction.transaction_type == 'TRANSFER' %}
+                                                {% if transaction.from_account == main_account.account_number %}
+                                                    <i class="fas fa-arrow-up text-primary fa-lg"></i>
+                                                {% else %}
+                                                    <i class="fas fa-arrow-down text-success fa-lg"></i>
+                                                {% endif %}
+                                            {% elif 'GOAL' in transaction.transaction_type %}
+                                                <i class="fas fa-bullseye text-warning fa-lg"></i>
+                                            {% elif transaction.transaction_type == 'BILL_PAYMENT' %}
+                                                <i class="fas fa-bolt text-info fa-lg"></i>
+                                            {% else %}
+                                                <i class="fas fa-exchange-alt text-secondary fa-lg"></i>
+                                            {% endif %}
+                                        </div>
+                                        <div>
+                                            <h6 class="mb-1">
+                                                {% if transaction.transaction_type == 'DEPOSIT' %}
+                                                    Deposit
+                                                {% elif transaction.transaction_type == 'TRANSFER' %}
+                                                    {% if transaction.from_account == main_account.account_number %}
+                                                        Transfer to {{ transaction.to_account }}
+                                                    {% else %}
+                                                        Transfer from {{ transaction.from_account }}
+                                                    {% endif %}
+                                                {% elif 'GOAL' in transaction.transaction_type %}
+                                                    Goal: {{ transaction.description|replace('Deposit to goal: ', '')|replace('Withdrawal from goal: ', '') }}
+                                                {% elif transaction.transaction_type == 'BILL_PAYMENT' %}
+                                                    {{ transaction.description }}
+                                                {% else %}
+                                                    {{ transaction.transaction_type }}
+                                                {% endif %}
+                                            </h6>
+                                            <small class="text-muted">
+                                                {{ transaction.created_at.strftime('%d %b %Y %H:%M') }}
+                                                {% if transaction.transaction_id %}
+                                                    • {{ transaction.transaction_id[:8] }}...
+                                                {% endif %}
+                                            </small>
+                                        </div>
+                                    </div>
+                                    <div class="text-end">
+                                        <h6 class="mb-1 {% if transaction.transaction_type == 'DEPOSIT' or (transaction.transaction_type == 'TRANSFER' and transaction.from_account != main_account.account_number) %}text-success{% else %}text-danger{% endif %}">
+                                            {% if transaction.transaction_type == 'DEPOSIT' or (transaction.transaction_type == 'TRANSFER' and transaction.from_account != main_account.account_number) %}
+                                                +{{ format_currency(transaction.amount) }}
+                                            {% else %}
+                                                -{{ format_currency(transaction.amount) }}
+                                            {% endif %}
+                                        </h6>
+                                        <div class="d-flex gap-1 justify-content-end">
+                                            {% if transaction.transaction_type == 'TRANSFER' and transaction.status == 'COMPLETED' and can_undo_transaction(transaction) %}
+                                                <form method="POST" action="{{ url_for('undo_transaction', transaction_id=transaction.transaction_id) }}" class="d-inline">
+                                                    <button type="submit" class="btn btn-sm btn-outline-primary" onclick="return confirm('Are you sure you want to undo this transaction?')">
+                                                        <i class="fas fa-undo me-1"></i>Undo
+                                                    </button>
+                                                </form>
+                                            {% endif %}
+                                            {% if transaction.status %}
+                                                <span class="status-badge status-{{ transaction.status.lower() }}">
+                                                    {{ transaction.status }}
+                                                </span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="text-center py-5">
+                            <i class="fas fa-exchange-alt fa-3x text-muted mb-3"></i>
+                            <p class="text-muted">No transactions yet</p>
+                            <a href="{{ url_for('deposit') }}" class="btn btn-primary">
+                                <i class="fas fa-arrow-down me-2"></i>Make Your First Deposit
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Goals Progress -->
+        <div class="col-lg-4">
+            <div class="dashboard-card p-4 h-100">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h3 class="h5 mb-0">Active Goals</h3>
+                    <a href="{{ url_for('goals') }}" class="btn btn-sm btn-outline-primary">
+                        <i class="fas fa-plus me-1"></i>New Goal
+                    </a>
+                </div>
+                
+                {% if goals %}
+                    {% for goal in goals %}
+                        <div class="mb-3 pb-3 border-bottom">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <div>
+                                    <h6 class="mb-1">{{ goal.name }}</h6>
+                                    <small class="text-muted">
+                                        <i class="fas fa-calendar me-1"></i>{{ goal.target_date.strftime('%d %b %Y') }}
+                                        <span class="ms-2">
+                                            <i class="fas fa-clock me-1"></i>{{ goal.days_remaining }} days left
+                                        </span>
+                                    </small>
+                                </div>
+                                <div class="text-end">
+                                    <small class="text-primary fw-bold">{{ "%.0f"|format(goal.progress) }}%</small>
+                                </div>
+                            </div>
+                            <div class="goal-progress mb-2">
+                                <div class="goal-progress-bar" style="width: {{ goal.progress }}%"></div>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <small class="text-muted">{{ format_currency(goal.current_amount) }}</small>
+                                <small class="text-muted">{{ format_currency(goal.target_amount) }}</small>
+                            </div>
+                            {% if goal.days_remaining < 7 %}
+                                <small class="text-warning">
+                                    <i class="fas fa-exclamation-triangle me-1"></i>Deadline approaching!
+                                </small>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-bullseye fa-3x text-muted mb-3"></i>
+                        <p class="text-muted mb-3">No active goals yet</p>
+                        <a href="{{ url_for('goals') }}" class="btn btn-primary btn-sm">
+                            <i class="fas fa-plus me-2"></i>Create Goal
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Second Row -->
+    <div class="row g-4 mt-4">
+        <!-- Notifications -->
+        <div class="col-lg-6">
+            <div class="dashboard-card p-4 h-100">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h3 class="h5 mb-0">Notifications</h3>
+                    <a href="{{ url_for('notifications') }}" class="btn btn-sm btn-outline-primary">
+                        <i class="fas fa-bell me-1"></i>View All
+                    </a>
+                </div>
+                
+                <div>
+                    {% if notifications %}
+                        {% for notification in notifications %}
+                            <div class="notification-item notification-{{ notification.notification_type.lower() }} {% if not notification.is_read %}notification-unread{% endif %}">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div class="flex-grow-1">
+                                        <h6 class="mb-1">{{ notification.title }}</h6>
+                                        <p class="small text-muted mb-2">{{ notification.message }}</p>
+                                        <small class="text-muted">
+                                            <i class="fas fa-clock me-1"></i>{{ notification.created_at.strftime('%d %b %H:%M') }}
+                                        </small>
+                                    </div>
+                                    {% if not notification.is_read %}
+                                        <form method="POST" action="{{ url_for('mark_notification_read', notification_id=notification.id) }}" class="ms-2">
+                                            <button type="submit" class="btn btn-sm btn-outline-secondary">
+                                                <i class="fas fa-check"></i>
+                                            </button>
+                                        </form>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-bell fa-3x text-muted mb-3"></i>
+                            <p class="text-muted">No new notifications</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Bill Payments -->
+        <div class="col-lg-6">
+            <div class="dashboard-card p-4 h-100">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h3 class="h5 mb-0">Recent Bill Payments</h3>
+                    <a href="{{ url_for('bills') }}" class="btn btn-sm btn-outline-primary">
+                        <i class="fas fa-plus me-1"></i>Pay Bill
+                    </a>
+                </div>
+                
+                <div>
+                    {% if recent_bills %}
+                        {% for bill in recent_bills %}
+                            <div class="bill-item bill-{{ bill.bill_type.lower() }}">
+                                <div>
+                                    <h6 class="mb-1">
+                                        {% if bill.bill_type == 'ELECTRICITY' %}
+                                            <i class="fas fa-bolt me-2"></i>Electricity
+                                        {% elif bill.bill_type == 'WATER' %}
+                                            <i class="fas fa-tint me-2"></i>Water
+                                        {% elif bill.bill_type == 'AIR_TIME' %}
+                                            <i class="fas fa-mobile-alt me-2"></i>Airtime
+                                        {% elif bill.bill_type == 'DATA' %}
+                                            <i class="fas fa-wifi me-2"></i>Data Bundle
+                                        {% else %}
+                                            <i class="fas fa-file-invoice-dollar me-2"></i>{{ bill.bill_type }}
+                                        {% endif %}
+                                    </h6>
+                                    <small class="text-muted">
+                                        Ref: {{ bill.reference_number }}
+                                        {% if bill.meter_number %}
+                                            • Meter: {{ bill.meter_number }}
+                                        {% endif %}
+                                    </small>
+                                    <br>
+                                    <small class="text-muted">
+                                        <i class="fas fa-clock me-1"></i>{{ bill.created_at.strftime('%d %b %H:%M') }}
+                                    </small>
+                                </div>
+                                <div class="text-end">
+                                    <h6 class="text-danger mb-1">-{{ format_currency(bill.amount) }}</h6>
+                                    <span class="status-badge status-{{ bill.status.lower() }}">
+                                        {{ bill.status }}
+                                    </span>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-file-invoice-dollar fa-3x text-muted mb-3"></i>
+                            <p class="text-muted mb-3">No bill payments yet</p>
+                            <a href="{{ url_for('bills') }}" class="btn btn-primary btn-sm">
+                                <i class="fas fa-bolt me-2"></i>Pay First Bill
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Account Summary -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="dashboard-card p-4">
+                <h3 class="h5 mb-3">Account Summary</h3>
+                <div class="row">
+                    <div class="col-md-3 col-6 mb-3">
+                        <div class="text-center">
+                            <div class="stats-icon deposit mb-2">
+                                <i class="fas fa-arrow-down"></i>
+                            </div>
+                            <h6 class="mb-1">Total Deposits</h6>
+                            <p class="text-muted mb-0">This month</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-6 mb-3">
+                        <div class="text-center">
+                            <div class="stats-icon transfer mb-2">
+                                <i class="fas fa-exchange-alt"></i>
+                            </div>
+                            <h6 class="mb-1">Total Transfers</h6>
+                            <p class="text-muted mb-0">This month</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-6 mb-3">
+                        <div class="text-center">
+                            <div class="stats-icon bill mb-2">
+                                <i class="fas fa-bolt"></i>
+                            </div>
+                            <h6 class="mb-1">Bill Payments</h6>
+                            <p class="text-muted mb-0">This month</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-6 mb-3">
+                        <div class="text-center">
+                            <div class="stats-icon goal mb-2">
+                                <i class="fas fa-bullseye"></i>
+                            </div>
+                            <h6 class="mb-1">Goals Progress</h6>
+                            <p class="text-muted mb-0">{{ goals|length }} active</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Security Alert -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="alert alert-custom alert-info">
+                <div class="d-flex align-items-center">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-shield-alt fa-2x"></i>
+                    </div>
+                    <div class="flex-grow-1 ms-3">
+                        <h5 class="alert-heading mb-1">Security Status: Excellent</h5>
+                        <p class="mb-0">Your account is secure. Last login: <span class="current-time"></span></p>
+                    </div>
+                    <div class="flex-shrink-0">
+                        <a href="{{ url_for('profile') }}" class="btn btn-sm btn-outline-info">
+                            <i class="fas fa-user-shield me-1"></i>Security Settings
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Auto-refresh notifications
+    function refreshNotifications() {
+        fetch('{{ url_for("notifications") }}')
+            .then(response => response.text())
+            .then(html => {
+                // You could implement live notification updates here
+                console.log('Notifications refreshed');
+            })
+            .catch(error => console.error('Error refreshing notifications:', error));
+    }
+
+    // Refresh every 30 seconds
+    setInterval(refreshNotifications, 30000);
+
+    // Undo transaction confirmation
+    document.addEventListener('submit', function(e) {
+        if (e.target.action && e.target.action.includes('/undo_transaction/')) {
+            if (!confirm('Are you sure you want to undo this transaction? This action cannot be reversed.')) {
+                e.preventDefault();
+                return false;
+            }
+            
+            // Show loading
+            const button = e.target.querySelector('button[type="submit"]');
+            const originalText = button.innerHTML;
+            button.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Processing...';
+            button.disabled = true;
+            
+            setTimeout(() => {
+                button.innerHTML = originalText;
+                button.disabled = false;
+            }, 5000);
+        }
+    });
+
+    // Update time every minute
+    function updateTime() {
+        const now = new Date();
+        const timeElements = document.querySelectorAll('.current-time');
+        timeElements.forEach(el => {
+            el.textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        });
+    }
+
+    setInterval(updateTime, 60000);
+
+    // Initialize tooltips
+    document.addEventListener('DOMContentLoaded', function() {
+        const tooltips = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+        tooltips.forEach(tooltip => {
+            new bootstrap.Tooltip(tooltip);
+        });
+        
+        // Update time immediately
+        updateTime();
+    });
+
+    // Balance animation
+    function animateBalance() {
+        const balanceElements = document.querySelectorAll('.balance-amount');
+        balanceElements.forEach(element => {
+            const value = parseFloat(element.textContent.replace(/[^0-9.-]+/g, ""));
+            if (!isNaN(value)) {
+                element.textContent = formatCurrency(value);
+            }
+        });
+    }
+
+    function formatCurrency(value) {
+        return 'R' + value.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+    }
+
+    // Initialize animations
+    animateBalance();
+</script>
+{% endblock %}
