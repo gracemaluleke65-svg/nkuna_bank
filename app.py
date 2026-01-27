@@ -20,7 +20,7 @@ import re
 import os
 
 # Initialize Flask app
-app = Flask(__name__)
+app = Flask(__name__, static_url_path='/static', static_folder='static')
 
 # Configuration for Render
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production')
@@ -1796,21 +1796,49 @@ def notification_count():
 
 # ==================== APPLICATION STARTUP ====================
 
+
 def create_default_admin():
     """Create default admin user if none exists"""
-    admin = Admin.query.filter_by(email='admin@nkunabank.co.za').first()
-    
-    if not admin:
-        hashed_password = bcrypt.generate_password_hash('Admin@123').decode('utf-8')
-        admin = Admin(
-            email='admin@nkunabank.co.za',
-            password_hash=hashed_password,
-            full_name='System Administrator',
-            is_super_admin=True
-        )
-        db.session.add(admin)
-        db.session.commit()
-        print("Default admin user created: admin@nkunabank.co.za / Admin@123")
+    try:
+        admin = Admin.query.filter_by(email='admin@nkunabank.co.za').first()
+        
+        if not admin:
+            hashed_password = bcrypt.generate_password_hash('Admin@123').decode('utf-8')
+            admin = Admin(
+                email='admin@nkunabank.co.za',
+                password_hash=hashed_password,
+                full_name='System Administrator',
+                is_super_admin=True
+            )
+            db.session.add(admin)
+            db.session.commit()
+            print("✅ Default admin user created: admin@nkunabank.co.za / Admin@123")
+        else:
+            print("✅ Admin already exists")
+    except Exception as e:
+        print(f"⚠️  Could not create admin (database might not be ready): {e}")
+
+def init_app():
+    """Initialize the application and database"""
+    with app.app_context():
+        try:
+            # Try to create all tables
+            db.create_all()
+            print("✅ Database tables created successfully!")
+            
+            # Create default admin
+            create_default_admin()
+            
+            # Check if we can query users (test connection)
+            user_count = User.query.count()
+            print(f"✅ Database connection working. Total users: {user_count}")
+            
+        except Exception as e:
+            print(f"⚠️  Database initialization issue: {e}")
+            print("🔄 Will retry on next request...")
+
+# Initialize the app when this file is imported
+init_app()
 
 # ==================== ERROR HANDLERS ====================
 
@@ -1826,6 +1854,9 @@ def internal_error(error):
 # ==================== MAIN ====================
 
 if __name__ == '__main__':
+    # This won't run on Render, but keeps local development working
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port, debug=False)
     # Initialize database and create default admin
     with app.app_context():
         db.create_all()
