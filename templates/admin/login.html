@@ -1,6 +1,67 @@
 {% extends "base.html" %}
 
-{% block title %}Admin Login - Nkuna Bank{% endblock %}
+{% block title %}Admin Login – Bank of SA{% endblock %}
+
+{% block extra_css %}
+<style>
+    .card {
+        border-radius: 15px;
+        transition: transform 0.3s ease;
+    }
+    
+    .card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .form-control-lg {
+        padding: 0.75rem 1rem;
+        border-radius: 10px;
+        border: 2px solid #e9ecef;
+        transition: all 0.3s ease;
+    }
+    
+    .form-control-lg:focus {
+        border-color: var(--bs-primary);
+        box-shadow: 0 0 0 0.25rem rgba(24, 66, 182, 0.25);
+    }
+    
+    .input-group-text {
+        border-radius: 0 10px 10px 0;
+        border: 2px solid #e9ecef;
+        border-left: none;
+        background: #f8f9fa;
+    }
+    
+    .input-group .form-control {
+        border-right: none;
+    }
+    
+    .btn-lg {
+        padding: 0.75rem 2rem;
+        border-radius: 10px;
+        font-weight: 600;
+    }
+    
+    .alert {
+        border-radius: 10px;
+        border: none;
+    }
+
+    .bg-primary-custom {
+        background: var(--bs-primary);
+    }
+
+    .text-primary-custom {
+        color: var(--bs-primary);
+    }
+    
+    @media (max-width: 768px) {
+        .card-body {
+            padding: 2rem !important;
+        }
+    }
+</style>
+{% endblock %}
 
 {% block content %}
 <div class="container py-5">
@@ -10,12 +71,12 @@
                 <div class="row g-0">
                     <!-- Left Side - Benefits -->
                     <div class="col-lg-5 d-none d-lg-block">
-                        <div class="bg-primary text-white h-100 p-4 p-md-5">
+                        <div class="bg-primary text-white h-100 p-4 p-md-5" style="background: var(--bs-primary) !important;">
                             <div class="h-100 d-flex flex-column justify-content-center">
                                 <div class="text-center mb-5">
                                     <i class="fas fa-university fa-4x mb-4 text-white-50"></i>
                                     <h2 class="h3 mb-3">Admin Portal</h2>
-                                    <p class="opacity-75">Secure admin access to Nkuna Bank</p>
+                                    <p class="opacity-75">Secure admin access to Bank of SA</p>
                                 </div>
                                 
                                 <div class="mb-4">
@@ -76,6 +137,7 @@
                                 <p class="text-muted">Access your admin dashboard</p>
                             </div>
                             
+                            <!-- FIXED: form action now uses correct endpoint -->
                             <form method="POST" action="{{ url_for('admin_login') }}">
                                 {{ form.hidden_tag() }}
                                 
@@ -157,6 +219,7 @@
                                 
                                 <!-- Alternative Actions -->
                                 <div class="d-grid gap-3">
+                                    <!-- FIXED: user login link now uses correct endpoint -->
                                     <a href="{{ url_for('login') }}" class="btn btn-outline-secondary btn-lg">
                                         <i class="fas fa-user me-2"></i>User Login
                                     </a>
@@ -210,55 +273,4 @@
         submitBtn.value = 'Logging in...';
     });
 </script>
-
-<style>
-    .card {
-        border-radius: 15px;
-        transition: transform 0.3s ease;
-    }
-    
-    .card:hover {
-        transform: translateY(-5px);
-    }
-    
-    .form-control-lg {
-        padding: 0.75rem 1rem;
-        border-radius: 10px;
-        border: 2px solid #e9ecef;
-        transition: all 0.3s ease;
-    }
-    
-    .form-control-lg:focus {
-        border-color: var(--primary-blue);
-        box-shadow: 0 0 0 0.25rem rgba(0, 102, 204, 0.25);
-    }
-    
-    .input-group-text {
-        border-radius: 0 10px 10px 0;
-        border: 2px solid #e9ecef;
-        border-left: none;
-        background: #f8f9fa;
-    }
-    
-    .input-group .form-control {
-        border-right: none;
-    }
-    
-    .btn-lg {
-        padding: 0.75rem 2rem;
-        border-radius: 10px;
-        font-weight: 600;
-    }
-    
-    .alert {
-        border-radius: 10px;
-        border: none;
-    }
-    
-    @media (max-width: 768px) {
-        .card-body {
-            padding: 2rem !important;
-        }
-    }
-</style>
 {% endblock %}

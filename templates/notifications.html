@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Notifications - Nkuna Bank{% endblock %}
+{% block title %}Notifications – Bank of SA{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -17,12 +17,12 @@
     }
     
     .notification-unread {
-        border-left-color: var(--primary-blue);
-        background-color: rgba(0, 102, 204, 0.05);
+        border-left-color: var(--bs-secondary);
+        background-color: rgba(38, 212, 140, 0.05);
     }
     
     .notification-success {
-        border-left-color: var(--accent-green);
+        border-left-color: #28a745;
     }
     
     .notification-warning {
@@ -30,7 +30,7 @@
     }
     
     .notification-info {
-        border-left-color: var(--sky-blue);
+        border-left-color: #17a2b8;
     }
     
     .notification-badge {
@@ -42,7 +42,7 @@
     }
     
     .notification-badge-success {
-        background-color: var(--accent-green);
+        background-color: #28a745;
     }
     
     .notification-badge-warning {
@@ -50,11 +50,11 @@
     }
     
     .notification-badge-info {
-        background-color: var(--sky-blue);
+        background-color: #17a2b8;
     }
     
     .notification-badge-primary {
-        background-color: var(--primary-blue);
+        background-color: var(--bs-secondary);
     }
     
     .time-ago {
@@ -90,8 +90,8 @@
     }
     
     .notification-type-success {
-        background: rgba(0, 200, 83, 0.1);
-        color: var(--accent-green);
+        background: rgba(40, 167, 69, 0.1);
+        color: #28a745;
     }
     
     .notification-type-warning {
@@ -100,13 +100,13 @@
     }
     
     .notification-type-info {
-        background: rgba(0, 180, 255, 0.1);
-        color: var(--sky-blue);
+        background: rgba(23, 162, 184, 0.1);
+        color: #17a2b8;
     }
     
     .notification-type-primary {
-        background: rgba(0, 102, 204, 0.1);
-        color: var(--primary-blue);
+        background: rgba(38, 212, 140, 0.15);
+        color: var(--bs-secondary);
     }
     
     .notification-type-danger {
@@ -133,8 +133,28 @@
     }
     
     .pagination .page-item.active .page-link {
-        background: linear-gradient(135deg, var(--primary-blue), var(--sky-blue));
-        border-color: var(--primary-blue);
+        background: var(--bs-secondary);
+        border-color: var(--bs-secondary);
+        color: #fff;
+    }
+    
+    .btn-secondary {
+        color: #fff;
+        background-color: var(--bs-secondary);
+        border-color: var(--bs-secondary);
+    }
+    .btn-secondary:hover {
+        background-color: #1fb87a;
+        border-color: #1fb87a;
+        color: #fff;
+    }
+    .btn-outline-secondary {
+        color: var(--bs-secondary);
+        border-color: var(--bs-secondary);
+    }
+    .btn-outline-secondary:hover {
+        background-color: var(--bs-secondary);
+        color: #fff;
     }
 </style>
 {% endblock %}
@@ -145,17 +165,17 @@
     <div class="row mb-4">
         <div class="col-md-8">
             <h1 class="h2 mb-2">
-                <i class="fas fa-bell text-primary me-2"></i>Notifications
+                <i class="fas fa-bell text-secondary me-2"></i>Notifications
             </h1>
             <p class="text-muted mb-0">Stay updated with your account activities and important alerts</p>
         </div>
         <div class="col-md-4 text-md-end">
             {% if unread_count > 0 %}
-            <button id="markAllReadBtn" class="btn btn-outline-primary">
+            <button id="markAllReadBtn" class="btn btn-outline-secondary mb-2">
                 <i class="fas fa-check-double me-2"></i>Mark All as Read
             </button>
             {% endif %}
-            <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary">
+            <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary mb-2">
                 <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
             </a>
         </div>
@@ -167,8 +187,8 @@
             <div class="card border-0 shadow-sm h-100">
                 <div class="card-body">
                     <div class="d-flex align-items-center">
-                        <div class="bg-primary bg-opacity-10 p-3 rounded-circle me-3">
-                            <i class="fas fa-bell text-primary"></i>
+                        <div class="bg-secondary bg-opacity-10 p-3 rounded-circle me-3">
+                            <i class="fas fa-bell text-secondary"></i>
                         </div>
                         <div>
                             <h3 class="h2 mb-0">{{ unread_count }}</h3>
@@ -212,8 +232,8 @@
             <div class="card border-0 shadow-sm h-100">
                 <div class="card-body">
                     <div class="d-flex align-items-center">
-                        <div class="bg-warning bg-opacity-10 p-3 rounded-circle me-3">
-                            <i class="fas fa-clock text-warning"></i>
+                        <div class="bg-secondary bg-opacity-10 p-3 rounded-circle me-3">
+                            <i class="fas fa-clock text-secondary"></i>
                         </div>
                         <div>
                             {% if notifications.items %}
@@ -278,7 +298,7 @@
                                                     {{ notification.created_at|time_ago }}
                                                 </span>
                                                 {% if not notification.is_read %}
-                                                    <button class="btn btn-sm btn-outline-primary notification-action-btn mark-read-btn" 
+                                                    <button class="btn btn-sm btn-outline-secondary notification-action-btn mark-read-btn" 
                                                             data-notification-id="{{ notification.id }}">
                                                         <i class="fas fa-check me-1"></i>Mark as Read
                                                     </button>
@@ -357,10 +377,10 @@
                     <h3 class="h4 mb-3">No Notifications</h3>
                     <p class="text-muted mb-4">You don't have any notifications at the moment. When you do, they'll appear here.</p>
                     <div class="d-flex justify-content-center gap-3">
-                        <a href="{{ url_for('dashboard') }}" class="btn btn-primary">
+                        <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">
                             <i class="fas fa-tachometer-alt me-2"></i>Go to Dashboard
                         </a>
-                        <a href="{{ url_for('transfer') }}" class="btn btn-outline-primary">
+                        <a href="{{ url_for('transfer') }}" class="btn btn-outline-secondary">
                             <i class="fas fa-exchange-alt me-2"></i>Make a Transfer
                         </a>
                     </div>
@@ -431,16 +451,16 @@
             <div class="card border-0 shadow-sm">
                 <div class="card-body">
                     <h5 class="h6 mb-3">
-                        <i class="fas fa-filter me-2"></i>Notification Filters
+                        <i class="fas fa-filter text-secondary me-2"></i>Notification Filters
                     </h5>
                     <div class="d-flex flex-wrap gap-2">
-                        <a href="{{ url_for('notifications') }}" class="btn btn-sm {% if request.args.get('filter') != 'read' and request.args.get('filter') != 'unread' %}btn-primary{% else %}btn-outline-primary{% endif %}">
+                        <a href="{{ url_for('notifications') }}" class="btn btn-sm {% if request.args.get('filter') != 'read' and request.args.get('filter') != 'unread' %}btn-secondary{% else %}btn-outline-secondary{% endif %}">
                             All
                         </a>
-                        <a href="{{ url_for('notifications', filter='unread') }}" class="btn btn-sm {% if request.args.get('filter') == 'unread' %}btn-primary{% else %}btn-outline-primary{% endif %}">
+                        <a href="{{ url_for('notifications', filter='unread') }}" class="btn btn-sm {% if request.args.get('filter') == 'unread' %}btn-secondary{% else %}btn-outline-secondary{% endif %}">
                             Unread Only
                         </a>
-                        <a href="{{ url_for('notifications', filter='read') }}" class="btn btn-sm {% if request.args.get('filter') == 'read' %}btn-primary{% else %}btn-outline-primary{% endif %}">
+                        <a href="{{ url_for('notifications', filter='read') }}" class="btn btn-sm {% if request.args.get('filter') == 'read' %}btn-secondary{% else %}btn-outline-secondary{% endif %}">
                             Read Only
                         </a>
                     </div>
@@ -451,7 +471,7 @@
             <div class="card border-0 shadow-sm">
                 <div class="card-body">
                     <h5 class="h6 mb-3">
-                        <i class="fas fa-cog me-2"></i>Notification Settings
+                        <i class="fas fa-cog text-secondary me-2"></i>Notification Settings
                     </h5>
                     <div class="form-check form-switch">
                         <input class="form-check-input" type="checkbox" id="emailNotifications" checked>
@@ -535,12 +555,12 @@
                     // Update button
                     const btnContainer = this.closest('.d-flex');
                     this.innerHTML = '<i class="fas fa-check me-1"></i>Read';
-                    this.classList.remove('btn-outline-primary');
+                    this.classList.remove('btn-outline-secondary');
                     this.classList.add('btn-light');
                     this.disabled = true;
                     
                     // Update unread count
-                    const unreadCountElement = document.querySelector('.bg-primary .h2');
+                    const unreadCountElement = document.querySelector('.bg-secondary .h2');
                     if (unreadCountElement) {
                         const currentCount = parseInt(unreadCountElement.textContent);
                         if (currentCount > 0) {
@@ -585,14 +605,14 @@
                     const buttons = card.querySelectorAll('.mark-read-btn');
                     buttons.forEach(btn => {
                         btn.innerHTML = '<i class="fas fa-check me-1"></i>Read';
-                        btn.classList.remove('btn-outline-primary');
+                        btn.classList.remove('btn-outline-secondary');
                         btn.classList.add('btn-light');
                         btn.disabled = true;
                     });
                 });
                 
                 // Update unread count
-                const unreadCountElement = document.querySelector('.bg-primary .h2');
+                const unreadCountElement = document.querySelector('.bg-secondary .h2');
                 if (unreadCountElement) {
                     unreadCountElement.textContent = '0';
                 }
@@ -700,7 +720,7 @@
             .then(response => response.json())
             .then(data => {
                 if (data.unread_count !== undefined) {
-                    const unreadElement = document.querySelector('.bg-primary .h2');
+                    const unreadElement = document.querySelector('.bg-secondary .h2');
                     if (unreadElement && parseInt(unreadElement.textContent) !== data.unread_count) {
                         // If count changed, refresh the page
                         if (!document.hidden) {
@@ -721,7 +741,7 @@
                     .then(response => response.json())
                     .then(data => {
                         if (data.unread_count !== undefined) {
-                            const unreadElement = document.querySelector('.bg-primary .h2');
+                            const unreadElement = document.querySelector('.bg-secondary .h2');
                             if (unreadElement && parseInt(unreadElement.textContent) !== data.unread_count) {
                                 location.reload();
                             }
@@ -745,12 +765,4 @@
     // Register filters globally for template use
     Object.assign(window, filters);
 </script>
-
-<!-- Add a custom Jinja2 filter in your Flask app for time_ago -->
-{% if request.endpoint == 'notifications' %}
-<script>
-    // This would be implemented in Flask, but we need a client-side fallback
-    console.log('Notifications page loaded');
-</script>
-{% endif %}
 {% endblock %}

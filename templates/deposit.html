@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Deposit - Nkuna Bank{% endblock %}
+{% block title %}Deposit – Bank of SA{% endblock %}
 
 {% block content %}
 <div class="container py-5">
@@ -8,29 +8,29 @@
         <!-- Left Column - Deposit Form -->
         <div class="col-lg-8">
             <div class="card border-0 shadow-lg mb-4">
-                <div class="card-header bg-primary text-white py-3">
+                <div class="card-header bg-dark text-white py-3">
                     <div class="d-flex align-items-center">
-                        <i class="fas fa-money-bill-wave fa-2x me-3"></i>
+                        <i class="fas fa-money-bill-wave fa-2x me-3 text-secondary"></i>
                         <div>
                             <h2 class="h4 mb-0">Make a Deposit</h2>
-                            <p class="mb-0 opacity-75">Add funds to your Nkuna Bank account securely</p>
+                            <p class="mb-0 opacity-75">Add funds to your Bank of SA account securely</p>
                         </div>
                     </div>
                 </div>
                 
                 <div class="card-body p-4 p-md-5">
                     <!-- Current Balance Card -->
-                    <div class="card border-primary mb-4" style="border-left: 4px solid var(--primary-blue);">
+                    <div class="card mb-4" style="border-left: 4px solid var(--bs-secondary);">
                         <div class="card-body">
                             <div class="row align-items-center">
                                 <div class="col-md-8">
                                     <h5 class="card-title mb-1">
-                                        <i class="fas fa-wallet me-2 text-primary"></i>Current Balance
+                                        <i class="fas fa-wallet me-2 text-secondary"></i>Current Balance
                                     </h5>
                                     <p class="card-text text-muted mb-0">Main Account: {{ main_account.account_number }}</p>
                                 </div>
                                 <div class="col-md-4 text-md-end">
-                                    <h3 class="text-primary mb-0">{{ format_currency(main_account.balance) }}</h3>
+                                    <h3 class="mb-0">{{ format_currency(main_account.balance) }}</h3>
                                     <small class="text-muted">Available Balance</small>
                                 </div>
                             </div>
@@ -44,7 +44,7 @@
                         <!-- Amount Input -->
                         <div class="mb-4">
                             <label for="{{ form.amount.id }}" class="form-label fw-bold">
-                                <i class="fas fa-money-bill me-2 text-primary"></i>Deposit Amount
+                                <i class="fas fa-money-bill me-2 text-secondary"></i>Deposit Amount
                             </label>
                             <div class="input-group input-group-lg">
                                 <span class="input-group-text bg-light">R</span>
@@ -68,22 +68,22 @@
                         <!-- Quick Amount Buttons -->
                         <div class="mb-4">
                             <label class="form-label fw-bold">
-                                <i class="fas fa-bolt me-2 text-primary"></i>Quick Deposit Amounts
+                                <i class="fas fa-bolt me-2 text-secondary"></i>Quick Deposit Amounts
                             </label>
                             <div class="d-flex flex-wrap gap-2 mb-3">
-                                <button type="button" class="btn btn-outline-primary quick-amount" data-amount="100">
+                                <button type="button" class="btn btn-outline-secondary quick-amount" data-amount="100">
                                     R100
                                 </button>
-                                <button type="button" class="btn btn-outline-primary quick-amount" data-amount="500">
+                                <button type="button" class="btn btn-outline-secondary quick-amount" data-amount="500">
                                     R500
                                 </button>
-                                <button type="button" class="btn btn-outline-primary quick-amount" data-amount="1000">
+                                <button type="button" class="btn btn-outline-secondary quick-amount" data-amount="1000">
                                     R1,000
                                 </button>
-                                <button type="button" class="btn btn-outline-primary quick-amount" data-amount="5000">
+                                <button type="button" class="btn btn-outline-secondary quick-amount" data-amount="5000">
                                     R5,000
                                 </button>
-                                <button type="button" class="btn btn-outline-primary quick-amount" data-amount="10000">
+                                <button type="button" class="btn btn-outline-secondary quick-amount" data-amount="10000">
                                     R10,000
                                 </button>
                             </div>
@@ -92,7 +92,7 @@
                         <!-- Description -->
                         <div class="mb-4">
                             <label for="{{ form.description.id }}" class="form-label fw-bold">
-                                <i class="fas fa-sticky-note me-2 text-primary"></i>Deposit Reference (Optional)
+                                <i class="fas fa-sticky-note me-2 text-secondary"></i>Deposit Reference (Optional)
                             </label>
                             {{ form.description(class="form-control", placeholder="e.g., Salary deposit, Cash deposit, Transfer from savings") }}
                             <small class="text-muted d-block mt-1">
@@ -111,7 +111,7 @@
                         <div class="card bg-light border-0 mb-4">
                             <div class="card-body">
                                 <h6 class="card-title mb-3">
-                                    <i class="fas fa-receipt me-2 text-primary"></i>Deposit Summary
+                                    <i class="fas fa-receipt me-2 text-secondary"></i>Deposit Summary
                                 </h6>
                                 <div class="row mb-2">
                                     <div class="col-6">
@@ -135,16 +135,16 @@
                                         <span class="text-muted">New Balance:</span>
                                     </div>
                                     <div class="col-6 text-end">
-                                        <span id="summaryNewBalance" class="fw-bold text-primary">R{{ "%.2f"|format(main_account.balance) }}</span>
+                                        <span id="summaryNewBalance" class="fw-bold">{{ format_currency(main_account.balance) }}</span>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Security Notice -->
-                        <div class="alert alert-warning mb-4">
+                        <div class="alert alert-info mb-4">
                             <div class="d-flex">
-                                <i class="fas fa-shield-alt fa-lg me-3"></i>
+                                <i class="fas fa-shield-alt fa-lg me-3 text-secondary"></i>
                                 <div>
                                     <strong>Security Notice</strong>
                                     <p class="mb-0 small">All deposits are processed securely. Your funds will be available immediately in your account.</p>
@@ -154,7 +154,7 @@
 
                         <!-- Submit Button -->
                         <div class="d-grid">
-                            <button type="submit" class="btn btn-primary btn-lg" id="submitBtn">
+                            <button type="submit" class="btn btn-secondary btn-lg" id="submitBtn">
                                 <i class="fas fa-check-circle me-2"></i>Confirm Deposit
                             </button>
                         </div>
@@ -167,9 +167,9 @@
         <div class="col-lg-4">
             <!-- How to Deposit Card -->
             <div class="card border-0 shadow-lg mb-4">
-                <div class="card-header bg-info text-white py-3">
+                <div class="card-header bg-dark text-white py-3">
                     <div class="d-flex align-items-center">
-                        <i class="fas fa-question-circle fa-2x me-3"></i>
+                        <i class="fas fa-question-circle fa-2x me-3 text-secondary"></i>
                         <div>
                             <h3 class="h5 mb-0">How to Deposit</h3>
                             <p class="mb-0 opacity-75">Step-by-step guide</p>
@@ -179,7 +179,7 @@
                 <div class="card-body p-4">
                     <div class="mb-3">
                         <div class="d-flex mb-3">
-                            <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 30px; height: 30px; flex-shrink: 0;">
+                            <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 30px; height: 30px; flex-shrink: 0; background: var(--bs-secondary); color: #fff;">
                                 <span class="fw-bold">1</span>
                             </div>
                             <div class="ms-3">
@@ -189,7 +189,7 @@
                         </div>
                         
                         <div class="d-flex mb-3">
-                            <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 30px; height: 30px; flex-shrink: 0;">
+                            <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 30px; height: 30px; flex-shrink: 0; background: var(--bs-secondary); color: #fff;">
                                 <span class="fw-bold">2</span>
                             </div>
                             <div class="ms-3">
@@ -199,7 +199,7 @@
                         </div>
                         
                         <div class="d-flex mb-3">
-                            <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 30px; height: 30px; flex-shrink: 0;">
+                            <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 30px; height: 30px; flex-shrink: 0; background: var(--bs-secondary); color: #fff;">
                                 <span class="fw-bold">3</span>
                             </div>
                             <div class="ms-3">
@@ -209,7 +209,7 @@
                         </div>
                         
                         <div class="d-flex">
-                            <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 30px; height: 30px; flex-shrink: 0;">
+                            <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 30px; height: 30px; flex-shrink: 0; background: var(--bs-secondary); color: #fff;">
                                 <span class="fw-bold">4</span>
                             </div>
                             <div class="ms-3">
@@ -223,9 +223,9 @@
 
             <!-- Deposit Limits Card -->
             <div class="card border-0 shadow-lg mb-4">
-                <div class="card-header bg-success text-white py-3">
+                <div class="card-header bg-secondary text-white py-3">
                     <div class="d-flex align-items-center">
-                        <i class="fas fa-chart-line fa-2x me-3"></i>
+                        <i class="fas fa-chart-line fa-2x me-3 text-white"></i>
                         <div>
                             <h3 class="h5 mb-0">Deposit Limits</h3>
                             <p class="mb-0 opacity-75">Know your limits</p>
@@ -260,9 +260,9 @@
 
             <!-- Recent Deposits Card -->
             <div class="card border-0 shadow-lg">
-                <div class="card-header bg-warning text-white py-3">
+                <div class="card-header bg-dark text-white py-3">
                     <div class="d-flex align-items-center">
-                        <i class="fas fa-history fa-2x me-3"></i>
+                        <i class="fas fa-history fa-2x me-3 text-secondary"></i>
                         <div>
                             <h3 class="h5 mb-0">Recent Deposits</h3>
                             <p class="mb-0 opacity-75">Your last 5 deposits</p>
@@ -294,7 +294,7 @@
                             {% endfor %}
                         </div>
                         <div class="text-center mt-3">
-                            <a href="{{ url_for('history') }}" class="btn btn-outline-primary btn-sm">
+                            <a href="{{ url_for('history') }}" class="btn btn-outline-secondary btn-sm">
                                 <i class="fas fa-list me-1"></i>View All Transactions
                             </a>
                         </div>
@@ -316,13 +316,13 @@
             <div class="card border-0 shadow-lg">
                 <div class="card-body p-4">
                     <h4 class="mb-4 text-center">
-                        <i class="fas fa-shield-alt me-2 text-primary"></i>Secure Deposit Features
+                        <i class="fas fa-shield-alt me-2 text-secondary"></i>Secure Deposit Features
                     </h4>
                     <div class="row g-4">
                         <div class="col-md-3">
                             <div class="text-center">
-                                <div class="bg-primary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 70px; height: 70px;">
-                                    <i class="fas fa-lock fa-2x text-primary"></i>
+                                <div class="rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 70px; height: 70px; background: rgba(38, 212, 140, 0.1);">
+                                    <i class="fas fa-lock fa-2x text-secondary"></i>
                                 </div>
                                 <h6>256-bit Encryption</h6>
                                 <p class="small text-muted mb-0">Bank-level security for all transactions</p>
@@ -499,8 +499,8 @@
     }
     
     .form-control:focus {
-        border-color: var(--primary-blue);
-        box-shadow: 0 0 0 0.25rem rgba(0, 102, 204, 0.25);
+        border-color: var(--bs-secondary);
+        box-shadow: 0 0 0 0.25rem rgba(38, 212, 140, 0.25);
     }
     
     .input-group-text {
@@ -527,7 +527,7 @@
     
     .quick-amount:hover {
         transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0, 102, 204, 0.2);
+        box-shadow: 0 4px 12px rgba(38, 212, 140, 0.2);
     }
     
     .list-group-item {
@@ -535,7 +535,7 @@
     }
     
     .list-group-item:hover {
-        background-color: rgba(0, 102, 204, 0.05);
+        background-color: rgba(38, 212, 140, 0.05);
     }
     
     .badge {

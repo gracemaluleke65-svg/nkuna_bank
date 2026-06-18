@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Register - Nkuna Bank{% endblock %}
+{% block title %}Register – Bank of SA{% endblock %}
 
 {% block content %}
 <div class="container py-5">
@@ -13,7 +13,7 @@
                         <div class="card-body p-4 p-md-5">
                             <div class="text-center mb-4">
                                 <a href="{{ url_for('index') }}" class="d-inline-block mb-3">
-                                    <i class="fas fa-university fa-2x text-primary"></i>
+                                    <i class="fas fa-university fa-2x text-secondary"></i>
                                 </a>
                                 <h2 class="h3 mb-3">Create Your Account</h2>
                                 <p class="text-muted">Join thousands of South Africans banking smarter</p>
@@ -25,7 +25,7 @@
                                 <!-- Full Name -->
                                 <div class="mb-3">
                                     <label for="{{ form.full_name.id }}" class="form-label">
-                                        <i class="fas fa-user me-2 text-primary"></i>Full Name
+                                        <i class="fas fa-user me-2 text-secondary"></i>Full Name
                                     </label>
                                     {{ form.full_name(class="form-control form-control-lg", placeholder="Enter your full name") }}
                                     {% if form.full_name.errors %}
@@ -40,12 +40,12 @@
                                 <!-- ID Number -->
                                 <div class="mb-3">
                                     <label for="{{ form.id_number.id }}" class="form-label">
-                                        <i class="fas fa-id-card me-2 text-primary"></i>South African ID Number
+                                        <i class="fas fa-id-card me-2 text-secondary"></i>South African ID Number
                                     </label>
                                     <div class="input-group">
                                         {{ form.id_number(class="form-control form-control-lg", placeholder="13-digit SA ID (numbers only)") }}
                                         <span class="input-group-text bg-light">
-                                            <i class="fas fa-shield-alt text-primary"></i>
+                                            <i class="fas fa-shield-alt text-secondary"></i>
                                         </span>
                                     </div>
                                     <small class="text-muted d-block mt-1">
@@ -63,12 +63,12 @@
                                 <!-- Email -->
                                 <div class="mb-3">
                                     <label for="{{ form.email.id }}" class="form-label">
-                                        <i class="fas fa-envelope me-2 text-primary"></i>Email Address
+                                        <i class="fas fa-envelope me-2 text-secondary"></i>Email Address
                                     </label>
                                     <div class="input-group">
                                         {{ form.email(class="form-control form-control-lg", placeholder="your.email@example.com") }}
                                         <span class="input-group-text bg-light">
-                                            <i class="fas fa-at text-primary"></i>
+                                            <i class="fas fa-at text-secondary"></i>
                                         </span>
                                     </div>
                                     {% if form.email.errors %}
@@ -83,12 +83,12 @@
                                 <!-- Phone Number -->
                                 <div class="mb-3">
                                     <label for="{{ form.phone_number.id }}" class="form-label">
-                                        <i class="fas fa-phone me-2 text-primary"></i>Phone Number
+                                        <i class="fas fa-phone me-2 text-secondary"></i>Phone Number
                                     </label>
                                     <div class="input-group">
                                         {{ form.phone_number(class="form-control form-control-lg", placeholder="0812345678 or +27812345678") }}
                                         <span class="input-group-text bg-light">
-                                            <i class="fas fa-mobile-alt text-primary"></i>
+                                            <i class="fas fa-mobile-alt text-secondary"></i>
                                         </span>
                                     </div>
                                     <small class="text-muted d-block mt-1">
@@ -106,7 +106,7 @@
                                 <!-- Password -->
                                 <div class="mb-3">
                                     <label for="{{ form.password.id }}" class="form-label">
-                                        <i class="fas fa-lock me-2 text-primary"></i>Password
+                                        <i class="fas fa-lock me-2 text-secondary"></i>Password
                                     </label>
                                     <div class="input-group">
                                         {{ form.password(class="form-control form-control-lg", placeholder="At least 6 characters", id="password") }}
@@ -126,7 +126,7 @@
                                 <!-- Confirm Password -->
                                 <div class="mb-4">
                                     <label for="{{ form.confirm_password.id }}" class="form-label">
-                                        <i class="fas fa-lock me-2 text-primary"></i>Confirm Password
+                                        <i class="fas fa-lock me-2 text-secondary"></i>Confirm Password
                                     </label>
                                     <div class="input-group">
                                         {{ form.confirm_password(class="form-control form-control-lg", placeholder="Confirm your password", id="confirmPassword") }}
@@ -144,9 +144,9 @@
                                 </div>
 
                                 <!-- Age Verification Alert -->
-                                <div class="alert alert-info mb-4">
+                                <div class="alert alert-secondary bg-opacity-10 border-secondary mb-4">
                                     <div class="d-flex">
-                                        <i class="fas fa-exclamation-circle fa-lg me-3"></i>
+                                        <i class="fas fa-exclamation-circle fa-lg me-3 text-secondary"></i>
                                         <div>
                                             <strong>Age Verification</strong>
                                             <p class="mb-0 small">You must be 18 years or older to register. Your age will be automatically verified from your ID number.</p>
@@ -187,48 +187,48 @@
                     </div>
 
                     <!-- Right Side - Benefits -->
-                    <div class="col-md-5 bg-primary text-white p-4 p-md-5">
-                        <div class="h-100 d-flex flex-column justify-content-center">
-                            <h3 class="h4 mb-4">Why Join Nkuna Bank?</h3>
+                    <div class="col-md-5 bg-primary text-white">
+                        <div class="p-4 p-md-5 h-100 d-flex flex-column justify-content-center">
+                            <h3 class="h4 mb-4 text-secondary">Why Join Bank of SA?</h3>
                             
                             <div class="mb-4">
                                 <div class="d-flex align-items-start mb-3">
                                     <div class="bg-white bg-opacity-25 p-2 rounded-circle me-3">
-                                        <i class="fas fa-undo text-white"></i>
+                                        <i class="fas fa-undo text-secondary"></i>
                                     </div>
                                     <div>
                                         <h5 class="h6 mb-1">15-Minute Undo</h5>
-                                        <p class="small mb-0">Reverse transactions if you make a mistake</p>
+                                        <p class="small mb-0 text-white-50">Reverse transactions if you make a mistake</p>
                                     </div>
                                 </div>
 
                                 <div class="d-flex align-items-start mb-3">
                                     <div class="bg-white bg-opacity-25 p-2 rounded-circle me-3">
-                                        <i class="fas fa-bullseye text-white"></i>
+                                        <i class="fas fa-bullseye text-secondary"></i>
                                     </div>
                                     <div>
                                         <h5 class="h6 mb-1">Goal Savings</h5>
-                                        <p class="small mb-0">Save for specific goals with progress tracking</p>
+                                        <p class="small mb-0 text-white-50">Save for specific goals with progress tracking</p>
                                     </div>
                                 </div>
 
                                 <div class="d-flex align-items-start mb-3">
                                     <div class="bg-white bg-opacity-25 p-2 rounded-circle me-3">
-                                        <i class="fas fa-bolt text-white"></i>
+                                        <i class="fas fa-bolt text-secondary"></i>
                                     </div>
                                     <div>
                                         <h5 class="h6 mb-1">Instant Bill Payments</h5>
-                                        <p class="small mb-0">Pay electricity, water, airtime, and data instantly</p>
+                                        <p class="small mb-0 text-white-50">Pay electricity, water, airtime, and data instantly</p>
                                     </div>
                                 </div>
 
                                 <div class="d-flex align-items-start">
                                     <div class="bg-white bg-opacity-25 p-2 rounded-circle me-3">
-                                        <i class="fas fa-shield-alt text-white"></i>
+                                        <i class="fas fa-shield-alt text-secondary"></i>
                                     </div>
                                     <div>
                                         <h5 class="h6 mb-1">SA ID Verification</h5>
-                                        <p class="small mb-0">Advanced validation for secure registration</p>
+                                        <p class="small mb-0 text-white-50">Advanced validation for secure registration</p>
                                     </div>
                                 </div>
                             </div>
@@ -237,10 +237,10 @@
                                 <div class="card bg-white bg-opacity-10 border-0">
                                     <div class="card-body p-3">
                                         <div class="d-flex align-items-center">
-                                            <i class="fas fa-check-circle fa-2x me-3"></i>
+                                            <i class="fas fa-check-circle fa-2x text-secondary me-3"></i>
                                             <div>
-                                                <h5 class="h6 mb-1">Instant Account</h5>
-                                                <p class="small mb-0">Get your 10-digit account number immediately</p>
+                                                <h5 class="h6 mb-1 text-white">Instant Account</h5>
+                                                <p class="small mb-0 text-white-50">Get your 10-digit account number immediately</p>
                                             </div>
                                         </div>
                                     </div>
@@ -257,7 +257,7 @@
                     <div class="col-md-4">
                         <div class="card border-0 h-100">
                             <div class="card-body text-center">
-                                <i class="fas fa-lock fa-2x text-primary mb-3"></i>
+                                <i class="fas fa-lock fa-2x text-secondary mb-3"></i>
                                 <h6 class="card-title">Bank-Level Security</h6>
                                 <p class="card-text small text-muted">256-bit encryption and secure authentication</p>
                             </div>
@@ -266,7 +266,7 @@
                     <div class="col-md-4">
                         <div class="card border-0 h-100">
                             <div class="card-body text-center">
-                                <i class="fas fa-mobile-alt fa-2x text-primary mb-3"></i>
+                                <i class="fas fa-mobile-alt fa-2x text-secondary mb-3"></i>
                                 <h6 class="card-title">Always Available</h6>
                                 <p class="card-text small text-muted">Access your account 24/7 from any device</p>
                             </div>
@@ -275,7 +275,7 @@
                     <div class="col-md-4">
                         <div class="card border-0 h-100">
                             <div class="card-body text-center">
-                                <i class="fas fa-headset fa-2x text-primary mb-3"></i>
+                                <i class="fas fa-headset fa-2x text-secondary mb-3"></i>
                                 <h6 class="card-title">24/7 Support</h6>
                                 <p class="card-text small text-muted">Get help whenever you need it</p>
                             </div>
@@ -353,7 +353,7 @@
         feedback.textContent = feedbackText;
     });
 
-    // Auto-format phone number (kept for user convenience but cleaned on submit)
+    // Auto-format phone number
     document.getElementById('{{ form.phone_number.id }}').addEventListener('input', function(e) {
         let value = e.target.value.replace(/\D/g, '');
         
@@ -361,7 +361,6 @@
             value = '0' + value.substring(2);
         }
         
-        // Format with spaces for readability (optional)
         if (value.length > 3 && value.length <= 6) {
             value = value.replace(/(\d{3})(\d+)/, '$1 $2');
         } else if (value.length > 6) {
@@ -371,23 +370,16 @@
         e.target.value = value;
     });
 
-    // ID Number - Only allow digits and auto-clean on input
+    // ID Number - Only allow digits
     document.getElementById('{{ form.id_number.id }}').addEventListener('input', function(e) {
-        // Remove all non-digit characters
         let value = e.target.value.replace(/\D/g, '');
-        
-        // Limit to 13 digits
         value = value.substring(0, 13);
-        
-        // Update the input value
         e.target.value = value;
     });
 
-    // ID Number - Validate on blur (when user leaves the field)
+    // ID Number - Validate on blur
     document.getElementById('{{ form.id_number.id }}').addEventListener('blur', function(e) {
         const value = e.target.value;
-        
-        // Check if it's exactly 13 digits
         if (value.length === 13) {
             e.target.classList.remove('is-invalid');
             e.target.classList.add('is-valid');
@@ -402,26 +394,18 @@
     // Form validation on submit
     document.querySelector('form').addEventListener('submit', function(e) {
         const phoneInput = document.getElementById('{{ form.phone_number.id }}');
-        const idInput = document.getElementById('{{ form.id_number.id }}');
-        
-        // Clean phone number before submission (remove spaces)
         let phoneValue = phoneInput.value.replace(/\D/g, '');
         if (phoneValue.startsWith('27') && phoneValue.length === 11) {
             phoneValue = '0' + phoneValue.substring(2);
         }
         phoneInput.value = phoneValue;
-        
-        // ID number is already digits-only from our input handler
-        
         return true;
     });
 
-    // Real-time ID number validation
+    // Real-time ID number validation indicator
     document.getElementById('{{ form.id_number.id }}').addEventListener('input', function() {
         const idInput = this;
         const idValue = idInput.value;
-        
-        // Show length indicator
         const indicator = document.getElementById('id-length-indicator') || (function() {
             const div = document.createElement('div');
             div.id = 'id-length-indicator';
@@ -461,13 +445,13 @@
     }
     
     .form-control-lg:focus {
-        border-color: var(--primary-blue);
-        box-shadow: 0 0 0 0.25rem rgba(0, 102, 204, 0.25);
+        border-color: var(--bs-primary);
+        box-shadow: 0 0 0 0.25rem rgba(24, 66, 182, 0.25);
     }
     
     .form-control-lg.is-valid {
-        border-color: var(--accent-green);
-        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%2300C853' d='M2.3 6.73L.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3e%3c/svg%3e");
+        border-color: #28a745;
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%2328a745' d='M2.3 6.73L.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3e%3c/svg%3e");
     }
     
     .form-control-lg.is-invalid {
@@ -507,7 +491,6 @@
         border: none;
     }
     
-    /* ID number input specific styling */
     input[placeholder*="13-digit"] {
         font-family: 'Courier New', monospace;
         letter-spacing: 1px;

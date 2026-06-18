@@ -1,0 +1,219 @@
+{% extends "base.html" %}
+
+{% block title %}How It Works – Bank of SA{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="container-fluid page-header py-5">
+    <div class="container text-center py-5">
+        <h1 class="display-2 text-white mb-4 animated slideInDown">How It Works</h1>
+        <nav aria-label="breadcrumb animated slideInDown">
+            <ol class="breadcrumb justify-content-center mb-0">
+                <li class="breadcrumb-item"><a href="{{ url_for('index') }}" class="text-white">Home</a></li>
+                <li class="breadcrumb-item text-white" aria-current="page">How It Works</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<!-- Introduction -->
+<div class="container-fluid py-5 my-3">
+    <div class="container">
+        <div class="text-center mx-auto pb-5 wow fadeIn" data-wow-delay=".3s" style="max-width: 700px;">
+            <h5 class="text-primary">Getting Started</h5>
+            <h1 class="mb-4">Your Step‑by‑Step Guide to Bank of SA</h1>
+            <p class="lead text-muted">Follow these simple steps to set up your account and start using all the smart banking features – from instant transfers to goal‑based savings.</p>
+        </div>
+    </div>
+</div>
+
+<!-- Step 1: Register -->
+<div class="container-fluid py-4 bg-light">
+    <div class="container">
+        <div class="row g-4 align-items-center">
+            <div class="col-lg-12 wow fadeIn" data-wow-delay=".4s">
+                <div class="d-flex align-items-start mb-3">
+                    <span class="display-4 fw-bold text-primary me-3">1</span>
+                    <div>
+                        <h3>Create Your Account</h3>
+                        <p class="text-muted">Click <strong>Register</strong> and fill in your details. You'll need:</p>
+                        <ul class="text-muted">
+                            <li>Full name</li>
+                            <li>South African ID number (13 digits)</li>
+                            <li>Email address and phone number</li>
+                            <li>A secure password</li>
+                        </ul>
+                        <p class="text-muted">Our system automatically verifies your ID and checks that you're 18+.</p>
+                    </div>
+                </div>
+                <div class="alert alert-info">
+                    <strong>Tip:</strong> Use a valid ID format – the system validates South African ID numbers.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Step 2: Login -->
+<div class="container-fluid py-4">
+    <div class="container">
+        <div class="row g-4 align-items-center">
+            <div class="col-lg-12 wow fadeIn" data-wow-delay=".4s">
+                <div class="d-flex align-items-start mb-3">
+                    <span class="display-4 fw-bold text-primary me-3">2</span>
+                    <div>
+                        <h3>Log In to Your Dashboard</h3>
+                        <p class="text-muted">Use your email and password to log in. Once logged in, you'll see your <strong>Dashboard</strong> – the central hub of your banking activity.</p>
+                        <p class="text-muted">From here you can:</p>
+                        <ul class="text-muted">
+                            <li>View your account balance</li>
+                            <li>See recent transactions</li>
+                            <li>Access all banking features</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="alert alert-secondary">
+                    <strong>Security:</strong> Your password is hashed with BCrypt – we never store plain text passwords.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Step 3: Dashboard Overview -->
+<div class="container-fluid py-4 bg-light">
+    <div class="container">
+        <div class="row g-4 align-items-center">
+            <div class="col-lg-12 wow fadeIn" data-wow-delay=".4s">
+                <div class="d-flex align-items-start mb-3">
+                    <span class="display-4 fw-bold text-primary me-3">3</span>
+                    <div>
+                        <h3>Explore Your Dashboard</h3>
+                        <p class="text-muted">Your dashboard shows a snapshot of your finances:</p>
+                        <ul class="text-muted">
+                            <li><strong>Balance</strong> – total across all accounts</li>
+                            <li><strong>Recent Transactions</strong> – last 10 activities</li>
+                            <li><strong>Savings Goals</strong> – progress on your goals</li>
+                            <li><strong>Notifications</strong> – important alerts</li>
+                        </ul>
+                        <p class="text-muted">Use the navigation bar to quickly jump to any feature.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Step 4: Make a Transfer (with two accounts) -->
+<div class="container-fluid py-4">
+    <div class="container">
+        <div class="row g-4 align-items-center">
+            <div class="col-lg-12 wow fadeIn" data-wow-delay=".4s">
+                <div class="d-flex align-items-start mb-3">
+                    <span class="display-4 fw-bold text-primary me-3">4</span>
+                    <div>
+                        <h3>Send Money – The Transfer Feature</h3>
+                        <p class="text-muted">To experience the full power of transfers, <strong>you need two accounts</strong>. Here's how:</p>
+                        <div class="card border-0 bg-warning bg-opacity-10 mb-3">
+                            <div class="card-body">
+                                <h5 class="card-title text-warning">Important</h5>
+                                <p class="card-text mb-0">Since this is a demo, you can create a second account with any fake credentials (different email). Use a second browser or incognito window to log in to both accounts simultaneously – then you can transfer money between them in real time!</p>
+                            </div>
+                        </div>
+                        <p class="text-muted">Once you have two accounts:</p>
+                        <ol class="text-muted">
+                            <li>Log in to Account A, go to <strong>Transfer</strong>.</li>
+                            <li>Enter Account B's 10‑digit account number.</li>
+                            <li>Enter an amount and a description (optional).</li>
+                            <li>Review the fee (1%, min R2, max R100) and click <strong>Transfer Money</strong>.</li>
+                            <li>The balance of Account A decreases, and Account B's balance increases instantly.</li>
+                        </ol>
+                        <p class="text-muted">You can also <strong>undo</strong> a transfer within 15 minutes – a unique safety net!</p>
+                    </div>
+                </div>
+                <div class="alert alert-success">
+                    <strong>Real‑time updates:</strong> Both accounts' balances and transaction histories update immediately. You'll see the transfer reflected on both dashboards in real time.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Step 5: Other Features (Deposit, Goals, Bills) -->
+<div class="container-fluid py-4 bg-light">
+    <div class="container">
+        <div class="text-center mx-auto pb-4 wow fadeIn" data-wow-delay=".3s" style="max-width: 600px;">
+            <h5 class="text-primary">More Features</h5>
+            <h1>Beyond Transfers</h1>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-4 wow fadeIn" data-wow-delay=".2s">
+                <div class="card border-0 shadow-sm h-100 text-center p-4">
+                    <h4>Deposit</h4>
+                    <p class="text-muted">Add funds to your main account. Deposits are recorded instantly and appear in your transaction history.</p>
+                </div>
+            </div>
+            <div class="col-md-4 wow fadeIn" data-wow-delay=".4s">
+                <div class="card border-0 shadow-sm h-100 text-center p-4">
+                    <h4>Savings Goals</h4>
+                    <p class="text-muted">Set a target amount and deadline, then deposit money into a dedicated goal account. Track your progress with a visual bar.</p>
+                </div>
+            </div>
+            <div class="col-md-4 wow fadeIn" data-wow-delay=".6s">
+                <div class="card border-0 shadow-sm h-100 text-center p-4">
+                    <h4>Bill Payments</h4>
+                    <p class="text-muted">Pay electricity, water, airtime, and data bundles directly from your account. All payments are processed instantly.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Step 6: Notifications & History -->
+<div class="container-fluid py-4">
+    <div class="container">
+        <div class="row g-4 align-items-center">
+            <div class="col-lg-12 wow fadeIn" data-wow-delay=".4s">
+                <div class="d-flex align-items-start mb-3">
+                    <span class="display-4 fw-bold text-primary me-3">5</span>
+                    <div>
+                        <h3>Stay Informed with Notifications &amp; History</h3>
+                        <p class="text-muted">Every transaction triggers a notification – you'll always know what's happening with your money.</p>
+                        <ul class="text-muted">
+                            <li><strong>Notifications:</strong> Get alerts for deposits, transfers, bill payments, and low balance warnings.</li>
+                            <li><strong>Transaction History:</strong> View a complete log of all your activities, with filters by type and search.</li>
+                            <li><strong>Undo:</strong> If you made a mistake, you can reverse a transfer within 15 minutes – just click the "Undo" button next to the transaction.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Final CTA -->
+<div class="container-fluid bg-primary py-5 my-5">
+    <div class="container text-center">
+        <h2 class="text-white mb-4">Ready to Try It Yourself?</h2>
+        <p class="text-white-50 mb-4">Create your account now and experience smart banking with real‑time updates and unique features.</p>
+        <div class="d-flex flex-wrap justify-content-center gap-3">
+            {% if not current_user.is_authenticated %}
+                <a href="{{ url_for('register') }}" class="btn btn-warning btn-lg px-5">
+                    Create Free Account
+                </a>
+                <a href="{{ url_for('login') }}" class="btn btn-outline-light btn-lg px-5">
+                    Login
+                </a>
+            {% else %}
+                <a href="{{ url_for('dashboard') }}" class="btn btn-warning btn-lg px-5">
+                    Go to Dashboard
+                </a>
+                <a href="{{ url_for('transfer') }}" class="btn btn-outline-light btn-lg px-5">
+                    Make a Transfer
+                </a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% endblock %}

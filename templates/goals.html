@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Goals - Nkuna Bank{% endblock %}
+{% block title %}Goals – Bank of SA{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -13,8 +13,8 @@
     
     .goal-card:hover {
         transform: translateY(-5px);
-        box-shadow: 0 10px 30px rgba(0, 102, 204, 0.1);
-        border-color: var(--primary-blue);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        border-color: var(--bs-secondary);
     }
     
     .progress-goal {
@@ -28,6 +28,7 @@
         height: 100%;
         border-radius: 4px;
         transition: width 1s ease-in-out;
+        background-color: var(--bs-secondary);
     }
     
     .goal-status {
@@ -43,19 +44,19 @@
     }
     
     .status-completed {
-        background-color: rgba(33, 150, 243, 0.1);
-        color: #2196F3;
-        border: 1px solid rgba(33, 150, 243, 0.2);
+        background-color: rgba(38, 212, 140, 0.1);
+        color: #1a9b6a;
+        border: 1px solid rgba(38, 212, 140, 0.2);
     }
     
     .goal-amount {
         font-size: 1.75rem;
         font-weight: 700;
-        color: var(--primary-blue);
+        color: var(--bs-dark);
     }
     
     .goal-target {
-        color: var(--text-light);
+        color: #6c757d;
         font-size: 0.9rem;
     }
     
@@ -102,8 +103,8 @@
     }
     
     .amount-input:focus {
-        border-color: var(--primary-blue);
-        box-shadow: 0 0 0 0.25rem rgba(0, 102, 204, 0.1);
+        border-color: var(--bs-secondary);
+        box-shadow: 0 0 0 0.25rem rgba(38, 212, 140, 0.25);
     }
     
     .action-btn {
@@ -114,8 +115,8 @@
     }
     
     .form-check-input:checked {
-        background-color: var(--primary-blue);
-        border-color: var(--primary-blue);
+        background-color: var(--bs-secondary);
+        border-color: var(--bs-secondary);
     }
     
     .form-control-lg {
@@ -125,8 +126,8 @@
     }
     
     .form-control-lg:focus {
-        border-color: var(--primary-blue);
-        box-shadow: 0 0 0 0.25rem rgba(0, 102, 204, 0.1);
+        border-color: var(--bs-secondary);
+        box-shadow: 0 0 0 0.25rem rgba(38, 212, 140, 0.25);
     }
     
     .empty-state {
@@ -146,7 +147,7 @@
     .goal-icon {
         width: 50px;
         height: 50px;
-        background: linear-gradient(135deg, var(--light-blue) 0%, #d9ecff 100%);
+        background: rgba(38, 212, 140, 0.1);
         border-radius: 12px;
         display: flex;
         align-items: center;
@@ -156,13 +157,13 @@
     
     .goal-icon i {
         font-size: 1.5rem;
-        color: var(--primary-blue);
+        color: var(--bs-secondary);
     }
     
     .auto-deposit-badge {
-        background-color: rgba(255, 193, 7, 0.1);
-        color: #FFC107;
-        border: 1px solid rgba(255, 193, 7, 0.2);
+        background-color: rgba(38, 212, 140, 0.1);
+        color: var(--bs-secondary);
+        border: 1px solid rgba(38, 212, 140, 0.2);
         padding: 0.25rem 0.75rem;
         border-radius: 50px;
         font-size: 0.85rem;
@@ -171,9 +172,13 @@
     }
     
     .modal-header {
-        background: linear-gradient(135deg, var(--primary-blue) 0%, var(--dark-blue) 100%);
+        background: var(--bs-dark);
         color: white;
         border-radius: 15px 15px 0 0;
+    }
+    
+    .modal-header .btn-close {
+        filter: brightness(0) invert(1);
     }
     
     .modal-content {
@@ -181,7 +186,6 @@
         border: none;
     }
     
-    /* Fix for number input validation */
     input[type="number"] {
         -moz-appearance: textfield;
     }
@@ -216,10 +220,10 @@
                     <p class="text-muted mb-0">Set, track, and achieve your financial goals</p>
                 </div>
                 <div class="d-flex gap-2">
-                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createGoalModal">
+                    <button class="btn btn-secondary text-white" data-bs-toggle="modal" data-bs-target="#createGoalModal">
                         <i class="fas fa-plus me-2"></i> New Goal
                     </button>
-                    <a href="{{ url_for('dashboard') }}" class="btn btn-outline-primary">
+                    <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary">
                         <i class="fas fa-tachometer-alt me-2"></i> Dashboard
                     </a>
                 </div>
@@ -237,8 +241,8 @@
                             <h6 class="text-muted mb-2">Active Goals</h6>
                             <h3 class="h2 mb-0">{{ goals|length }}</h3>
                         </div>
-                        <div class="bg-primary bg-opacity-10 p-3 rounded-circle">
-                            <i class="fas fa-bullseye text-primary fa-lg"></i>
+                        <div class="bg-secondary bg-opacity-10 p-3 rounded-circle">
+                            <i class="fas fa-bullseye text-secondary fa-lg"></i>
                         </div>
                     </div>
                 </div>
@@ -269,8 +273,8 @@
                             <h6 class="text-muted mb-2">Goals Achieved</h6>
                             <h3 class="h2 mb-0">{{ completed_goals }}</h3>
                         </div>
-                        <div class="bg-warning bg-opacity-10 p-3 rounded-circle">
-                            <i class="fas fa-trophy text-warning fa-lg"></i>
+                        <div class="bg-secondary bg-opacity-10 p-3 rounded-circle">
+                            <i class="fas fa-trophy text-secondary fa-lg"></i>
                         </div>
                     </div>
                 </div>
@@ -285,8 +289,8 @@
                             <h6 class="text-muted mb-2">Main Account Balance</h6>
                             <h3 class="h2 mb-0">{{ format_currency(main_account.balance) }}</h3>
                         </div>
-                        <div class="bg-info bg-opacity-10 p-3 rounded-circle">
-                            <i class="fas fa-wallet text-info fa-lg"></i>
+                        <div class="bg-secondary bg-opacity-10 p-3 rounded-circle">
+                            <i class="fas fa-wallet text-secondary fa-lg"></i>
                         </div>
                     </div>
                 </div>
@@ -355,7 +359,7 @@
                                         <span class="goal-target">Target: {{ format_currency(goal.target_amount) }}</span>
                                     </div>
                                     <div class="progress-goal">
-                                        <div class="progress-goal-bar bg-primary" 
+                                        <div class="progress-goal-bar" 
                                              style="width: {{ (goal.current_amount / goal.target_amount * 100) if goal.target_amount > 0 else 0 }}%">
                                         </div>
                                     </div>
@@ -398,7 +402,7 @@
                                         </button>
                                     </div>
                                     <div class="col-6">
-                                        <button class="btn btn-warning w-100 action-btn" 
+                                        <button class="btn btn-secondary text-white w-100 action-btn" 
                                                 data-bs-toggle="modal" 
                                                 data-bs-target="#withdrawModal{{ goal.id }}"
                                                 {% if goal.current_amount <= 0 %}disabled{% endif %}>
@@ -409,7 +413,7 @@
                             </div>
                         </div>
                         
-                        <!-- Deposit Modal for this goal - FIXED -->
+                        <!-- Deposit Modal for this goal -->
                         <div class="modal fade" id="depositModal{{ goal.id }}" tabindex="-1">
                             <div class="modal-dialog modal-dialog-centered">
                                 <div class="modal-content">
@@ -468,7 +472,7 @@
                                             </div>
                                             <div class="d-flex gap-2">
                                                 <button type="button" class="btn btn-secondary w-50" data-bs-dismiss="modal">Cancel</button>
-                                                <button type="submit" class="btn btn-primary w-50">
+                                                <button type="submit" class="btn btn-secondary text-white w-50">
                                                     <i class="fas fa-check me-2"></i> Confirm Deposit
                                                 </button>
                                             </div>
@@ -478,7 +482,7 @@
                             </div>
                         </div>
                         
-                        <!-- Withdraw Modal for this goal - FIXED -->
+                        <!-- Withdraw Modal for this goal -->
                         <div class="modal fade" id="withdrawModal{{ goal.id }}" tabindex="-1">
                             <div class="modal-dialog modal-dialog-centered">
                                 <div class="modal-content">
@@ -530,7 +534,7 @@
                                             </div>
                                             <div class="d-flex gap-2">
                                                 <button type="button" class="btn btn-secondary w-50" data-bs-dismiss="modal">Cancel</button>
-                                                <button type="submit" class="btn btn-warning w-50">
+                                                <button type="submit" class="btn btn-secondary text-white w-50">
                                                     <i class="fas fa-check me-2"></i> Confirm Withdrawal
                                                 </button>
                                             </div>
@@ -581,7 +585,7 @@
                     </div>
                     <h4 class="mb-3">No Goals Yet</h4>
                     <p class="text-muted mb-4">Start your financial journey by setting your first savings goal.</p>
-                    <button class="btn btn-primary btn-lg" data-bs-toggle="modal" data-bs-target="#createGoalModal">
+                    <button class="btn btn-secondary text-white btn-lg" data-bs-toggle="modal" data-bs-target="#createGoalModal">
                         <i class="fas fa-plus me-2"></i> Create Your First Goal
                     </button>
                 </div>
@@ -705,7 +709,7 @@
                     
                     <div class="d-flex gap-2 mt-4">
                         <button type="button" class="btn btn-secondary w-50" data-bs-dismiss="modal">Cancel</button>
-                        {{ form.submit(class="btn btn-primary w-50", value="Create Goal") }}
+                        {{ form.submit(class="btn btn-secondary text-white w-50", value="Create Goal") }}
                     </div>
                 </form>
             </div>
@@ -761,9 +765,8 @@
         });
     });
     
-    // Calculate days remaining for each goal on page load
+    // Animate progress bars on load
     document.addEventListener('DOMContentLoaded', function() {
-        // Animate progress bars
         document.querySelectorAll('.progress-goal-bar').forEach(bar => {
             const width = bar.style.width;
             bar.style.width = '0%';

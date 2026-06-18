@@ -1,6 +1,121 @@
 {% extends "base.html" %}
 
-{% block title %}Transactions - Admin Dashboard{% endblock %}
+{% block title %}Transactions – Admin Dashboard{% endblock %}
+
+{% block extra_css %}
+<style>
+    .table th {
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+        letter-spacing: 0.5px;
+        border-bottom: 2px solid #e9ecef;
+    }
+    
+    .table td {
+        vertical-align: middle;
+        padding: 1rem 0.75rem;
+    }
+    
+    .table-hover tbody tr:hover {
+        background-color: rgba(24, 66, 182, 0.02);
+    }
+    
+    .badge {
+        padding: 0.35em 0.65em;
+        font-size: 0.75em;
+        font-weight: 600;
+    }
+    
+    .form-check-input {
+        width: 1.2em;
+        height: 1.2em;
+    }
+    
+    .form-check-input:checked {
+        background-color: var(--bs-primary);
+        border-color: var(--bs-primary);
+    }
+    
+    .dropdown-menu {
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+        border: none;
+        border-radius: 10px;
+    }
+    
+    .pagination .page-link {
+        color: var(--bs-primary);
+        border: none;
+        margin: 0 2px;
+        border-radius: 8px;
+        padding: 0.5rem 1rem;
+    }
+    
+    .pagination .page-item.active .page-link {
+        background-color: var(--bs-primary);
+        color: white;
+        border-color: var(--bs-primary);
+    }
+    
+    .pagination .page-link:hover {
+        background-color: rgba(24, 66, 182, 0.1);
+    }
+    
+    .modal-content {
+        border-radius: 15px;
+        border: none;
+    }
+    
+    .modal-header {
+        background: var(--bs-primary);
+        color: white;
+        border-radius: 15px 15px 0 0;
+    }
+    
+    .modal-header .btn-close {
+        filter: brightness(0) invert(1);
+    }
+    
+    .btn-primary {
+        background-color: var(--bs-primary);
+        border-color: var(--bs-primary);
+    }
+    .btn-primary:hover {
+        background-color: #133592;
+        border-color: #133592;
+    }
+    
+    .bg-primary-custom {
+        background: var(--bs-primary);
+    }
+    
+    .bg-primary-soft {
+        background: rgba(24, 66, 182, 0.08);
+    }
+    
+    .bg-success-soft {
+        background: rgba(40, 167, 69, 0.08);
+    }
+    
+    .bg-warning-soft {
+        background: rgba(255, 193, 7, 0.08);
+    }
+    
+    .bg-info-soft {
+        background: rgba(13, 202, 240, 0.08);
+    }
+    
+    @media (max-width: 768px) {
+        .table-responsive {
+            font-size: 0.85rem;
+        }
+        
+        .badge {
+            font-size: 0.7em;
+        }
+    }
+</style>
+{% endblock %}
 
 {% block content %}
 <div class="container-fluid py-4">
@@ -39,7 +154,7 @@
     <!-- Stats Cards -->
     <div class="row g-3 mb-4">
         <div class="col-md-3">
-            <div class="card border-0 bg-primary bg-opacity-10">
+            <div class="card border-0 bg-primary-soft">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
@@ -54,7 +169,7 @@
             </div>
         </div>
         <div class="col-md-3">
-            <div class="card border-0 bg-success bg-opacity-10">
+            <div class="card border-0 bg-success-soft">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
@@ -69,7 +184,7 @@
             </div>
         </div>
         <div class="col-md-3">
-            <div class="card border-0 bg-warning bg-opacity-10">
+            <div class="card border-0 bg-warning-soft">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
@@ -84,7 +199,7 @@
             </div>
         </div>
         <div class="col-md-3">
-            <div class="card border-0 bg-info bg-opacity-10">
+            <div class="card border-0 bg-info-soft">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
@@ -434,85 +549,6 @@
     </div>
 </div>
 
-<style>
-    .table th {
-        font-weight: 600;
-        text-transform: uppercase;
-        font-size: 0.85rem;
-        letter-spacing: 0.5px;
-        border-bottom: 2px solid #e9ecef;
-    }
-    
-    .table td {
-        vertical-align: middle;
-        padding: 1rem 0.75rem;
-    }
-    
-    .table-hover tbody tr:hover {
-        background-color: rgba(0, 102, 204, 0.02);
-    }
-    
-    .badge {
-        padding: 0.35em 0.65em;
-        font-size: 0.75em;
-        font-weight: 600;
-    }
-    
-    .form-check-input {
-        width: 1.2em;
-        height: 1.2em;
-    }
-    
-    .form-check-input:checked {
-        background-color: var(--primary-blue);
-        border-color: var(--primary-blue);
-    }
-    
-    .dropdown-menu {
-        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-        border: none;
-        border-radius: 10px;
-    }
-    
-    .pagination .page-link {
-        color: var(--primary-blue);
-        border: none;
-        margin: 0 2px;
-        border-radius: 8px;
-        padding: 0.5rem 1rem;
-    }
-    
-    .pagination .page-item.active .page-link {
-        background-color: var(--primary-blue);
-        color: white;
-    }
-    
-    .pagination .page-link:hover {
-        background-color: rgba(0, 102, 204, 0.1);
-    }
-    
-    .modal-content {
-        border-radius: 15px;
-        border: none;
-    }
-    
-    .modal-header {
-        background: linear-gradient(135deg, var(--primary-blue) 0%, var(--dark-blue) 100%);
-        color: white;
-        border-radius: 15px 15px 0 0;
-    }
-    
-    @media (max-width: 768px) {
-        .table-responsive {
-            font-size: 0.85rem;
-        }
-        
-        .badge {
-            font-size: 0.7em;
-        }
-    }
-</style>
-
 <script>
     // Checkbox selection handling
     document.getElementById('selectAll').addEventListener('change', function() {
@@ -761,7 +797,7 @@
             <!DOCTYPE html>
             <html>
             <head>
-                <title>Transaction Details - Nkuna Bank</title>
+                <title>Transaction Details - Bank of SA</title>
                 <style>
                     body { font-family: Arial, sans-serif; margin: 20px; }
                     table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
@@ -775,7 +811,7 @@
             </head>
             <body>
                 <div class="header">
-                    <h1>Nkuna Bank</h1>
+                    <h1>Bank of SA</h1>
                     <h3>Transaction Details</h3>
                     <p>Printed: ${new Date().toLocaleString()}</p>
                 </div>

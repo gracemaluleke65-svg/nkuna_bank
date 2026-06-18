@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Transfer Money - Nkuna Bank{% endblock %}
+{% block title %}Transfer Money – Bank of SA{% endblock %}
 
 {% block content %}
 <div class="container py-5">
@@ -8,13 +8,13 @@
         <!-- Left Column: Transfer Form -->
         <div class="col-lg-8 mb-4 mb-lg-0">
             <div class="card border-0 shadow-lg mb-4">
-                <div class="card-header bg-primary text-white py-3">
+                <div class="card-header bg-secondary text-white py-3">
                     <h3 class="h5 mb-0">
                         <i class="fas fa-exchange-alt me-2"></i>Make a Transfer
                     </h3>
                 </div>
                 <div class="card-body p-4">
-                    <div class="alert alert-info mb-4">
+                    <div class="alert alert-secondary mb-4">
                         <div class="d-flex">
                             <i class="fas fa-info-circle fa-lg me-3"></i>
                             <div>
@@ -34,7 +34,7 @@
                         <!-- From Account (Read-only) -->
                         <div class="mb-4">
                             <label class="form-label">
-                                <i class="fas fa-user-circle me-2 text-primary"></i>From Account
+                                <i class="fas fa-user-circle me-2 text-secondary"></i>From Account
                             </label>
                             <div class="input-group">
                                 <input type="text" class="form-control form-control-lg" 
@@ -42,7 +42,7 @@
                                        readonly
                                        style="background-color: #f8f9fa; cursor: not-allowed;">
                                 <span class="input-group-text bg-light">
-                                    <i class="fas fa-university text-primary"></i>
+                                    <i class="fas fa-university text-secondary"></i>
                                 </span>
                             </div>
                             <div class="mt-1">
@@ -53,20 +53,20 @@
                         <!-- To Account -->
                         <div class="mb-4">
                             <label for="{{ form.to_account.id }}" class="form-label">
-                                <i class="fas fa-user-friends me-2 text-primary"></i>Recipient Account Number
+                                <i class="fas fa-user-friends me-2 text-secondary"></i>Recipient Account Number
                             </label>
                             <div class="input-group">
                                 {{ form.to_account(class="form-control form-control-lg", 
                                                   placeholder="Enter 10-digit account number",
                                                   id="toAccount",
                                                   maxlength="10") }}
-                                <button class="btn btn-outline-primary" type="button" id="verifyAccountBtn">
+                                <button class="btn btn-outline-secondary" type="button" id="verifyAccountBtn">
                                     <i class="fas fa-search me-1"></i>Verify
                                 </button>
                             </div>
                             <div class="mt-1">
                                 <div id="accountVerificationResult"></div>
-                                <small class="text-muted">Enter the recipient's 10-digit Nkuna Bank account number</small>
+                                <small class="text-muted">Enter the recipient's 10-digit Bank of SA account number</small>
                             </div>
                             {% if form.to_account.errors %}
                                 <div class="text-danger small mt-1">
@@ -80,7 +80,7 @@
                         <!-- Amount -->
                         <div class="mb-4">
                             <label for="{{ form.amount.id }}" class="form-label">
-                                <i class="fas fa-money-bill-wave me-2 text-primary"></i>Amount to Transfer
+                                <i class="fas fa-money-bill-wave me-2 text-secondary"></i>Amount to Transfer
                             </label>
                             <div class="input-group">
                                 <span class="input-group-text bg-light">R</span>
@@ -103,7 +103,7 @@
                         <!-- Description -->
                         <div class="mb-4">
                             <label for="{{ form.description.id }}" class="form-label">
-                                <i class="fas fa-sticky-note me-2 text-primary"></i>Description (Optional)
+                                <i class="fas fa-sticky-note me-2 text-secondary"></i>Description (Optional)
                             </label>
                             {{ form.description(class="form-control form-control-lg", 
                                               placeholder="e.g., Rent payment, Birthday gift, etc.",
@@ -117,7 +117,7 @@
                         <div class="card border-0 bg-light mb-4">
                             <div class="card-body">
                                 <h6 class="card-title mb-3">
-                                    <i class="fas fa-calculator me-2 text-primary"></i>Transfer Summary
+                                    <i class="fas fa-calculator me-2 text-secondary"></i>Transfer Summary
                                 </h6>
                                 
                                 <div class="row mb-2">
@@ -163,7 +163,7 @@
 
                         <!-- Submit Button -->
                         <div class="d-grid">
-                            <button type="submit" class="btn btn-primary btn-lg" id="submitBtn" disabled>
+                            <button type="submit" class="btn btn-secondary btn-lg" id="submitBtn" disabled>
                                 <i class="fas fa-paper-plane me-2"></i>Transfer Money
                             </button>
                         </div>
@@ -171,7 +171,7 @@
                         <!-- Undo Information -->
                         <div class="mt-3 text-center">
                             <small class="text-muted">
-                                <i class="fas fa-undo me-1 text-primary"></i>
+                                <i class="fas fa-undo me-1 text-secondary"></i>
                                 You can undo this transfer within 15 minutes after completion
                             </small>
                         </div>
@@ -184,7 +184,7 @@
             <div class="card border-0 shadow-lg">
                 <div class="card-header bg-light py-3">
                     <h5 class="mb-0">
-                        <i class="fas fa-history me-2 text-primary"></i>Recent Transfers
+                        <i class="fas fa-history me-2 text-secondary"></i>Recent Transfers
                     </h5>
                 </div>
                 <div class="card-body p-0">
@@ -234,7 +234,7 @@
                                     </td>
                                     <td class="text-end pe-4">
                                         {% if transfer.status == 'COMPLETED' %}
-                                            <button class="btn btn-sm btn-outline-primary" 
+                                            <button class="btn btn-sm btn-outline-secondary" 
                                                     onclick="copyToClipboard('{{ transfer.transaction_id }}')"
                                                     title="Copy Transaction ID">
                                                 <i class="fas fa-copy"></i>
@@ -248,7 +248,7 @@
                     </div>
                 </div>
                 <div class="card-footer bg-light py-3">
-                    <a href="{{ url_for('history') }}" class="btn btn-outline-primary btn-sm">
+                    <a href="{{ url_for('history') }}" class="btn btn-outline-secondary btn-sm">
                         <i class="fas fa-list me-1"></i>View All Transactions
                     </a>
                 </div>
@@ -298,7 +298,7 @@
 
             <!-- Transfer Guidelines -->
             <div class="card border-0 shadow-lg mb-4">
-                <div class="card-header bg-warning text-white py-3">
+                <div class="card-header bg-secondary text-white py-3">
                     <h5 class="mb-0">
                         <i class="fas fa-lightbulb me-2"></i>Transfer Guidelines
                     </h5>
@@ -363,13 +363,13 @@
                 </div>
                 <div class="card-body">
                     <div class="d-grid gap-2">
-                        <a href="{{ url_for('dashboard') }}" class="btn btn-outline-primary">
+                        <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary">
                             <i class="fas fa-tachometer-alt me-2"></i>Go to Dashboard
                         </a>
                         <a href="{{ url_for('deposit') }}" class="btn btn-outline-success">
                             <i class="fas fa-money-bill-wave me-2"></i>Make a Deposit
                         </a>
-                        <a href="{{ url_for('bills') }}" class="btn btn-outline-warning">
+                        <a href="{{ url_for('bills') }}" class="btn btn-outline-secondary">
                             <i class="fas fa-file-invoice-dollar me-2"></i>Pay Bills
                         </a>
                         <a href="{{ url_for('history') }}" class="btn btn-outline-secondary">
@@ -438,7 +438,7 @@
             remainingBalanceDisplay.classList.add('text-success');
         }
         
-        // Enable/disable submit button - UPDATED VALIDATION
+        // Enable/disable submit button
         const toAccount = toAccountInput.value.trim();
         const cleanAccount = toAccount.replace(/\D/g, "");
         const isValidAmount = amount > 0 && amount <= 1000000;
@@ -644,8 +644,8 @@
     }
     
     .form-control-lg:focus {
-        border-color: var(--primary-blue);
-        box-shadow: 0 0 0 0.25rem rgba(0, 102, 204, 0.25);
+        border-color: var(--bs-secondary);
+        box-shadow: 0 0 0 0.25rem rgba(38, 212, 140, 0.25);
     }
     
     .input-group-text {
@@ -667,7 +667,7 @@
     
     .table th {
         font-weight: 600;
-        color: var(--text-dark);
+        color: var(--bs-dark);
         border-bottom: 2px solid #dee2e6;
     }
     

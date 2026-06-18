@@ -1417,6 +1417,11 @@ def settings():
     
     return render_template('settings.html', form=form)
 
+
+@app.route('/how-it-works')
+def how_it_works():
+    """How It Works page - step by step guide"""
+    return render_template('how_it_works.html')
 # ==================== ADMIN ROUTES ====================
 
 @app.route('/admin/login', methods=['GET', 'POST'])

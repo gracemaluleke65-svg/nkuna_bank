@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Transaction History - Nkuna Bank{% endblock %}
+{% block title %}Transaction History – Bank of SA{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -21,7 +21,7 @@
     }
     
     .transaction-transfer {
-        border-left: 4px solid #0066CC;
+        border-left: 4px solid var(--bs-secondary);
     }
     
     .transaction-bill {
@@ -95,9 +95,9 @@
     }
     
     .filter-btn.active {
-        background: linear-gradient(135deg, #0066CC, #0084FF);
-        color: white;
-        border: none;
+        background: var(--bs-secondary);
+        color: #fff;
+        border-color: var(--bs-secondary);
     }
     
     .stats-card {
@@ -109,6 +109,10 @@
     .stats-card:hover {
         transform: translateY(-5px);
     }
+    
+    .bg-secondary-soft {
+        background-color: rgba(38, 212, 140, 0.1);
+    }
 </style>
 {% endblock %}
 
@@ -118,12 +122,12 @@
     <div class="row mb-4">
         <div class="col-md-8">
             <h1 class="h2 mb-2">
-                <i class="fas fa-history text-primary me-2"></i>Transaction History
+                <i class="fas fa-history text-secondary me-2"></i>Transaction History
             </h1>
             <p class="text-muted mb-0">View and manage all your financial transactions in one place</p>
         </div>
         <div class="col-md-4 text-md-end">
-            <a href="{{ url_for('dashboard') }}" class="btn btn-outline-primary">
+            <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary">
                 <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
             </a>
         </div>
@@ -132,7 +136,7 @@
     <!-- Stats Cards -->
     <div class="row mb-4">
         <div class="col-md-3 mb-3">
-            <div class="card stats-card border-0 shadow-sm" style="background: linear-gradient(135deg, #d4edda, #c3e6cb);">
+            <div class="card stats-card border-0 shadow-sm bg-secondary-soft">
                 <div class="card-body">
                     <div class="d-flex align-items-center">
                         <div class="bg-white bg-opacity-50 p-3 rounded-circle me-3">
@@ -148,15 +152,15 @@
         </div>
         
         <div class="col-md-3 mb-3">
-            <div class="card stats-card border-0 shadow-sm" style="background: linear-gradient(135deg, #cce5ff, #b8daff);">
+            <div class="card stats-card border-0 shadow-sm" style="background: linear-gradient(135deg, var(--bs-dark), #1a1a1a); color: white;">
                 <div class="card-body">
                     <div class="d-flex align-items-center">
-                        <div class="bg-white bg-opacity-50 p-3 rounded-circle me-3">
-                            <i class="fas fa-exchange-alt text-primary fa-lg"></i>
+                        <div class="bg-white bg-opacity-10 p-3 rounded-circle me-3">
+                            <i class="fas fa-exchange-alt text-secondary fa-lg"></i>
                         </div>
                         <div>
-                            <p class="text-muted mb-1 small">Total Transfers</p>
-                            <h3 class="h4 mb-0">{{ format_currency(total_transfers) }}</h3>
+                            <p class="text-white-50 mb-1 small">Total Transfers</p>
+                            <h3 class="h4 mb-0 text-secondary">{{ format_currency(total_transfers) }}</h3>
                         </div>
                     </div>
                 </div>
@@ -164,11 +168,11 @@
         </div>
         
         <div class="col-md-3 mb-3">
-            <div class="card stats-card border-0 shadow-sm" style="background: linear-gradient(135deg, #fff3cd, #ffeaa7);">
+            <div class="card stats-card border-0 shadow-sm bg-light">
                 <div class="card-body">
                     <div class="d-flex align-items-center">
                         <div class="bg-white bg-opacity-50 p-3 rounded-circle me-3">
-                            <i class="fas fa-percentage text-warning fa-lg"></i>
+                            <i class="fas fa-percentage text-secondary fa-lg"></i>
                         </div>
                         <div>
                             <p class="text-muted mb-1 small">Total Fees Paid</p>
@@ -180,7 +184,7 @@
         </div>
         
         <div class="col-md-3 mb-3">
-            <div class="card stats-card border-0 shadow-sm" style="background: linear-gradient(135deg, #e2e3e5, #d6d8db);">
+            <div class="card stats-card border-0 shadow-sm bg-light">
                 <div class="card-body">
                     <div class="d-flex align-items-center">
                         <div class="bg-white bg-opacity-50 p-3 rounded-circle me-3">
@@ -202,18 +206,18 @@
             <div class="row align-items-center">
                 <div class="col-md-6">
                     <h5 class="mb-3 mb-md-0">
-                        <i class="fas fa-filter text-primary me-2"></i>Filter Transactions
+                        <i class="fas fa-filter text-secondary me-2"></i>Filter Transactions
                     </h5>
                 </div>
                 <div class="col-md-6">
                     <div class="d-flex flex-wrap gap-2 justify-content-md-end">
-                        <button class="filter-btn btn btn-outline-primary active" data-filter="all">
+                        <button class="filter-btn btn btn-outline-secondary active" data-filter="all">
                             All Transactions
                         </button>
                         <button class="filter-btn btn btn-outline-success" data-filter="deposit">
                             <i class="fas fa-arrow-down me-1"></i>Deposits
                         </button>
-                        <button class="filter-btn btn btn-outline-primary" data-filter="transfer">
+                        <button class="filter-btn btn btn-outline-secondary" data-filter="transfer">
                             <i class="fas fa-exchange-alt me-1"></i>Transfers
                         </button>
                         <button class="filter-btn btn btn-outline-warning" data-filter="bill">
@@ -263,7 +267,7 @@
                                                 <i class="fas fa-arrow-down me-1"></i>Deposit
                                             </span>
                                         {% elif transaction.transaction_type == 'TRANSFER' %}
-                                            <span class="badge bg-primary">
+                                            <span class="badge bg-secondary text-white">
                                                 <i class="fas fa-exchange-alt me-1"></i>Transfer
                                             </span>
                                         {% elif transaction.transaction_type == 'BILL_PAYMENT' %}
@@ -451,7 +455,7 @@
                         </div>
                         <div class="col-md-6 text-md-end">
                             <div class="btn-group">
-                                <button type="button" class="btn btn-outline-primary btn-sm dropdown-toggle" data-bs-toggle="dropdown">
+                                <button type="button" class="btn btn-outline-secondary btn-sm dropdown-toggle" data-bs-toggle="dropdown">
                                     <i class="fas fa-download me-2"></i>Export
                                 </button>
                                 <ul class="dropdown-menu">
@@ -471,10 +475,10 @@
                     <h4 class="mb-3">No Transactions Yet</h4>
                     <p class="text-muted mb-4">You haven't made any transactions yet. Start by making a deposit or transfer.</p>
                     <div class="d-flex flex-wrap justify-content-center gap-3">
-                        <a href="{{ url_for('deposit') }}" class="btn btn-primary">
+                        <a href="{{ url_for('deposit') }}" class="btn btn-secondary">
                             <i class="fas fa-arrow-down me-2"></i>Make First Deposit
                         </a>
-                        <a href="{{ url_for('transfer') }}" class="btn btn-outline-primary">
+                        <a href="{{ url_for('transfer') }}" class="btn btn-outline-secondary">
                             <i class="fas fa-exchange-alt me-2"></i>Make Transfer
                         </a>
                     </div>
@@ -484,12 +488,12 @@
     </div>
     
     <!-- Undo Info Card -->
-    <div class="card border-0 shadow-sm mt-4" style="border-left: 4px solid #ff6b35;">
+    <div class="card border-0 shadow-sm mt-4" style="border-left: 4px solid var(--bs-secondary);">
         <div class="card-body">
             <div class="row align-items-center">
                 <div class="col-md-10">
                     <h5 class="mb-1">
-                        <i class="fas fa-info-circle text-warning me-2"></i>About Transaction Undo
+                        <i class="fas fa-info-circle text-secondary me-2"></i>About Transaction Undo
                     </h5>
                     <p class="text-muted mb-0">
                         You can undo transfers within 15 minutes of completion. This feature gives you peace of mind against accidental transfers.
@@ -497,7 +501,7 @@
                     </p>
                 </div>
                 <div class="col-md-2 text-md-end">
-                    <span class="badge bg-warning text-dark px-3 py-2">
+                    <span class="badge bg-secondary text-white px-3 py-2">
                         <i class="fas fa-clock me-1"></i>15-Minute Window
                     </span>
                 </div>
@@ -511,7 +515,7 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title text-warning">
+                <h5 class="modal-title text-secondary">
                     <i class="fas fa-exclamation-triangle me-2"></i>Confirm Transaction Undo
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
@@ -559,7 +563,7 @@
 </div>
 {% endblock %}
 
-{% block extra_js %}
+{% block scripts %}
 <script>
     // Filter transactions
     document.querySelectorAll('.filter-btn').forEach(btn => {

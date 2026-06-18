@@ -1,11 +1,11 @@
 {% extends "base.html" %}
 
-{% block title %}Admin Dashboard - Nkuna Bank{% endblock %}
+{% block title %}Admin Dashboard – Bank of SA{% endblock %}
 
-{% block content %}
+{% block extra_css %}
 <style>
     .admin-header {
-        background: linear-gradient(135deg, var(--primary-blue) 0%, var(--dark-blue) 100%);
+        background: linear-gradient(135deg, var(--bs-primary) 0%, #0d2b7a 100%);
         color: white;
         padding: 2rem 0;
         border-radius: 0 0 20px 20px;
@@ -19,12 +19,12 @@
         height: 100%;
         box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
         transition: all 0.3s ease;
-        border-left: 4px solid var(--primary-blue);
+        border-left: 4px solid var(--bs-primary);
     }
     
     .stats-card:hover {
         transform: translateY(-5px);
-        box-shadow: 0 10px 25px rgba(0, 102, 204, 0.15);
+        box-shadow: 0 10px 25px rgba(24, 66, 182, 0.15);
     }
     
     .stats-icon {
@@ -45,7 +45,7 @@
     }
     
     .stats-label {
-        color: var(--text-light);
+        color: #6c757d;
         font-size: 0.9rem;
         text-transform: uppercase;
         letter-spacing: 1px;
@@ -59,7 +59,7 @@
     }
     
     .table-header {
-        background: var(--light-blue);
+        background: #f8f9fa;
         padding: 1.5rem;
         border-bottom: 1px solid #e9ecef;
     }
@@ -92,7 +92,7 @@
         width: 40px;
         height: 40px;
         border-radius: 50%;
-        background: linear-gradient(135deg, var(--primary-blue), var(--sky-blue));
+        background: linear-gradient(135deg, var(--bs-primary), #6c8fd9);
         color: white;
         display: flex;
         align-items: center;
@@ -101,8 +101,8 @@
     }
     
     .revenue-badge {
-        background: var(--light-blue);
-        color: var(--primary-blue);
+        background: #e9ecef;
+        color: var(--bs-primary);
         padding: 0.5rem 1rem;
         border-radius: 50px;
         font-size: 0.85rem;
@@ -125,7 +125,7 @@
         display: flex;
         align-items: center;
         padding: 0.75rem 1rem;
-        color: var(--text-dark);
+        color: #212529;
         text-decoration: none;
         border-radius: 10px;
         margin-bottom: 0.5rem;
@@ -133,13 +133,13 @@
     }
     
     .admin-nav-link:hover {
-        background: var(--light-blue);
-        color: var(--primary-blue);
+        background: #f8f9fa;
+        color: var(--bs-primary);
         transform: translateX(5px);
     }
     
     .admin-nav-link.active {
-        background: var(--primary-blue);
+        background: var(--bs-primary);
         color: white;
     }
     
@@ -147,7 +147,15 @@
         width: 24px;
         margin-right: 10px;
     }
+    
+    .btn-outline-primary:hover {
+        background: var(--bs-primary);
+        color: #fff;
+    }
 </style>
+{% endblock %}
+
+{% block content %}
 
 <!-- Admin Header -->
 <div class="admin-header">
@@ -206,6 +214,10 @@
                             <i class="fas fa-list-alt"></i>
                             All Transactions
                         </a>
+                        <a href="{{ url_for('admin_revenue') }}" class="admin-nav-link">
+                            <i class="fas fa-coins"></i>
+                            Revenue
+                        </a>
                         <a href="{{ url_for('admin_login') }}" class="admin-nav-link">
                             <i class="fas fa-cog"></i>
                             Settings
@@ -217,7 +229,7 @@
                     <div class="text-center">
                         <small class="text-muted">
                             <i class="fas fa-clock me-1"></i>
-                            {{ current_time.strftime('%Y-%m-%d %H:%M') }}
+                            {{ current_time.strftime('%Y-%m-%d %H:%M') if current_time else '--:--' }}
                         </small>
                     </div>
                 </div>
@@ -230,7 +242,7 @@
             <div class="row mb-4">
                 <div class="col-md-6 col-lg-3 mb-4">
                     <div class="stats-card">
-                        <div class="stats-icon" style="background: rgba(0, 102, 204, 0.1); color: var(--primary-blue);">
+                        <div class="stats-icon" style="background: rgba(24, 66, 182, 0.1); color: var(--bs-primary);">
                             <i class="fas fa-users"></i>
                         </div>
                         <div class="stats-number">{{ total_users }}</div>
@@ -510,6 +522,14 @@
                                     <i class="fas fa-arrow-right"></i>
                                 </a>
                                 
+                                <a href="{{ url_for('admin_revenue') }}" class="btn btn-outline-primary btn-lg d-flex align-items-center justify-content-between">
+                                    <div>
+                                        <i class="fas fa-coins me-3"></i>
+                                        <span>Revenue Reports</span>
+                                    </div>
+                                    <i class="fas fa-arrow-right"></i>
+                                </a>
+                                
                                 <a href="{{ url_for('index') }}" class="btn btn-outline-secondary btn-lg d-flex align-items-center justify-content-between">
                                     <div>
                                         <i class="fas fa-home me-3"></i>
@@ -583,59 +603,19 @@
 </div>
 
 <script>
-    // Auto-refresh dashboard every 60 seconds
+    // Auto-refresh dashboard every 60 seconds (only if admin is active)
     setTimeout(function() {
-        window.location.reload();
+        if (!document.hidden) {
+            window.location.reload();
+        }
     }, 60000);
     
-    // Format currency on page
-    document.addEventListener('DOMContentLoaded', function() {
-        // Add current time to the page
-        const updateTime = () => {
-            const now = new Date();
-            const timeElements = document.querySelectorAll('.current-time');
-            timeElements.forEach(el => {
-                el.textContent = now.toLocaleString('en-ZA', {
-                    year: 'numeric',
-                    month: '2-digit',
-                    day: '2-digit',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                });
-            });
-        };
-        
-        updateTime();
-        setInterval(updateTime, 60000); // Update every minute
-        
-        // Add click animation to stats cards
-        document.querySelectorAll('.stats-card').forEach(card => {
-            card.addEventListener('click', function() {
-                this.style.transform = 'translateY(-10px) scale(1.02)';
-                setTimeout(() => {
-                    this.style.transform = 'translateY(-5px) scale(1)';
-                }, 150);
-            });
-        });
-        
-        // Initialize tooltips
-        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-        const tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-            return new bootstrap.Tooltip(tooltipTriggerEl);
-        });
-    });
-</script>
-
-{% if not current_time %}
-<script>
-    // Fallback if current_time not provided by backend
-    document.addEventListener('DOMContentLoaded', function() {
-        const timeElement = document.querySelector('.admin-nav small.text-muted');
-        if (timeElement && timeElement.textContent.includes('clock')) {
-            const now = new Date();
-            timeElement.innerHTML = `<i class="fas fa-clock me-1"></i>${now.toLocaleDateString()} ${now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
+    // Handle visibility change to avoid reload when tab is hidden
+    document.addEventListener('visibilitychange', function() {
+        if (document.visible) {
+            // Optionally refresh when tab becomes visible again
         }
     });
 </script>
-{% endif %}
+
 {% endblock %}

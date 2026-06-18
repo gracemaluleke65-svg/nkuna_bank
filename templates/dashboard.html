@@ -1,10 +1,10 @@
 {% extends "base.html" %}
 
-{% block title %}Dashboard - Nkuna Bank{% endblock %}
+{% block title %}Dashboard – Bank of SA{% endblock %}
 
 {% block extra_css %}
 <style>
-    /* Dashboard Specific Styles */
+    /* Dashboard Specific Styles – adapted to template color scheme */
     .dashboard-card {
         background: white;
         border-radius: 15px;
@@ -15,12 +15,12 @@
     
     .dashboard-card:hover {
         transform: translateY(-5px);
-        box-shadow: 0 10px 30px rgba(0, 102, 204, 0.1);
-        border-color: var(--sky-blue);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        border-color: var(--bs-secondary);
     }
     
     .balance-card {
-        background: linear-gradient(135deg, var(--primary-blue) 0%, var(--dark-blue) 100%);
+        background: linear-gradient(135deg, var(--bs-dark) 0%, #1a1a1a 100%);
         color: white;
         border-radius: 15px;
         padding: 2rem;
@@ -33,23 +33,27 @@
     }
     
     .quick-action-btn {
-        background: var(--light-blue);
-        border: none;
+        background: #f8f9fa;
+        border: 1px solid #e9ecef;
         border-radius: 10px;
         padding: 1rem;
         width: 100%;
         text-align: center;
         transition: all 0.3s ease;
+        text-decoration: none;
+        display: block;
+        color: inherit;
     }
     
     .quick-action-btn:hover {
-        background: var(--primary-blue);
+        background: var(--bs-secondary);
         color: white;
         transform: translateY(-3px);
+        border-color: var(--bs-secondary);
     }
     
     .quick-action-btn:hover i {
-        color: white;
+        color: white !important;
     }
     
     .transaction-item {
@@ -61,24 +65,24 @@
     }
     
     .transaction-item:hover {
-        background: var(--light-blue);
-        border-left-color: var(--primary-blue);
+        background: #f8f9fa;
+        border-left-color: var(--bs-secondary);
     }
     
     .transaction-deposit {
-        border-left-color: var(--accent-green);
+        border-left-color: #28a745;
     }
     
     .transaction-transfer {
-        border-left-color: var(--primary-blue);
+        border-left-color: var(--bs-secondary);
     }
     
     .transaction-goal {
-        border-left-color: var(--accent-orange);
+        border-left-color: #fd7e14;
     }
     
     .transaction-bill {
-        border-left-color: var(--secondary-blue);
+        border-left-color: #17a2b8;
     }
     
     .goal-progress {
@@ -90,7 +94,7 @@
     
     .goal-progress-bar {
         height: 100%;
-        background: linear-gradient(to right, var(--primary-blue), var(--sky-blue));
+        background: linear-gradient(to right, var(--bs-secondary), #20c997);
         border-radius: 5px;
         transition: width 1s ease;
     }
@@ -100,24 +104,24 @@
         border-radius: 10px;
         margin-bottom: 0.5rem;
         background: #f8f9fa;
-        border-left: 4px solid var(--primary-blue);
+        border-left: 4px solid var(--bs-secondary);
     }
     
     .notification-success {
-        border-left-color: var(--accent-green);
+        border-left-color: #28a745;
     }
     
     .notification-warning {
-        border-left-color: var(--accent-orange);
+        border-left-color: #fd7e14;
     }
     
     .notification-info {
-        border-left-color: var(--primary-blue);
+        border-left-color: var(--bs-secondary);
     }
     
     .notification-unread {
         background: white;
-        border: 1px solid var(--light-blue);
+        border: 1px solid #e9ecef;
     }
     
     .bill-item {
@@ -130,16 +134,17 @@
         align-items: center;
     }
     
-    .bill-electricity { border-left: 4px solid #FF6B35; }
-    .bill-water { border-left: 4px solid #36C; }
-    .bill-airtime { border-left: 4px solid #00C853; }
-    .bill-data { border-left: 4px solid #9C27B0; }
+    .bill-electricity { border-left: 4px solid #ffc107; }
+    .bill-water { border-left: 4px solid #0d6efd; }
+    .bill-airtime { border-left: 4px solid #198754; }
+    .bill-data { border-left: 4px solid #6f42c1; }
     
     .stats-card {
         text-align: center;
         padding: 1.5rem;
         border-radius: 12px;
         background: white;
+        border: 1px solid #e9ecef;
     }
     
     .stats-icon {
@@ -152,10 +157,10 @@
         margin: 0 auto 1rem;
     }
     
-    .stats-icon.deposit { background: rgba(0, 200, 83, 0.1); color: var(--accent-green); }
-    .stats-icon.transfer { background: rgba(0, 102, 204, 0.1); color: var(--primary-blue); }
-    .stats-icon.goal { background: rgba(255, 107, 53, 0.1); color: var(--accent-orange); }
-    .stats-icon.bill { background: rgba(156, 39, 176, 0.1); color: #9C27B0; }
+    .stats-icon.deposit { background: rgba(40, 167, 69, 0.1); color: #28a745; }
+    .stats-icon.transfer { background: rgba(38, 212, 140, 0.1); color: var(--bs-secondary); }
+    .stats-icon.goal { background: rgba(253, 126, 20, 0.1); color: #fd7e14; }
+    .stats-icon.bill { background: rgba(23, 162, 184, 0.1); color: #17a2b8; }
     
     .recent-transactions {
         max-height: 400px;
@@ -172,7 +177,7 @@
     }
     
     .recent-transactions::-webkit-scrollbar-thumb {
-        background: var(--primary-blue);
+        background: var(--bs-secondary);
         border-radius: 3px;
     }
     
@@ -180,24 +185,20 @@
         .balance-amount {
             font-size: 2rem;
         }
-        
         .quick-action-btn {
             padding: 0.75rem;
         }
-        
         .dashboard-card {
             margin-bottom: 1.5rem;
         }
     }
     
-    /* Alert styles */
     .alert-custom {
         border-radius: 10px;
         border: none;
         padding: 1rem 1.25rem;
     }
     
-    /* Badge styles */
     .status-badge {
         padding: 0.25rem 0.75rem;
         border-radius: 50px;
@@ -205,9 +206,18 @@
         font-weight: 600;
     }
     
-    .status-completed { background: rgba(0, 200, 83, 0.1); color: var(--accent-green); }
+    .status-completed { background: rgba(40, 167, 69, 0.1); color: #28a745; }
     .status-pending { background: rgba(255, 193, 7, 0.1); color: #ffc107; }
-    .status-undo { background: rgba(0, 102, 204, 0.1); color: var(--primary-blue); }
+    .status-undone { background: rgba(108, 117, 125, 0.1); color: #6c757d; }
+    
+    .btn-outline-secondary {
+        border-color: var(--bs-secondary);
+        color: var(--bs-secondary);
+    }
+    .btn-outline-secondary:hover {
+        background: var(--bs-secondary);
+        color: #fff;
+    }
 </style>
 {% endblock %}
 
@@ -219,10 +229,10 @@
             <div class="balance-card">
                 <div class="d-flex justify-content-between align-items-start">
                     <div>
-                        <h1 class="h4 mb-2">Welcome back, {{ user.full_name.split()[0] }}!</h1>
-                        <p class="opacity-75 mb-3">Here's your financial overview</p>
-                        <h2 class="balance-amount">{{ format_currency(main_account.balance if main_account else 0) }}</h2>
-                        <p class="mb-0 opacity-75">
+                        <h1 class="h4 mb-2 text-white">Welcome back, {{ user.full_name.split()[0] }}!</h1>
+                        <p class="opacity-75 text-white mb-3">Here's your financial overview</p>
+                        <h2 class="balance-amount text-white">{{ format_currency(main_account.balance if main_account else 0) }}</h2>
+                        <p class="mb-0 opacity-75 text-white">
                             <i class="fas fa-wallet me-2"></i>Main Account Balance
                             {% if main_account %}
                                 <small class="d-block mt-1">Account: {{ main_account.account_number }}</small>
@@ -231,10 +241,10 @@
                     </div>
                     <div class="text-end">
                         <div class="d-flex gap-2 mb-3">
-                            <span class="badge bg-success bg-opacity-25 text-success">Active</span>
-                            <span class="badge bg-info bg-opacity-25 text-info">Verified</span>
+                            <span class="badge bg-success bg-opacity-25 text-white">Active</span>
+                            <span class="badge bg-secondary bg-opacity-25 text-white">Verified</span>
                         </div>
-                        <p class="mb-0 opacity-75">
+                        <p class="mb-0 opacity-75 text-white">
                             <i class="fas fa-calendar me-2"></i><span class="current-time"></span>
                         </p>
                     </div>
@@ -246,7 +256,7 @@
             <div class="dashboard-card p-4">
                 <h3 class="h5 mb-3">Total Assets</h3>
                 <div class="d-flex align-items-end mb-3">
-                    <h2 class="balance-amount text-primary mb-0">{{ format_currency(total_balance) }}</h2>
+                    <h2 class="balance-amount text-secondary mb-0">{{ format_currency(total_balance) }}</h2>
                     <small class="text-muted ms-2">All accounts</small>
                 </div>
                 
@@ -281,28 +291,28 @@
                 <h3 class="h5 mb-3">Quick Actions</h3>
                 <div class="row g-3">
                     <div class="col-6 col-md-3">
-                        <a href="{{ url_for('transfer') }}" class="quick-action-btn text-decoration-none">
-                            <i class="fas fa-exchange-alt fa-2x mb-2 text-primary"></i>
+                        <a href="{{ url_for('transfer') }}" class="quick-action-btn">
+                            <i class="fas fa-exchange-alt fa-2x mb-2 text-secondary"></i>
                             <h6 class="mb-1">Transfer Money</h6>
                             <p class="small text-muted mb-0">Send money to anyone</p>
                         </a>
                     </div>
                     <div class="col-6 col-md-3">
-                        <a href="{{ url_for('deposit') }}" class="quick-action-btn text-decoration-none">
+                        <a href="{{ url_for('deposit') }}" class="quick-action-btn">
                             <i class="fas fa-arrow-down fa-2x mb-2 text-success"></i>
                             <h6 class="mb-1">Make Deposit</h6>
                             <p class="small text-muted mb-0">Add funds to account</p>
                         </a>
                     </div>
                     <div class="col-6 col-md-3">
-                        <a href="{{ url_for('goals') }}" class="quick-action-btn text-decoration-none">
+                        <a href="{{ url_for('goals') }}" class="quick-action-btn">
                             <i class="fas fa-bullseye fa-2x mb-2 text-warning"></i>
                             <h6 class="mb-1">Goals</h6>
                             <p class="small text-muted mb-0">Track & save for goals</p>
                         </a>
                     </div>
                     <div class="col-6 col-md-3">
-                        <a href="{{ url_for('bills') }}" class="quick-action-btn text-decoration-none">
+                        <a href="{{ url_for('bills') }}" class="quick-action-btn">
                             <i class="fas fa-bolt fa-2x mb-2 text-info"></i>
                             <h6 class="mb-1">Pay Bills</h6>
                             <p class="small text-muted mb-0">Electricity, water, airtime</p>
@@ -320,7 +330,7 @@
             <div class="dashboard-card p-4 h-100">
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h3 class="h5 mb-0">Recent Transactions</h3>
-                    <a href="{{ url_for('history') }}" class="btn btn-sm btn-outline-primary">
+                    <a href="{{ url_for('history') }}" class="btn btn-sm btn-outline-secondary">
                         <i class="fas fa-history me-1"></i>View All
                     </a>
                 </div>
@@ -336,7 +346,7 @@
                                                 <i class="fas fa-arrow-down text-success fa-lg"></i>
                                             {% elif transaction.transaction_type == 'TRANSFER' %}
                                                 {% if transaction.from_account == main_account.account_number %}
-                                                    <i class="fas fa-arrow-up text-primary fa-lg"></i>
+                                                    <i class="fas fa-arrow-up text-warning fa-lg"></i>
                                                 {% else %}
                                                     <i class="fas fa-arrow-down text-success fa-lg"></i>
                                                 {% endif %}
@@ -385,7 +395,7 @@
                                         <div class="d-flex gap-1 justify-content-end">
                                             {% if transaction.transaction_type == 'TRANSFER' and transaction.status == 'COMPLETED' and can_undo_transaction(transaction) %}
                                                 <form method="POST" action="{{ url_for('undo_transaction', transaction_id=transaction.transaction_id) }}" class="d-inline">
-                                                    <button type="submit" class="btn btn-sm btn-outline-primary" onclick="return confirm('Are you sure you want to undo this transaction?')">
+                                                    <button type="submit" class="btn btn-sm btn-outline-secondary" onclick="return confirm('Are you sure you want to undo this transaction?')">
                                                         <i class="fas fa-undo me-1"></i>Undo
                                                     </button>
                                                 </form>
@@ -404,7 +414,7 @@
                         <div class="text-center py-5">
                             <i class="fas fa-exchange-alt fa-3x text-muted mb-3"></i>
                             <p class="text-muted">No transactions yet</p>
-                            <a href="{{ url_for('deposit') }}" class="btn btn-primary">
+                            <a href="{{ url_for('deposit') }}" class="btn btn-secondary text-white">
                                 <i class="fas fa-arrow-down me-2"></i>Make Your First Deposit
                             </a>
                         </div>
@@ -418,7 +428,7 @@
             <div class="dashboard-card p-4 h-100">
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h3 class="h5 mb-0">Active Goals</h3>
-                    <a href="{{ url_for('goals') }}" class="btn btn-sm btn-outline-primary">
+                    <a href="{{ url_for('goals') }}" class="btn btn-sm btn-outline-secondary">
                         <i class="fas fa-plus me-1"></i>New Goal
                     </a>
                 </div>
@@ -437,7 +447,7 @@
                                     </small>
                                 </div>
                                 <div class="text-end">
-                                    <small class="text-primary fw-bold">{{ "%.0f"|format(goal.progress) }}%</small>
+                                    <small class="text-secondary fw-bold">{{ "%.0f"|format(goal.progress) }}%</small>
                                 </div>
                             </div>
                             <div class="goal-progress mb-2">
@@ -458,7 +468,7 @@
                     <div class="text-center py-4">
                         <i class="fas fa-bullseye fa-3x text-muted mb-3"></i>
                         <p class="text-muted mb-3">No active goals yet</p>
-                        <a href="{{ url_for('goals') }}" class="btn btn-primary btn-sm">
+                        <a href="{{ url_for('goals') }}" class="btn btn-secondary text-white btn-sm">
                             <i class="fas fa-plus me-2"></i>Create Goal
                         </a>
                     </div>
@@ -474,7 +484,7 @@
             <div class="dashboard-card p-4 h-100">
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h3 class="h5 mb-0">Notifications</h3>
-                    <a href="{{ url_for('notifications') }}" class="btn btn-sm btn-outline-primary">
+                    <a href="{{ url_for('notifications') }}" class="btn btn-sm btn-outline-secondary">
                         <i class="fas fa-bell me-1"></i>View All
                     </a>
                 </div>
@@ -516,7 +526,7 @@
             <div class="dashboard-card p-4 h-100">
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h3 class="h5 mb-0">Recent Bill Payments</h3>
-                    <a href="{{ url_for('bills') }}" class="btn btn-sm btn-outline-primary">
+                    <a href="{{ url_for('bills') }}" class="btn btn-sm btn-outline-secondary">
                         <i class="fas fa-plus me-1"></i>Pay Bill
                     </a>
                 </div>
@@ -562,7 +572,7 @@
                         <div class="text-center py-4">
                             <i class="fas fa-file-invoice-dollar fa-3x text-muted mb-3"></i>
                             <p class="text-muted mb-3">No bill payments yet</p>
-                            <a href="{{ url_for('bills') }}" class="btn btn-primary btn-sm">
+                            <a href="{{ url_for('bills') }}" class="btn btn-secondary text-white btn-sm">
                                 <i class="fas fa-bolt me-2"></i>Pay First Bill
                             </a>
                         </div>
@@ -622,17 +632,17 @@
     <!-- Security Alert -->
     <div class="row mt-4">
         <div class="col-12">
-            <div class="alert alert-custom alert-info">
+            <div class="alert alert-custom alert-warning">
                 <div class="d-flex align-items-center">
                     <div class="flex-shrink-0">
-                        <i class="fas fa-shield-alt fa-2x"></i>
+                        <i class="fas fa-shield-alt fa-2x text-warning"></i>
                     </div>
                     <div class="flex-grow-1 ms-3">
                         <h5 class="alert-heading mb-1">Security Status: Excellent</h5>
                         <p class="mb-0">Your account is secure. Last login: <span class="current-time"></span></p>
                     </div>
                     <div class="flex-shrink-0">
-                        <a href="{{ url_for('profile') }}" class="btn btn-sm btn-outline-info">
+                        <a href="{{ url_for('profile') }}" class="btn btn-sm btn-outline-secondary">
                             <i class="fas fa-user-shield me-1"></i>Security Settings
                         </a>
                     </div>

@@ -1,6 +1,67 @@
 {% extends "base.html" %}
 
-{% block title %}Bank Revenue - Nkuna Bank Admin{% endblock %}
+{% block title %}Bank Revenue – Bank of SA Admin{% endblock %}
+
+{% block extra_css %}
+<style>
+    .card {
+        border-radius: 10px;
+        transition: transform 0.3s ease;
+    }
+    
+    .card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .card-header {
+        border-radius: 10px 10px 0 0 !important;
+    }
+    
+    .table thead th {
+        border-bottom: 2px solid var(--bs-primary);
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+        color: var(--bs-dark);
+    }
+    
+    .table tbody tr:hover {
+        background-color: rgba(24, 66, 182, 0.05);
+    }
+    
+    .progress {
+        border-radius: 10px;
+    }
+    
+    .badge {
+        font-size: 0.75rem;
+        padding: 0.35em 0.65em;
+    }
+    
+    .border-start {
+        border-left-width: 4px !important;
+    }
+    
+    .bg-primary-custom {
+        background: var(--bs-primary);
+    }
+    .text-primary-custom {
+        color: var(--bs-primary);
+    }
+    
+    @media (max-width: 768px) {
+        .card-body {
+            padding: 1rem !important;
+        }
+        .table-responsive {
+            font-size: 0.85rem;
+        }
+        .h5 {
+            font-size: 1.25rem;
+        }
+    }
+</style>
+{% endblock %}
 
 {% block content %}
 <div class="container-fluid py-4">
@@ -515,9 +576,9 @@
                     {% endfor %}
                 ],
                 backgroundColor: [
-                    '#0066CC', // Primary blue for transaction fees
-                    '#FF6B35', // Orange for bill commissions
-                    '#00C853', // Green for other
+                    '#1842b6', // Template primary
+                    '#26d48c', // Template secondary
+                    '#ffc107', // Warning
                 ],
                 borderWidth: 2,
                 borderColor: '#fff'
@@ -553,12 +614,10 @@
         const btn = this;
         const icon = btn.querySelector('i');
         
-        // Add rotation animation
         icon.classList.add('fa-spin');
         btn.disabled = true;
         btn.innerHTML = '<i class="fas fa-sync-alt fa-spin me-2"></i>Refreshing...';
         
-        // Simulate refresh and reload page
         setTimeout(() => {
             window.location.reload();
         }, 1000);
@@ -588,7 +647,6 @@
     // Copy reference ID
     function copyReference(referenceId) {
         navigator.clipboard.writeText(referenceId).then(() => {
-            // Show toast notification
             const toast = document.createElement('div');
             toast.className = 'alert alert-success alert-dismissible fade show position-fixed';
             toast.style.top = '20px';
@@ -615,7 +673,6 @@
         const minAmount = document.getElementById('minAmount').value;
         const maxAmount = document.getElementById('maxAmount').value;
         
-        // Build query string
         let queryParams = [];
         if (typeFilter !== 'ALL') queryParams.push(`type=${typeFilter}`);
         if (startDate) queryParams.push(`start_date=${startDate}`);
@@ -623,7 +680,6 @@
         if (minAmount) queryParams.push(`min_amount=${minAmount}`);
         if (maxAmount) queryParams.push(`max_amount=${maxAmount}`);
         
-        // Redirect with filters
         if (queryParams.length > 0) {
             window.location.href = `{{ url_for('admin_revenue') }}?${queryParams.join('&')}`;
         }
@@ -667,7 +723,6 @@
     document.getElementById('exportData').addEventListener('click', function(e) {
         e.preventDefault();
         
-        // Create CSV content
         let csvContent = "data:text/csv;charset=utf-8,";
         csvContent += "Date,Revenue Type,Amount,Description,Reference ID\n";
         
@@ -685,11 +740,10 @@
             }
         });
         
-        // Create download link
         const encodedUri = encodeURI(csvContent);
         const link = document.createElement("a");
         link.setAttribute("href", encodedUri);
-        link.setAttribute("download", "nkuna_bank_revenue.csv");
+        link.setAttribute("download", "bank_of_sa_revenue.csv");
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
@@ -700,60 +754,6 @@
         if (!document.hidden) {
             window.location.reload();
         }
-    }, 300000); // 5 minutes
+    }, 300000);
 </script>
-
-<style>
-    .card {
-        border-radius: 10px;
-        transition: transform 0.3s ease;
-    }
-    
-    .card:hover {
-        transform: translateY(-5px);
-    }
-    
-    .card-header {
-        border-radius: 10px 10px 0 0 !important;
-    }
-    
-    .table thead th {
-        border-bottom: 2px solid var(--primary-blue);
-        font-weight: 600;
-        text-transform: uppercase;
-        font-size: 0.85rem;
-        color: var(--text-dark);
-    }
-    
-    .table tbody tr:hover {
-        background-color: rgba(0, 102, 204, 0.05);
-    }
-    
-    .progress {
-        border-radius: 10px;
-    }
-    
-    .badge {
-        font-size: 0.75rem;
-        padding: 0.35em 0.65em;
-    }
-    
-    .border-start {
-        border-left-width: 4px !important;
-    }
-    
-    @media (max-width: 768px) {
-        .card-body {
-            padding: 1rem !important;
-        }
-        
-        .table-responsive {
-            font-size: 0.85rem;
-        }
-        
-        .h5 {
-            font-size: 1.25rem;
-        }
-    }
-</style>
 {% endblock %}

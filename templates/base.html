@@ -1,457 +1,181 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Nkuna Bank - Smart Banking Solutions{% endblock %}</title>
-    
-    <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
+    <title>{% block title %}Bank of SA – Smart Banking{% endblock %}</title>
+
+    <!-- Google Web Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Saira:wght@500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Icon Font Stylesheet -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
+
+    <!-- Libraries Stylesheet -->
+    <link href="{{ url_for('static', filename='lib/animate/animate.min.css') }}" rel="stylesheet">
+
+    <!-- Customized Bootstrap Stylesheet -->
+    <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
+
+    <!-- Template Stylesheet -->
+    <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+
+    <!-- Additional custom CSS -->
     <style>
-        :root {
-            --primary-blue: #0066CC;
-            --secondary-blue: #0084FF;
-            --sky-blue: #00B4FF;
-            --light-blue: #E6F2FF;
-            --dark-blue: #0052A3;
-            --accent-orange: #FF6B35;
-            --accent-green: #00C853;
-            --text-dark: #2D3748;
-            --text-light: #718096;
-            --background-white: #FFFFFF;
+        .disclaimer-banner {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 8px 20px;
+            text-align: center;
+            font-size: 0.9rem;
+            border-bottom: 2px solid #f5c6cb;
         }
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        .disclaimer-banner i {
+            margin-right: 8px;
         }
-        
-        body {
-            font-family: 'Inter', sans-serif;
-            color: var(--text-dark);
-            line-height: 1.6;
-            background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
-            min-height: 100vh;
-        }
-        
-        /* Navigation */
-        .navbar {
-            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--dark-blue) 100%) !important;
-            box-shadow: 0 2px 15px rgba(0, 102, 204, 0.2);
-            padding: 1rem 0;
-            transition: all 0.3s ease;
-        }
-        
         .navbar-brand {
             font-weight: 700;
-            font-size: 1.8rem;
-            color: white !important;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            font-size: 1.6rem;
         }
-        
-        .navbar-brand i {
-            color: var(--sky-blue);
+        .navbar-brand span {
+            color: var(--bs-secondary);
         }
-        
-        .nav-link {
-            color: rgba(255, 255, 255, 0.9) !important;
-            font-weight: 500;
-            padding: 0.5rem 1rem !important;
-            margin: 0 0.2rem;
-            border-radius: 6px;
-            transition: all 0.3s ease;
+        .footer-credit {
+            font-size: 0.9rem;
         }
-        
-        .nav-link:hover {
-            color: white !important;
-            background: rgba(255, 255, 255, 0.1);
-            transform: translateY(-2px);
-        }
-        
-        .nav-link.active {
-            color: white !important;
-            background: rgba(255, 255, 255, 0.15);
-        }
-        
-        .dropdown-menu {
-            border: none;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-            border-radius: 10px;
-            padding: 0.5rem;
-        }
-        
-        .dropdown-item {
-            border-radius: 6px;
-            padding: 0.7rem 1rem;
-            margin: 0.2rem 0;
-            transition: all 0.2s ease;
-        }
-        
-        .dropdown-item:hover {
-            background: var(--light-blue);
-            color: var(--primary-blue);
-        }
-        
-        /* Hero Section */
-        .hero-section {
-            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--sky-blue) 100%);
-            color: white;
-            padding: 100px 0;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .hero-section::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="%23ffffff" fill-opacity="0.1" d="M0,96L48,112C96,128,192,160,288,160C384,160,480,128,576,112C672,96,768,96,864,112C960,128,1056,160,1152,160C1248,160,1344,128,1392,112L1440,96L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>');
-            background-size: cover;
-            opacity: 0.2;
-        }
-        
-        /* Feature Cards */
-        .feature-card {
-            background: white;
-            border-radius: 15px;
-            padding: 2rem;
-            height: 100%;
-            transition: all 0.3s ease;
-            border: 1px solid rgba(0, 0, 0, 0.05);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-        }
-        
-        .feature-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 20px 40px rgba(0, 102, 204, 0.15);
-            border-color: var(--sky-blue);
-        }
-        
-        .feature-icon {
-            width: 70px;
-            height: 70px;
-            background: linear-gradient(135deg, var(--light-blue) 0%, #d9ecff 100%);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 1.5rem;
-            transition: all 0.3s ease;
-        }
-        
-        .feature-card:hover .feature-icon {
-            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--sky-blue) 100%);
-            transform: scale(1.1);
-        }
-        
-        .feature-icon i {
-            font-size: 2rem;
-            color: var(--primary-blue);
-            transition: all 0.3s ease;
-        }
-        
-        .feature-card:hover .feature-icon i {
-            color: white;
-        }
-        
-        /* Developer Section */
-        .developer-card {
-            background: white;
-            border-radius: 20px;
-            overflow: hidden;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
-            transition: all 0.4s ease;
-        }
-        
-        .developer-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 30px 80px rgba(0, 102, 204, 0.2);
-        }
-        
-        .developer-img {
-            height: 280px;
-            object-fit: cover;
-            border-bottom: 4px solid var(--primary-blue);
-        }
-        
-        .skill-badge {
-            background: var(--light-blue);
-            color: var(--primary-blue);
-            padding: 0.5rem 1rem;
-            border-radius: 50px;
-            font-size: 0.85rem;
-            font-weight: 500;
-            margin: 0.2rem;
-            display: inline-block;
-            transition: all 0.3s ease;
-        }
-        
-        .skill-badge:hover {
-            background: var(--primary-blue);
-            color: white;
-            transform: scale(1.05);
-        }
-        
-        /* Buttons */
-        .btn-primary {
-            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
-            border: none;
-            padding: 0.8rem 2rem;
-            border-radius: 50px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            box-shadow: 0 5px 15px rgba(0, 102, 204, 0.3);
-        }
-        
-        .btn-primary:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 25px rgba(0, 102, 204, 0.4);
-            background: linear-gradient(135deg, var(--dark-blue) 0%, var(--primary-blue) 100%);
-        }
-        
-        .btn-outline-primary {
-            border: 2px solid var(--primary-blue);
-            color: var(--primary-blue);
-            padding: 0.8rem 2rem;
-            border-radius: 50px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-        
-        .btn-outline-primary:hover {
-            background: var(--primary-blue);
-            color: white;
-            transform: translateY(-3px);
-            box-shadow: 0 10px 25px rgba(0, 102, 204, 0.2);
-        }
-        
-        /* Section Headers */
-        .section-header {
-            text-align: center;
-            margin-bottom: 4rem;
-        }
-        
-        .section-header h2 {
-            color: var(--primary-blue);
-            font-weight: 700;
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
-            position: relative;
-            display: inline-block;
-        }
-        
-        .section-header h2::after {
-            content: '';
-            position: absolute;
-            bottom: -10px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 80px;
-            height: 4px;
-            background: linear-gradient(to right, var(--primary-blue), var(--sky-blue));
-            border-radius: 2px;
-        }
-        
-        .section-header p {
-            color: var(--text-light);
-            font-size: 1.1rem;
-            max-width: 700px;
-            margin: 0 auto;
-        }
-        
-        /* Footer */
-        .footer {
-            background: linear-gradient(135deg, #2D3748 0%, #1A202C 100%);
-            color: white;
-            padding: 60px 0 20px;
-        }
-        
-        .footer-links a {
-            color: rgba(255, 255, 255, 0.7);
+        .footer-credit a {
+            color: var(--bs-secondary);
             text-decoration: none;
-            transition: color 0.3s ease;
         }
-        
-        .footer-links a:hover {
-            color: var(--sky-blue);
-        }
-        
-        /* Animation */
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        .fade-in-up {
-            animation: fadeInUp 0.6s ease forwards;
-        }
-        
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .hero-section {
-                padding: 60px 0;
-            }
-            
-            .section-header h2 {
-                font-size: 2rem;
-            }
-            
-            .feature-card {
-                margin-bottom: 1.5rem;
-            }
-            
-            .navbar-nav {
-                background: rgba(0, 0, 0, 0.2);
-                padding: 1rem;
-                border-radius: 10px;
-                margin-top: 1rem;
-            }
-        }
-        
-        /* Custom scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        
-        ::-webkit-scrollbar-track {
-            background: #f1f1f1;
-        }
-        
-        ::-webkit-scrollbar-thumb {
-            background: var(--primary-blue);
-            border-radius: 4px;
-        }
-        
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--dark-blue);
+        .footer-credit a:hover {
+            text-decoration: underline;
         }
     </style>
-    
     {% block extra_css %}{% endblock %}
 </head>
+
 <body>
-    <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+    <!-- Spinner -->
+    <div id="spinner" class="show position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
+        <div class="spinner-grow text-primary" role="status"></div>
+    </div>
+
+    <!-- DISCLAIMER BANNER -->
+    <div class="disclaimer-banner">
+        <i class="fas fa-info-circle"></i>
+        <strong>DISCLAIMER:</strong> This is a demonstration banking system – not a real bank. Do not use with real money.
+    </div>
+
+    <!-- Topbar -->
+    <div class="container-fluid bg-dark py-2 d-none d-md-flex">
         <div class="container">
-            <a class="navbar-brand" href="{{ url_for('index') }}">
-                <i class="fas fa-university"></i>
-                Nkuna Bank
-            </a>
-            
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('index') }}#home">Home</a>
-                    </li>
-                   
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('index') }}#developer">Developer</a>
-                    </li>
-                    
-                    {% if current_user.is_authenticated %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('dashboard') }}">
-                                <i class="fas fa-tachometer-alt"></i> Dashboard
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('transfer') }}">
-                                <i class="fas fa-exchange-alt"></i> Transfer
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('goals') }}">
-                                <i class="fas fa-bullseye"></i> Goals
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('bills') }}">
-                                <i class="fas fa-file-invoice-dollar"></i> Bills
-                            </a>
-                        </li>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
-                                <i class="fas fa-user-circle"></i> {{ current_user.full_name.split()[0] }}
-                            </a>
-                            <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="{{ url_for('profile') }}">
-                                    <i class="fas fa-user"></i> Profile
-                                </a></li>
-                                <li><a class="dropdown-item" href="{{ url_for('history') }}">
-                                    <i class="fas fa-history"></i> History
-                                </a></li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item" href="{{ url_for('logout') }}">
-                                    <i class="fas fa-sign-out-alt"></i> Logout
-                                </a></li>
-                            </ul>
-                        </li>
-                    {% else %}
-                        <!-- Show links but they'll redirect to login if not authenticated -->
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('dashboard') }}" onclick="return checkAuth('dashboard');">
-                                <i class="fas fa-tachometer-alt"></i> Dashboard
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('transfer') }}" onclick="return checkAuth('transfer');">
-                                <i class="fas fa-exchange-alt"></i> Transfer
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('goals') }}" onclick="return checkAuth('goals');">
-                                <i class="fas fa-bullseye"></i> Goals
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('bills') }}" onclick="return checkAuth('bills');">
-                                <i class="fas fa-file-invoice-dollar"></i> Bills
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('login') }}">
-                                <i class="fas fa-sign-in-alt"></i> Login
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link btn btn-outline-light btn-sm ms-2" href="{{ url_for('register') }}">
-                                <i class="fas fa-user-plus"></i> Register
-                            </a>
-                        </li>
-                    {% endif %}
-                </ul>
+            <div class="d-flex justify-content-between topbar">
+                <div class="top-info">
+                    <small class="me-3 text-white-50">
+                        <a href="#"><i class="fas fa-map-marker-alt me-2 text-secondary"></i></a>Johannesburg, South Africa
+                    </small>
+                    <small class="me-3 text-white-50">
+                        <a href="#"><i class="fas fa-envelope me-2 text-secondary"></i></a>info@bankofsa.co.za
+                    </small>
+                </div>
+                <div id="note" class="text-secondary d-none d-xl-flex">
+                    <small>Your trusted partner in smart banking</small>
+                </div>
+                <div class="top-link">
+                    <a href="#" class="bg-light nav-fill btn btn-sm-square rounded-circle"><i class="fab fa-facebook-f text-primary"></i></a>
+                    <a href="#" class="bg-light nav-fill btn btn-sm-square rounded-circle"><i class="fab fa-twitter text-primary"></i></a>
+                    <a href="#" class="bg-light nav-fill btn btn-sm-square rounded-circle"><i class="fab fa-instagram text-primary"></i></a>
+                    <a href="#" class="bg-light nav-fill btn btn-sm-square rounded-circle me-0"><i class="fab fa-linkedin-in text-primary"></i></a>
+                </div>
             </div>
         </div>
-    </nav>
+    </div>
+
+    <!-- Navbar -->
+    <div class="container-fluid bg-primary">
+        <div class="container">
+            <nav class="navbar navbar-dark navbar-expand-lg py-0">
+                <a href="{{ url_for('index') }}" class="navbar-brand">
+                    <h1 class="text-white fw-bold d-block">Bank <span class="text-secondary">of SA</span></h1>
+                </a>
+                <button type="button" class="navbar-toggler me-0" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse bg-transparent" id="navbarCollapse">
+                    <div class="navbar-nav ms-auto mx-xl-auto p-0">
+                        {% if current_user.is_authenticated %}
+                            {% if current_user.is_super_admin is defined and current_user.is_super_admin %}
+                                <!-- Admin Navigation -->
+                                <a href="{{ url_for('admin_dashboard') }}" class="nav-item nav-link">Dashboard</a>
+                                <a href="{{ url_for('admin_users') }}" class="nav-item nav-link">Users</a>
+                                <a href="{{ url_for('admin_transactions') }}" class="nav-item nav-link">Transactions</a>
+                                <a href="{{ url_for('admin_revenue') }}" class="nav-item nav-link">Revenue</a>
+                                <a href="{{ url_for('admin_logout') }}" class="nav-item nav-link">Logout</a>
+                            {% else %}
+                                <!-- User Navigation -->
+                                <a href="{{ url_for('index') }}" class="nav-item nav-link">Home</a>
+                                <a href="{{ url_for('how_it_works') }}" class="nav-item nav-link">How It Works</a>
+                                <a href="{{ url_for('dashboard') }}" class="nav-item nav-link">Dashboard</a>
+                                <a href="{{ url_for('transfer') }}" class="nav-item nav-link">Transfer</a>
+                                <a href="{{ url_for('deposit') }}" class="nav-item nav-link">Deposit</a>
+                                <a href="{{ url_for('history') }}" class="nav-item nav-link">History</a>
+                                <a href="{{ url_for('goals') }}" class="nav-item nav-link">Goals</a>
+                                <a href="{{ url_for('bills') }}" class="nav-item nav-link">Bills</a>
+                                <div class="nav-item dropdown">
+                                    <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
+                                        <i class="fas fa-user-circle me-1"></i>{{ current_user.full_name|default('Profile') }}
+                                    </a>
+                                    <div class="dropdown-menu">
+                                        <a href="{{ url_for('profile') }}" class="dropdown-item">Profile</a>
+                                        <a href="{{ url_for('settings') }}" class="dropdown-item">Settings</a>
+                                        <a href="{{ url_for('notifications') }}" class="dropdown-item">Notifications</a>
+                                        <div class="dropdown-divider"></div>
+                                        <a href="{{ url_for('logout') }}" class="dropdown-item">Logout</a>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        {% else %}
+                            <a href="{{ url_for('index') }}" class="nav-item nav-link active">Home</a>
+                            <a href="{{ url_for('how_it_works') }}" class="nav-item nav-link">How It Works</a>
+                            <a href="#about" class="nav-item nav-link">About</a>
+                            <a href="#features" class="nav-item nav-link">Features</a>
+                            <a href="#developer" class="nav-item nav-link">Developer</a>
+                            <a href="{{ url_for('login') }}" class="nav-item nav-link">Login</a>
+                            <a href="{{ url_for('register') }}" class="nav-item nav-link">Register</a>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="d-none d-xl-flex flex-shrink-0">
+                    <div id="phone-tada" class="d-flex align-items-center justify-content-center me-4">
+                        <a href="#" class="position-relative animated tada infinite">
+                            <i class="fa fa-phone-alt text-white fa-2x"></i>
+                            <div class="position-absolute" style="top: -7px; left: 20px;">
+                                <span><i class="fa fa-comment-dots text-secondary"></i></span>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="d-flex flex-column pe-4 border-end">
+                        <span class="text-white-50">Have any questions?</span>
+                        <span class="text-secondary">Call: 062 719 5389</span>
+                    </div>
+                    <div class="d-flex align-items-center justify-content-center ms-4">
+                        <a href="#"><i class="bi bi-search text-white fa-2x"></i></a>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </div>
 
     <!-- Flash Messages -->
-    <div class="container mt-5 pt-5">
+    <div class="container mt-3">
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 {% for category, message in messages %}
-                    <div class="alert alert-{{ category }} alert-dismissible fade show mt-3">
-                        {{ message }}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        {{ message|safe }}
                         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                     </div>
                 {% endfor %}
@@ -465,122 +189,85 @@
     </main>
 
     <!-- Footer -->
-    <footer class="footer mt-auto">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-4 mb-4">
-                    <h4 class="mb-3"><i class="fas fa-university"></i> Nkuna Bank</h4>
-                    <p>Smart banking solutions for modern South Africans. Secure, innovative, and user-friendly banking at your fingertips.</p>
-                    <div class="social-icons mt-3">
-                        <a href="#" class="text-white me-3"><i class="fab fa-facebook-f"></i></a>
-                        <a href="#" class="text-white me-3"><i class="fab fa-twitter"></i></a>
-                        <a href="#" class="text-white me-3"><i class="fab fa-linkedin-in"></i></a>
-                        <a href="#" class="text-white"><i class="fab fa-instagram"></i></a>
+    <div class="container-fluid footer bg-dark wow fadeIn" data-wow-delay=".3s">
+        <div class="container pt-5 pb-4">
+            <div class="row g-5">
+                <div class="col-lg-3 col-md-6">
+                    <a href="{{ url_for('index') }}">
+                        <h1 class="text-white fw-bold d-block">Bank <span class="text-secondary">of SA</span></h1>
+                    </a>
+                    <p class="mt-4 text-light">Smart banking for South Africans. Real features, real innovation – all in one secure platform.</p>
+                    <div class="d-flex hightech-link">
+                        <a href="#" class="btn-light nav-fill btn btn-square rounded-circle me-2"><i class="fab fa-facebook-f text-primary"></i></a>
+                        <a href="#" class="btn-light nav-fill btn btn-square rounded-circle me-2"><i class="fab fa-twitter text-primary"></i></a>
+                        <a href="#" class="btn-light nav-fill btn btn-square rounded-circle me-2"><i class="fab fa-instagram text-primary"></i></a>
+                        <a href="#" class="btn-light nav-fill btn btn-square rounded-circle me-0"><i class="fab fa-linkedin-in text-primary"></i></a>
                     </div>
                 </div>
-                <div class="col-lg-2 col-md-6 mb-4">
-                    <h5 class="mb-3">Quick Links</h5>
-                    <ul class="list-unstyled footer-links">
-                        <li class="mb-2"><a href="{{ url_for('index') }}#home">Home</a></li>
-                        <li class="mb-2"><a href="{{ url_for('index') }}#about">About</a></li>
-                        <li class="mb-2"><a href="{{ url_for('index') }}#features">Features</a></li>
-                        <li class="mb-2"><a href="{{ url_for('index') }}#developer">Developer</a></li>
-                    </ul>
+                <div class="col-lg-3 col-md-6">
+                    <a href="#" class="h3 text-secondary">Short Links</a>
+                    <div class="mt-4 d-flex flex-column short-link">
+                        <a href="{{ url_for('index') }}" class="mb-2 text-white"><i class="fas fa-angle-right text-secondary me-2"></i>Home</a>
+                        <a href="{{ url_for('how_it_works') }}" class="mb-2 text-white"><i class="fas fa-angle-right text-secondary me-2"></i>How It Works</a>
+                        {% if current_user.is_authenticated and not (current_user.is_super_admin is defined and current_user.is_super_admin) %}
+                            <a href="{{ url_for('dashboard') }}" class="mb-2 text-white"><i class="fas fa-angle-right text-secondary me-2"></i>Dashboard</a>
+                            <a href="{{ url_for('transfer') }}" class="mb-2 text-white"><i class="fas fa-angle-right text-secondary me-2"></i>Transfer</a>
+                        {% endif %}
+                        {% if current_user.is_authenticated and (current_user.is_super_admin is defined and current_user.is_super_admin) %}
+                            <a href="{{ url_for('admin_dashboard') }}" class="mb-2 text-white"><i class="fas fa-angle-right text-secondary me-2"></i>Admin</a>
+                        {% endif %}
+                        <a href="#about" class="mb-2 text-white"><i class="fas fa-angle-right text-secondary me-2"></i>About</a>
+                        <a href="#developer" class="mb-2 text-white"><i class="fas fa-angle-right text-secondary me-2"></i>Developer</a>
+                    </div>
                 </div>
-                <div class="col-lg-3 col-md-6 mb-4">
-                    <h5 class="mb-3">Services</h5>
-                    <ul class="list-unstyled footer-links">
-                        <li class="mb-2"><a href="{{ url_for('dashboard') }}">Digital Banking</a></li>
-                        <li class="mb-2"><a href="{{ url_for('goals') }}">Goal Savings</a></li>
-                        <li class="mb-2"><a href="{{ url_for('bills') }}">Bill Payments</a></li>
-                        <li class="mb-2"><a href="{{ url_for('transfer') }}">Money Transfer</a></li>
-                    </ul>
+                <div class="col-lg-3 col-md-6">
+                    <a href="#" class="h3 text-secondary">Help & Support</a>
+                    <div class="mt-4 d-flex flex-column help-link">
+                        <a href="#" class="mb-2 text-white"><i class="fas fa-angle-right text-secondary me-2"></i>FAQ</a>
+                        <a href="#" class="mb-2 text-white"><i class="fas fa-angle-right text-secondary me-2"></i>Contact</a>
+                        <a href="#" class="mb-2 text-white"><i class="fas fa-angle-right text-secondary me-2"></i>Privacy Policy</a>
+                        <a href="#" class="mb-2 text-white"><i class="fas fa-angle-right text-secondary me-2"></i>Terms of Use</a>
+                    </div>
                 </div>
-                <div class="col-lg-3 col-md-6 mb-4">
-                    <h5 class="mb-3">Contact Info</h5>
-                    <ul class="list-unstyled footer-links">
-                        <li class="mb-2"><i class="fas fa-phone me-2"></i> 0860 111 222</li>
-                        <li class="mb-2"><i class="fas fa-envelope me-2"></i> support@nkunabank.co.za</li>
-                        <li class="mb-2"><i class="fas fa-map-marker-alt me-2"></i> Johannesburg, South Africa</li>
-                        <li class="mb-2"><i class="fas fa-clock me-2"></i> 24/7 Online Support</li>
-                    </ul>
+                <div class="col-lg-3 col-md-6">
+                    <a href="#" class="h3 text-secondary">Contact Us</a>
+                    <div class="text-white mt-4 d-flex flex-column contact-link">
+                        <a href="#" class="pb-3 text-light border-bottom border-primary"><i class="fas fa-map-marker-alt text-secondary me-2"></i> Johannesburg, SA</a>
+                        <a href="#" class="py-3 text-light border-bottom border-primary"><i class="fas fa-phone-alt text-secondary me-2"></i> 062 719 5389</a>
+                        <a href="#" class="py-3 text-light border-bottom border-primary"><i class="fas fa-envelope text-secondary me-2"></i> info@bankofsa.co.za</a>
+                    </div>
                 </div>
             </div>
-            <hr class="my-4" style="border-color: rgba(255, 255, 255, 0.1);">
+            <hr class="text-light mt-5 mb-4">
             <div class="row">
-                <div class="col-md-6">
-                    <p class="mb-0">&copy; 2024 Nkuna Bank. All rights reserved.</p>
+                <div class="col-md-6 text-center text-md-start">
+                    <span class="text-light footer-credit">
+                        <i class="fas fa-copyright text-secondary me-2"></i>Bank of SA, All rights reserved.
+                    </span>
                 </div>
-                <div class="col-md-6 text-md-end">
-                    <a href="#" class="text-white-50 me-3">Privacy Policy</a>
-                    <a href="#" class="text-white-50">Terms of Service</a>
+                <div class="col-md-6 text-center text-md-end">
+                    <span class="text-light footer-credit">
+                        Frontend designed by <a href="https://htmlcodex.com" target="_blank" class="text-secondary">HTML Codex</a> &bull;
+                        System developed &amp; engineered by <a href="https://shichabonkuna22-star.github.io/portfolio/" target="_blank" class="text-secondary">Shichabo Nkuna</a>
+                    </span>
                 </div>
             </div>
         </div>
-    </footer>
+    </div>
 
-    <!-- Bootstrap JS Bundle -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-    
-    <script>
-        // Function to check authentication before accessing protected pages
-        function checkAuth(page) {
-            {% if not current_user.is_authenticated %}
-                window.location.href = "{{ url_for('login') }}";
-                return false;
-            {% endif %}
-            return true;
-        }
+    <!-- Back to Top -->
+    <a href="#" class="btn btn-secondary btn-square rounded-circle back-to-top"><i class="fa fa-arrow-up text-white"></i></a>
 
-        // Smooth scrolling for anchor links
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const targetId = this.getAttribute('href');
-                if(targetId === '#') return;
-                
-                const targetElement = document.querySelector(targetId);
-                if(targetElement) {
-                    window.scrollTo({
-                        top: targetElement.offsetTop - 80,
-                        behavior: 'smooth'
-                    });
-                }
-            });
-        });
+    <!-- JavaScript Libraries -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='lib/wow/wow.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='lib/easing/easing.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='lib/waypoints/waypoints.min.js') }}"></script>
 
-        // Navbar scroll effect
-        window.addEventListener('scroll', function() {
-            const navbar = document.querySelector('.navbar');
-            if (window.scrollY > 50) {
-                navbar.style.padding = '0.5rem 0';
-                navbar.style.boxShadow = '0 2px 20px rgba(0, 102, 204, 0.3)';
-            } else {
-                navbar.style.padding = '1rem 0';
-                navbar.style.boxShadow = '0 2px 15px rgba(0, 102, 204, 0.2)';
-            }
-        });
+    <!-- Template Javascript -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 
-        // Animation on scroll
-        const observerOptions = {
-            threshold: 0.1,
-            rootMargin: '0px 0px -50px 0px'
-        };
-
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('fade-in-up');
-                }
-            });
-        }, observerOptions);
-
-        // Observe elements for animation
-        document.querySelectorAll('.feature-card, .section-header, .problem-card, .step-card').forEach(el => {
-            observer.observe(el);
-        });
-    </script>
-    
-    {% block extra_js %}{% endblock %}
+    {% block scripts %}{% endblock %}
 </body>
 </html>

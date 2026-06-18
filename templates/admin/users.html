@@ -1,6 +1,102 @@
 {% extends "base.html" %}
 
-{% block title %}Manage Users - Nkuna Bank Admin{% endblock %}
+{% block title %}Manage Users – Bank of SA Admin{% endblock %}
+
+{% block extra_css %}
+<style>
+    .table-hover tbody tr:hover {
+        background-color: rgba(24, 66, 182, 0.05);
+        transform: translateX(4px);
+        transition: all 0.2s ease;
+    }
+    
+    .table th {
+        font-weight: 600;
+        color: var(--bs-primary);
+        border-bottom: 2px solid var(--bs-primary);
+    }
+    
+    .badge {
+        padding: 0.5em 0.8em;
+        font-weight: 500;
+    }
+    
+    .dropdown-menu {
+        border-radius: 10px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+        border: 1px solid rgba(0, 0, 0, 0.05);
+    }
+    
+    .dropdown-item {
+        padding: 0.5rem 1rem;
+        border-radius: 5px;
+        margin: 0.1rem 0.5rem;
+        width: auto;
+    }
+    
+    .dropdown-item:hover {
+        background-color: #e9ecef;
+    }
+    
+    .page-link {
+        border-radius: 8px;
+        margin: 0 3px;
+        border: 1px solid #dee2e6;
+        color: var(--bs-primary);
+    }
+    
+    .page-item.active .page-link {
+        background-color: var(--bs-primary);
+        border-color: var(--bs-primary);
+        color: #fff;
+    }
+    
+    .modal-content {
+        border-radius: 15px;
+        border: none;
+    }
+    
+    .modal-header {
+        background: var(--bs-primary);
+        color: white;
+        border-radius: 15px 15px 0 0;
+    }
+    
+    .table-sm th, .table-sm td {
+        padding: 0.5rem;
+    }
+    
+    @media (max-width: 768px) {
+        .table-responsive {
+            border: 0;
+        }
+        .table thead {
+            display: none;
+        }
+        .table tr {
+            display: block;
+            margin-bottom: 1rem;
+            border: 1px solid #dee2e6;
+            border-radius: 10px;
+        }
+        .table td {
+            display: block;
+            text-align: right;
+            padding: 0.5rem 1rem;
+            border-bottom: 1px solid #dee2e6;
+        }
+        .table td::before {
+            content: attr(data-label);
+            float: left;
+            font-weight: bold;
+            color: var(--bs-primary);
+        }
+        .table td:last-child {
+            border-bottom: 0;
+        }
+    }
+</style>
+{% endblock %}
 
 {% block content %}
 <div class="container-fluid py-4">
@@ -188,7 +284,7 @@
                                 {% if user.accounts %}
                                     <span class="badge bg-info me-1">{{ user.accounts|length }} accounts</span>
                                     {% for account in user.accounts[:2] %}
-                                        <small class="d-block text-muted">{{ account.account_number }} (R{{ account.balance|format_currency }})</small>
+                                        <small class="d-block text-muted">{{ account.account_number }} ({{ format_currency(account.balance) }})</small>
                                     {% endfor %}
                                     {% if user.accounts|length > 2 %}
                                         <small class="text-primary">+{{ user.accounts|length - 2 }} more</small>
@@ -339,7 +435,7 @@
                                                                         {{ account.account_type }}
                                                                     </span>
                                                                 </td>
-                                                                <td>R{{ account.balance|format_currency }}</td>
+                                                                <td>{{ format_currency(account.balance) }}</td>
                                                                 <td>{{ account.created_at.strftime('%d %b %Y') }}</td>
                                                             </tr>
                                                             {% endfor %}
@@ -575,7 +671,7 @@
         return container;
     }
 
-    // Export users data (CSV)
+    // Export users data (CSV) – placeholder
     function exportUsers() {
         const searchParams = new URLSearchParams({
             search: '{{ request.args.get("search", "") }}',
@@ -583,7 +679,6 @@
             sort: '{{ request.args.get("sort", "") }}',
             export: 'csv'
         });
-        
         window.location.href = `/admin/users/export?${searchParams.toString()}`;
     }
 
@@ -595,102 +690,4 @@
         });
     });
 </script>
-
-<style>
-    .table-hover tbody tr:hover {
-        background-color: rgba(0, 102, 204, 0.05);
-        transform: translateX(4px);
-        transition: all 0.2s ease;
-    }
-    
-    .table th {
-        font-weight: 600;
-        color: var(--primary-blue);
-        border-bottom: 2px solid var(--primary-blue);
-    }
-    
-    .badge {
-        padding: 0.5em 0.8em;
-        font-weight: 500;
-    }
-    
-    .dropdown-menu {
-        border-radius: 10px;
-        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
-        border: 1px solid rgba(0, 0, 0, 0.05);
-    }
-    
-    .dropdown-item {
-        padding: 0.5rem 1rem;
-        border-radius: 5px;
-        margin: 0.1rem 0.5rem;
-        width: auto;
-    }
-    
-    .dropdown-item:hover {
-        background-color: var(--light-blue);
-    }
-    
-    .page-link {
-        border-radius: 8px;
-        margin: 0 3px;
-        border: 1px solid #dee2e6;
-        color: var(--primary-blue);
-    }
-    
-    .page-item.active .page-link {
-        background-color: var(--primary-blue);
-        border-color: var(--primary-blue);
-    }
-    
-    .modal-content {
-        border-radius: 15px;
-        border: none;
-    }
-    
-    .modal-header {
-        background: linear-gradient(135deg, var(--primary-blue) 0%, var(--dark-blue) 100%);
-        color: white;
-        border-radius: 15px 15px 0 0;
-    }
-    
-    .table-sm th, .table-sm td {
-        padding: 0.5rem;
-    }
-    
-    @media (max-width: 768px) {
-        .table-responsive {
-            border: 0;
-        }
-        
-        .table thead {
-            display: none;
-        }
-        
-        .table tr {
-            display: block;
-            margin-bottom: 1rem;
-            border: 1px solid #dee2e6;
-            border-radius: 10px;
-        }
-        
-        .table td {
-            display: block;
-            text-align: right;
-            padding: 0.5rem 1rem;
-            border-bottom: 1px solid #dee2e6;
-        }
-        
-        .table td::before {
-            content: attr(data-label);
-            float: left;
-            font-weight: bold;
-            color: var(--primary-blue);
-        }
-        
-        .table td:last-child {
-            border-bottom: 0;
-        }
-    }
-</style>
 {% endblock %}
