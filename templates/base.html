@@ -53,6 +53,18 @@
         .footer-credit a:hover {
             text-decoration: underline;
         }
+        /* Sticky navbar */
+        .sticky-nav {
+            position: sticky;
+            top: 0;
+            z-index: 1030;
+            background: var(--bs-primary) !important; /* ensure background stays */
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        /* Optional: Add some top padding to main content to prevent overlap if needed */
+        main {
+            padding-top: 0;
+        }
     </style>
     {% block extra_css %}{% endblock %}
 </head>
@@ -94,8 +106,8 @@
         </div>
     </div>
 
-    <!-- Navbar -->
-    <div class="container-fluid bg-primary">
+    <!-- Navbar (now sticky) -->
+    <div class="container-fluid bg-primary sticky-nav">
         <div class="container">
             <nav class="navbar navbar-dark navbar-expand-lg py-0">
                 <a href="{{ url_for('index') }}" class="navbar-brand">
