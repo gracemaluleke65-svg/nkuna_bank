@@ -24,10 +24,21 @@ app = Flask(__name__, static_url_path='/static', static_folder='static')
 
 # Configuration for Render
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production')
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///nkuna_bank.db')
+
+# Database configuration
+database_url = os.environ.get('DATABASE_URL', 'sqlite:///nkuna_bank.db')
 # Fix for Render's PostgreSQL URL (if it starts with postgres://, change to postgresql://)
-if app.config['SQLALCHEMY_DATABASE_URI'].startswith('postgres://'):
-    app.config['SQLALCHEMY_DATABASE_URI'] = app.config['SQLALCHEMY_DATABASE_URI'].replace('postgres://', 'postgresql://', 1)
+if database_url.startswith('postgres://'):
+    database_url = database_url.replace('postgres://', 'postgresql://', 1)
+# Ensure sslmode=require for PostgreSQL (if not already present)
+if database_url.startswith('postgresql://') and 'sslmode' not in database_url:
+    # Append ?sslmode=require if there are no query parameters, else append &sslmode=require
+    if '?' in database_url:
+        database_url += '&sslmode=require'
+    else:
+        database_url += '?sslmode=require'
+
+app.config['SQLALCHEMY_DATABASE_URI'] = database_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Initialize extensions
@@ -2171,18 +2182,9 @@ def internal_error(error):
 
 # ==================== MAIN ====================
 
+# This block is only executed when running the script directly (local development)
+# On Render, Gunicorn will import the app object and run it, so this block is not executed.
 if __name__ == '__main__':
-    # This won't run on Render, but keeps local development working
-    port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port, debug=False)
-    # Initialize database and create default admin
-    with app.app_context():
-        db.create_all()
-        create_default_admin()
-        print("Nkuna Bank initialized successfully!")
-        print(f"Database: {app.config['SQLALCHEMY_DATABASE_URI']}")
-        print("Admin login: admin@nkunabank.co.za / Admin@123")
-    
-    # Use PORT from environment variable for Render compatibility
+    # Use the PORT environment variable provided by Render (or default to 5000 locally)
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port, debug=False)
