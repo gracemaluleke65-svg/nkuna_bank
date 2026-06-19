@@ -14,6 +14,7 @@ from wtforms.validators import DataRequired, Length, Email, ValidationError, Num
 from wtforms.widgets import PasswordInput
 from datetime import datetime, timedelta
 from sqlalchemy import func, desc, or_, and_
+from sqlalchemy.pool import NullPool
 import random
 import string
 import re
@@ -21,6 +22,10 @@ import os
 
 # Initialize Flask app
 app = Flask(__name__, static_url_path='/static', static_folder='static')
+
+# ==================== DATABASE CONFIGURATION (FIXED) ====================
+# Set SSL mode for PostgreSQL via environment variable (fixes Render SSL issue)
+os.environ['PGSSLMODE'] = 'require'
 
 # Configuration for Render
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production')
@@ -34,18 +39,21 @@ if database_url.startswith('postgres://'):
 app.config['SQLALCHEMY_DATABASE_URI'] = database_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-# Engine options with SSL support for PostgreSQL
+# Engine options for connection pooling (optimised for Render free tier)
 engine_options = {
-    'pool_pre_ping': True,
-    'pool_recycle': 280,
-    'pool_size': 5,
-    'max_overflow': 0,
-    'pool_timeout': 30,
+    'pool_pre_ping': True,        # Check connection before using
+    'pool_recycle': 280,          # Recycle before Render's 30 min timeout
+    'pool_size': 5,               # Small pool for free tier
+    'max_overflow': 0,            # No extra connections
+    'pool_timeout': 30,           # Timeout for getting connection
 }
 
-# If using PostgreSQL, add sslmode=require to connect_args
+# If using PostgreSQL, add SSL connection args
 if database_url.startswith('postgresql://'):
-    engine_options['connect_args'] = {'sslmode': 'require'}
+    engine_options['connect_args'] = {
+        'sslmode': 'require',
+        'connect_timeout': 10,
+    }
 
 app.config['SQLALCHEMY_ENGINE_OPTIONS'] = engine_options
 
