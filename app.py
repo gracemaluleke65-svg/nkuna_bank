@@ -14,7 +14,6 @@ from wtforms.validators import DataRequired, Length, Email, ValidationError, Num
 from wtforms.widgets import PasswordInput
 from datetime import datetime, timedelta
 from sqlalchemy import func, desc, or_, and_
-from sqlalchemy.pool import NullPool
 import random
 import string
 import re
@@ -23,39 +22,13 @@ import os
 # Initialize Flask app
 app = Flask(__name__, static_url_path='/static', static_folder='static')
 
-# ==================== DATABASE CONFIGURATION (FIXED) ====================
-# Set SSL mode for PostgreSQL via environment variable (fixes Render SSL issue)
-os.environ['PGSSLMODE'] = 'require'
-
 # Configuration for Render
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production')
-
-# Database configuration
-database_url = os.environ.get('DATABASE_URL', 'sqlite:///nkuna_bank.db')
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///nkuna_bank.db')
 # Fix for Render's PostgreSQL URL (if it starts with postgres://, change to postgresql://)
-if database_url.startswith('postgres://'):
-    database_url = database_url.replace('postgres://', 'postgresql://', 1)
-
-app.config['SQLALCHEMY_DATABASE_URI'] = database_url
+if app.config['SQLALCHEMY_DATABASE_URI'].startswith('postgres://'):
+    app.config['SQLALCHEMY_DATABASE_URI'] = app.config['SQLALCHEMY_DATABASE_URI'].replace('postgres://', 'postgresql://', 1)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
-# Engine options for connection pooling (optimised for Render free tier)
-engine_options = {
-    'pool_pre_ping': True,        # Check connection before using
-    'pool_recycle': 280,          # Recycle before Render's 30 min timeout
-    'pool_size': 5,               # Small pool for free tier
-    'max_overflow': 0,            # No extra connections
-    'pool_timeout': 30,           # Timeout for getting connection
-}
-
-# If using PostgreSQL, add SSL connection args
-if database_url.startswith('postgresql://'):
-    engine_options['connect_args'] = {
-        'sslmode': 'require',
-        'connect_timeout': 10,
-    }
-
-app.config['SQLALCHEMY_ENGINE_OPTIONS'] = engine_options
 
 # Initialize extensions
 db = SQLAlchemy(app)
@@ -1449,7 +1422,6 @@ def settings():
 def how_it_works():
     """How It Works page - step by step guide"""
     return render_template('how_it_works.html')
-
 # ==================== ADMIN ROUTES ====================
 
 @app.route('/admin/login', methods=['GET', 'POST'])
@@ -1827,7 +1799,315 @@ def notification_count():
         'unread_count': unread_count
     })
 
+
+
+
+
+@app.route('/debug-database')
+def debug_database():
+    """Debug route to check database status"""
+    try:
+        # Check if tables exist
+        from sqlalchemy import inspect
+        inspector = inspect(db.engine)
+        tables = inspector.get_table_names()
+        
+        # Try to query each table
+        results = {}
+        for table_name in ['user', 'account', 'admin']:
+            try:
+                if table_name == 'user':
+                    count = User.query.count()
+                    results[table_name] = f"✅ Table exists, {count} records"
+                elif table_name == 'account':
+                    count = Account.query.count()
+                    results[table_name] = f"✅ Table exists, {count} records"
+                elif table_name == 'admin':
+                    count = Admin.query.count()
+                    results[table_name] = f"✅ Table exists, {count} records"
+            except Exception as e:
+                results[table_name] = f"❌ Error: {str(e)}"
+        
+        return f"""
+        <h1>Database Debug Info</h1>
+        <p><strong>Tables found:</strong> {tables}</p>
+        <hr>
+        <h2>Table Status:</h2>
+        {"<br>".join([f"<p><strong>{k}:</strong> {v}</p>" for k, v in results.items()])}
+        <hr>
+        <p><a href="/setup-database">Click here to force setup database</a></p>
+        """
+    except Exception as e:
+        return f"<h1>❌ Database Error</h1><p>{str(e)}</p><p><a href='/setup-database'>Try setup</a></p>"
+    
+    
+
+
+
+@app.route('/startup-status')
+def startup_status():
+    """Check if the app started successfully"""
+    try:
+        # Try to access database
+        user_count = User.query.count()
+        admin_count = Admin.query.count()
+        
+        return f"""
+        <h1>✅ App Running Successfully!</h1>
+        <p>Users in database: {user_count}</p>
+        <p>Admins in database: {admin_count}</p>
+        <p><a href="/register">Try Registration</a></p>
+        <p><a href="/">Homepage</a></p>
+        """
+    except Exception as e:
+        return f"""
+        <h1>❌ App Startup Failed</h1>
+        <p>Error: {str(e)}</p>
+        <p>Error type: {type(e).__name__}</p>
+        <p><a href="/force-setup">Click here to force database setup</a></p>
+        """
+
+
+@app.route('/force-setup')
+def force_setup():
+    """Force database setup with detailed error reporting"""
+    try:
+        print("🔧 Force setup starting...")
+        db.create_all()
+        print("✅ Tables created")
+        
+        create_default_admin()
+        print("✅ Admin created")
+        
+        return """
+        <h1>✅ Force Setup Complete!</h1>
+        <p>Database tables created</p>
+        <p>Admin user created</p>
+        <p><a href="/startup-status">Check status</a></p>
+        <p><a href="/register">Try registration</a></p>
+        """
+    except Exception as e:
+        error_details = str(e).replace('<', '&lt;').replace('>', '&gt;')
+        return f"""
+        <h1>❌ Force Setup Failed</h1>
+        <p><strong>Error:</strong> {error_details}</p>
+        <p><strong>Error type:</strong> {type(e).__name__}</p>
+        <hr>
+        <h3>Quick Fix:</h3>
+        <p>1. Check if your DATABASE_URL is correct in Render settings</p>
+        <p>2. Make sure all model classes are defined before db.create_all()</p>
+        <p>3. Try removing and re-adding the database</p>
+        """
+
+
+@app.route('/health')
+def health():
+    """Basic health check - no database access"""
+    return """
+    <h1>✅ App is responding!</h1>
+    <p>The Flask app is running but database might have issues.</p>
+    <p><a href="/startup-status">Check database status</a></p>
+    <p><a href="/force-setup">Force database setup</a></p>
+    """
+
+
+@app.route('/emergency-setup')
+def emergency_setup():
+    """Emergency table creation"""
+    try:
+        # Create tables individually
+        with db.engine.begin() as conn:
+            conn.execute(db.text("""
+                CREATE TABLE IF NOT EXISTS "user" (
+                    id SERIAL PRIMARY KEY,
+                    full_name VARCHAR(100) NOT NULL,
+                    id_number VARCHAR(13) UNIQUE NOT NULL,
+                    email VARCHAR(120) UNIQUE NOT NULL,
+                    password_hash VARCHAR(200) NOT NULL,
+                    phone_number VARCHAR(15) NOT NULL,
+                    date_of_birth DATE,
+                    is_active BOOLEAN DEFAULT TRUE,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+            """))
+            
+            conn.execute(db.text("""
+                CREATE TABLE IF NOT EXISTS account (
+                    id SERIAL PRIMARY KEY,
+                    account_number VARCHAR(10) UNIQUE NOT NULL,
+                    account_type VARCHAR(20) DEFAULT 'MAIN',
+                    balance FLOAT DEFAULT 0.0,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    user_id INTEGER REFERENCES "user"(id)
+                )
+            """))
+        
+        create_default_admin()
+        
+        return """
+        <h1>✅ Emergency Setup Complete!</h1>
+        <p>Tables created manually</p>
+        <p><a href="/startup-status">Check status</a></p>
+        <p><a href="/register">Try registration</a></p>
+        """
+    except Exception as e:
+        return f"<h1>❌ Emergency Setup Failed</h1><p>{str(e)}</p>"
+
+
+
+@app.route('/create-tables-now')
+def create_tables_now():
+    """Force create all tables with raw SQL"""
+    try:
+        # Raw SQL to create all tables
+        sql_commands = [
+            # User table
+            '''
+            CREATE TABLE IF NOT EXISTS "user" (
+                id SERIAL PRIMARY KEY,
+                full_name VARCHAR(100) NOT NULL,
+                id_number VARCHAR(13) UNIQUE NOT NULL,
+                email VARCHAR(120) UNIQUE NOT NULL,
+                password_hash VARCHAR(200) NOT NULL,
+                phone_number VARCHAR(15) NOT NULL,
+                date_of_birth DATE,
+                is_active BOOLEAN DEFAULT TRUE,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+            ''',
+            
+            # Account table
+            '''
+            CREATE TABLE IF NOT EXISTS account (
+                id SERIAL PRIMARY KEY,
+                account_number VARCHAR(10) UNIQUE NOT NULL,
+                account_type VARCHAR(20) DEFAULT 'MAIN',
+                balance FLOAT DEFAULT 0.0,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                user_id INTEGER REFERENCES "user"(id)
+            )
+            ''',
+            
+            # Transaction table
+            '''
+            CREATE TABLE IF NOT EXISTS transaction (
+                id SERIAL PRIMARY KEY,
+                transaction_id VARCHAR(20) UNIQUE NOT NULL,
+                from_account VARCHAR(10) NOT NULL,
+                to_account VARCHAR(10) NOT NULL,
+                amount FLOAT NOT NULL,
+                transaction_type VARCHAR(20),
+                description VARCHAR(200),
+                status VARCHAR(20) DEFAULT 'PENDING',
+                fee FLOAT DEFAULT 0.0,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                undo_deadline TIMESTAMP,
+                user_id INTEGER REFERENCES "user"(id)
+            )
+            ''',
+            
+            # Goal table
+            '''
+            CREATE TABLE IF NOT EXISTS goal (
+                id SERIAL PRIMARY KEY,
+                name VARCHAR(100) NOT NULL,
+                target_amount FLOAT NOT NULL,
+                current_amount FLOAT DEFAULT 0.0,
+                target_date DATE NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                is_active BOOLEAN DEFAULT TRUE,
+                auto_deposit BOOLEAN DEFAULT FALSE,
+                auto_deposit_amount FLOAT,
+                auto_deposit_day INTEGER,
+                user_id INTEGER REFERENCES "user"(id),
+                account_id INTEGER REFERENCES account(id)
+            )
+            ''',
+            
+            # BillPayment table
+            '''
+            CREATE TABLE IF NOT EXISTS bill_payment (
+                id SERIAL PRIMARY KEY,
+                user_id INTEGER REFERENCES "user"(id),
+                bill_type VARCHAR(50),
+                amount FLOAT NOT NULL,
+                reference_number VARCHAR(50),
+                meter_number VARCHAR(50),
+                status VARCHAR(20) DEFAULT 'PENDING',
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+            ''',
+            
+            # Admin table
+            '''
+            CREATE TABLE IF NOT EXISTS admin (
+                id SERIAL PRIMARY KEY,
+                email VARCHAR(120) UNIQUE NOT NULL,
+                password_hash VARCHAR(200) NOT NULL,
+                full_name VARCHAR(100),
+                is_super_admin BOOLEAN DEFAULT FALSE,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+            ''',
+            
+            # Notification table
+            '''
+            CREATE TABLE IF NOT EXISTS notification (
+                id SERIAL PRIMARY KEY,
+                user_id INTEGER REFERENCES "user"(id),
+                title VARCHAR(100) NOT NULL,
+                message VARCHAR(500) NOT NULL,
+                notification_type VARCHAR(20),
+                is_read BOOLEAN DEFAULT FALSE,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                expires_at TIMESTAMP
+            )
+            ''',
+            
+            # BankRevenue table
+            '''
+            CREATE TABLE IF NOT EXISTS bank_revenue (
+                id SERIAL PRIMARY KEY,
+                revenue_type VARCHAR(50),
+                amount FLOAT NOT NULL,
+                description VARCHAR(200),
+                reference_id VARCHAR(50),
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+            '''
+        ]
+        
+        # Execute each SQL command
+        with db.engine.begin() as conn:
+            for sql in sql_commands:
+                conn.execute(db.text(sql))
+        
+        # Create admin user
+        create_default_admin()
+        
+        return """
+        <h1>✅ Tables Created Successfully!</h1>
+        <p>All database tables have been created with raw SQL</p>
+        <p>Admin user created</p>
+        <hr>
+        <p><a href="/register">Try Registration Now</a></p>
+        <p><a href="/login">Try Login</a></p>
+        """
+        
+    except Exception as e:
+        return f"""
+        <h1>❌ Table Creation Failed</h1>
+        <p><strong>Error:</strong> {str(e)}</p>
+        <p><strong>Error type:</strong> {type(e).__name__}</p>
+        <hr>
+        <p>This usually means the tables already exist or there's a connection issue</p>
+        <p><a href="/">Go to Homepage</a></p>
+        """
+
+
+
 # ==================== APPLICATION STARTUP ====================
+
 
 def create_default_admin():
     """Create default admin user if none exists"""
@@ -1850,10 +2130,12 @@ def create_default_admin():
     except Exception as e:
         print(f"⚠️  Could not create admin (database might not be ready): {e}")
 
+
 def init_app():
     """Initialize the application and database"""
     with app.app_context():
         try:
+            # Import all models to ensure they're registered with SQLAlchemy
             from app import User, Account, Transaction, Goal, BillPayment, Admin, Notification, BankRevenue
             
             print("🔧 Models imported successfully")
@@ -1890,5 +2172,17 @@ def internal_error(error):
 # ==================== MAIN ====================
 
 if __name__ == '__main__':
+    # This won't run on Render, but keeps local development working
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port, debug=False)
+    # Initialize database and create default admin
+    with app.app_context():
+        db.create_all()
+        create_default_admin()
+        print("Nkuna Bank initialized successfully!")
+        print(f"Database: {app.config['SQLALCHEMY_DATABASE_URI']}")
+        print("Admin login: admin@nkunabank.co.za / Admin@123")
+    
+    # Use PORT from environment variable for Render compatibility
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port, debug=False)
