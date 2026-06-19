@@ -14,6 +14,7 @@ from wtforms.validators import DataRequired, Length, Email, ValidationError, Num
 from wtforms.widgets import PasswordInput
 from datetime import datetime, timedelta
 from sqlalchemy import func, desc, or_, and_
+from sqlalchemy.pool import NullPool
 import random
 import string
 import re
@@ -32,7 +33,6 @@ if database_url.startswith('postgres://'):
     database_url = database_url.replace('postgres://', 'postgresql://', 1)
 # Ensure sslmode=require for PostgreSQL (if not already present)
 if database_url.startswith('postgresql://') and 'sslmode' not in database_url:
-    # Append ?sslmode=require if there are no query parameters, else append &sslmode=require
     if '?' in database_url:
         database_url += '&sslmode=require'
     else:
@@ -40,6 +40,13 @@ if database_url.startswith('postgresql://') and 'sslmode' not in database_url:
 
 app.config['SQLALCHEMY_DATABASE_URI'] = database_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
+    'pool_pre_ping': True,      # Check connection before using
+    'pool_recycle': 280,        # Recycle connections before Render kills them (30 min default)
+    'pool_size': 5,             # Smaller pool for free tier
+    'max_overflow': 0,          # No extra connections on free tier
+    'pool_timeout': 30,         # Timeout for getting connection
+}
 
 # Initialize extensions
 db = SQLAlchemy(app)
@@ -1433,6 +1440,7 @@ def settings():
 def how_it_works():
     """How It Works page - step by step guide"""
     return render_template('how_it_works.html')
+
 # ==================== ADMIN ROUTES ====================
 
 @app.route('/admin/login', methods=['GET', 'POST'])
@@ -1810,20 +1818,14 @@ def notification_count():
         'unread_count': unread_count
     })
 
-
-
-
-
 @app.route('/debug-database')
 def debug_database():
     """Debug route to check database status"""
     try:
-        # Check if tables exist
         from sqlalchemy import inspect
         inspector = inspect(db.engine)
         tables = inspector.get_table_names()
         
-        # Try to query each table
         results = {}
         for table_name in ['user', 'account', 'admin']:
             try:
@@ -1851,15 +1853,10 @@ def debug_database():
     except Exception as e:
         return f"<h1>❌ Database Error</h1><p>{str(e)}</p><p><a href='/setup-database'>Try setup</a></p>"
     
-    
-
-
-
 @app.route('/startup-status')
 def startup_status():
     """Check if the app started successfully"""
     try:
-        # Try to access database
         user_count = User.query.count()
         admin_count = Admin.query.count()
         
@@ -1877,7 +1874,6 @@ def startup_status():
         <p>Error type: {type(e).__name__}</p>
         <p><a href="/force-setup">Click here to force database setup</a></p>
         """
-
 
 @app.route('/force-setup')
 def force_setup():
@@ -1910,7 +1906,6 @@ def force_setup():
         <p>3. Try removing and re-adding the database</p>
         """
 
-
 @app.route('/health')
 def health():
     """Basic health check - no database access"""
@@ -1921,12 +1916,10 @@ def health():
     <p><a href="/force-setup">Force database setup</a></p>
     """
 
-
 @app.route('/emergency-setup')
 def emergency_setup():
     """Emergency table creation"""
     try:
-        # Create tables individually
         with db.engine.begin() as conn:
             conn.execute(db.text("""
                 CREATE TABLE IF NOT EXISTS "user" (
@@ -1964,15 +1957,11 @@ def emergency_setup():
     except Exception as e:
         return f"<h1>❌ Emergency Setup Failed</h1><p>{str(e)}</p>"
 
-
-
 @app.route('/create-tables-now')
 def create_tables_now():
     """Force create all tables with raw SQL"""
     try:
-        # Raw SQL to create all tables
         sql_commands = [
-            # User table
             '''
             CREATE TABLE IF NOT EXISTS "user" (
                 id SERIAL PRIMARY KEY,
@@ -1986,8 +1975,6 @@ def create_tables_now():
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
             ''',
-            
-            # Account table
             '''
             CREATE TABLE IF NOT EXISTS account (
                 id SERIAL PRIMARY KEY,
@@ -1998,8 +1985,6 @@ def create_tables_now():
                 user_id INTEGER REFERENCES "user"(id)
             )
             ''',
-            
-            # Transaction table
             '''
             CREATE TABLE IF NOT EXISTS transaction (
                 id SERIAL PRIMARY KEY,
@@ -2016,8 +2001,6 @@ def create_tables_now():
                 user_id INTEGER REFERENCES "user"(id)
             )
             ''',
-            
-            # Goal table
             '''
             CREATE TABLE IF NOT EXISTS goal (
                 id SERIAL PRIMARY KEY,
@@ -2034,8 +2017,6 @@ def create_tables_now():
                 account_id INTEGER REFERENCES account(id)
             )
             ''',
-            
-            # BillPayment table
             '''
             CREATE TABLE IF NOT EXISTS bill_payment (
                 id SERIAL PRIMARY KEY,
@@ -2048,8 +2029,6 @@ def create_tables_now():
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
             ''',
-            
-            # Admin table
             '''
             CREATE TABLE IF NOT EXISTS admin (
                 id SERIAL PRIMARY KEY,
@@ -2060,8 +2039,6 @@ def create_tables_now():
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
             ''',
-            
-            # Notification table
             '''
             CREATE TABLE IF NOT EXISTS notification (
                 id SERIAL PRIMARY KEY,
@@ -2074,8 +2051,6 @@ def create_tables_now():
                 expires_at TIMESTAMP
             )
             ''',
-            
-            # BankRevenue table
             '''
             CREATE TABLE IF NOT EXISTS bank_revenue (
                 id SERIAL PRIMARY KEY,
@@ -2088,12 +2063,10 @@ def create_tables_now():
             '''
         ]
         
-        # Execute each SQL command
         with db.engine.begin() as conn:
             for sql in sql_commands:
                 conn.execute(db.text(sql))
         
-        # Create admin user
         create_default_admin()
         
         return """
@@ -2115,10 +2088,7 @@ def create_tables_now():
         <p><a href="/">Go to Homepage</a></p>
         """
 
-
-
 # ==================== APPLICATION STARTUP ====================
-
 
 def create_default_admin():
     """Create default admin user if none exists"""
@@ -2141,12 +2111,10 @@ def create_default_admin():
     except Exception as e:
         print(f"⚠️  Could not create admin (database might not be ready): {e}")
 
-
 def init_app():
     """Initialize the application and database"""
     with app.app_context():
         try:
-            # Import all models to ensure they're registered with SQLAlchemy
             from app import User, Account, Transaction, Goal, BillPayment, Admin, Notification, BankRevenue
             
             print("🔧 Models imported successfully")
@@ -2185,6 +2153,5 @@ def internal_error(error):
 # This block is only executed when running the script directly (local development)
 # On Render, Gunicorn will import the app object and run it, so this block is not executed.
 if __name__ == '__main__':
-    # Use the PORT environment variable provided by Render (or default to 5000 locally)
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port, debug=False)
