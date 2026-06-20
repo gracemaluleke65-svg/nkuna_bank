@@ -13,7 +13,7 @@ from wtforms import StringField, PasswordField, SubmitField, FloatField, DateFie
 from wtforms.validators import DataRequired, Length, Email, ValidationError, NumberRange, Optional, EqualTo, Regexp
 from wtforms.widgets import PasswordInput
 from datetime import datetime, timedelta
-from sqlalchemy import func, desc, or_, and_
+from sqlalchemy import func, desc, or_, and_, text
 import random
 import string
 import re
@@ -2143,6 +2143,25 @@ def init_app():
             print("📊 Creating database tables...")
             db.create_all()
             print("✅ Database tables created!")
+            
+            # Auto-fix transaction_id column length if it's still VARCHAR(20)
+            with db.engine.connect() as conn:
+                try:
+                    result = conn.execute(
+                        text("""
+                            SELECT character_maximum_length 
+                            FROM information_schema.columns 
+                            WHERE table_name='transaction' 
+                            AND column_name='transaction_id'
+                        """)
+                    )
+                    row = result.fetchone()
+                    if row and row[0] == 20:
+                        conn.execute(text("ALTER TABLE transaction ALTER COLUMN transaction_id TYPE VARCHAR(30)"))
+                        conn.commit()  # needed for some engines
+                        print("✅ Fixed transaction_id column length to 30")
+                except Exception as e:
+                    print(f"⚠️  Could not auto-fix column: {e}")
             
             print("👤 Creating default admin...")
             create_default_admin()
