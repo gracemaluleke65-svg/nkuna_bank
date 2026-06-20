@@ -102,7 +102,8 @@ class Account(db.Model):
 
 class Transaction(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    transaction_id = db.Column(db.String(20), unique=True, nullable=False)
+    # Fixed: increased length from 20 to 30 to accommodate generated IDs
+    transaction_id = db.Column(db.String(30), unique=True, nullable=False)
     from_account = db.Column(db.String(10), nullable=False)
     to_account = db.Column(db.String(10), nullable=False)
     amount = db.Column(db.Float, nullable=False)
@@ -237,7 +238,7 @@ def generate_account_number():
             return account_number
 
 def generate_transaction_id():
-    """Generates unique transaction ID"""
+    """Generates unique transaction ID (21 characters total: TRX + 14-digit timestamp + 4 random digits)"""
     timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
     random_suffix = ''.join(random.choices(string.digits, k=4))
     return f"TRX{timestamp}{random_suffix}"
@@ -1992,7 +1993,7 @@ def create_tables_now():
             '''
             CREATE TABLE IF NOT EXISTS transaction (
                 id SERIAL PRIMARY KEY,
-                transaction_id VARCHAR(20) UNIQUE NOT NULL,
+                transaction_id VARCHAR(30) UNIQUE NOT NULL,   -- fixed length
                 from_account VARCHAR(10) NOT NULL,
                 to_account VARCHAR(10) NOT NULL,
                 amount FLOAT NOT NULL,
